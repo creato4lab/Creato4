@@ -373,9 +373,9 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           top: '50%', left: '50%', transform: 'translate(-50%,-54%)',
         }} />
         <img
-          src="/creato4-logo.svg"
+          src="/creato4logo.png"
           alt="Creato4"
-          style={{ width: 100, height: 100, borderRadius: 18, position: 'relative', zIndex: 1 }}
+          style={{ width: 100, height: 100, borderRadius: 18, position: 'relative', zIndex: 1, objectFit: 'cover' }}
         />
       </motion.div>
 
