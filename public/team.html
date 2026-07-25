@@ -84,9 +84,9 @@
     /* Section 2: Team Grid Section (All 4 Members side by side) */
     .team-section {
       width: 100%;
-      max-width: 1320px;
+      max-width: 1800px;
       margin: 0 auto;
-      padding: 80px 24px 100px;
+      padding: 80px 40px 100px;
     }
 
     .section-header {
@@ -133,7 +133,13 @@
       }
     }
 
-    /* Member Card Design - Clean minimal design matching user screenshot */
+    /* 3D Perspective Wrapper */
+    .team-card-wrapper {
+      perspective: 1000px;
+      width: 100%;
+    }
+
+    /* Member Card Design - 3D Tilt Sheen Container */
     .team-card {
       background: #ffffff;
       border-radius: 40px;
@@ -145,12 +151,26 @@
       align-items: center;
       text-align: center;
       position: relative;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+      overflow: hidden;
+      cursor: pointer;
+      user-select: none;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease;
     }
 
-    .team-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 50px rgba(26, 58, 46, 0.12);
+    .team-card-wrapper:hover .team-card {
+      box-shadow: 0 25px 50px rgba(26, 58, 46, 0.18);
+    }
+
+    /* Dynamic Sheen / Light Reflection Overlay */
+    .card-glare {
+      position: absolute;
+      inset: 0;
+      border-radius: 40px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      z-index: 20;
     }
 
     /* 1. Avatar Area */
@@ -160,6 +180,9 @@
       height: 120px;
       margin-bottom: 22px;
       flex-shrink: 0;
+      transform: translateZ(35px);
+      transform-style: preserve-3d;
+      transition: transform 0.3s ease;
     }
 
     .avatar-ring {
@@ -168,7 +191,7 @@
       border-radius: 50%;
       padding: 4px;
       background: linear-gradient(135deg, #1a3a2e, #3d7a5a, #1a3a2e);
-      box-shadow: 0 8px 25px rgba(26, 58, 46, 0.15);
+      box-shadow: 0 8px 25px rgba(26, 58, 46, 0.18);
     }
 
     .avatar-inner {
@@ -212,13 +235,14 @@
       border-radius: 50%;
       background: #ffffff;
       font-size: 14px;
-      box-shadow: 0 4px 12px rgba(26, 58, 46, 0.12);
+      box-shadow: 0 4px 12px rgba(26, 58, 46, 0.14);
       border: 2px solid rgba(255, 255, 255, 0.95);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 10;
       user-select: none;
+      transform: translateZ(45px);
       animation: floatBadge 3s ease-in-out infinite;
     }
 
@@ -227,8 +251,8 @@
     .pos-bottom-left { bottom: -2px; left: -2px; animation-delay: 1.6s; }
 
     @keyframes floatBadge {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-5px); }
+      0%, 100% { transform: translateY(0px) translateZ(45px); }
+      50% { transform: translateY(-5px) translateZ(45px); }
     }
 
     /* 2. Name + Emoji */
@@ -243,6 +267,8 @@
       gap: 6px;
       margin-bottom: 6px;
       letter-spacing: -0.02em;
+      transform: translateZ(25px);
+      transition: transform 0.3s ease;
     }
 
     .name-emoji {
@@ -261,6 +287,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transform: translateZ(18px);
+      transition: transform 0.3s ease;
     }
 
     /* 4. Description Paragraph */
@@ -272,6 +300,8 @@
       text-align: center;
       margin-bottom: 22px;
       flex-grow: 1;
+      transform: translateZ(12px);
+      transition: transform 0.3s ease;
     }
 
     /* 5. Skill Tag Pills */
@@ -282,6 +312,8 @@
       gap: 8px;
       width: 100%;
       margin-top: auto;
+      transform: translateZ(20px);
+      transition: transform 0.3s ease;
     }
 
     .skill-tag {
@@ -369,144 +401,156 @@
     <div class="team-grid">
       
       <!-- Card 1: Prince Tagadiya -->
-      <article class="team-card">
-        <div class="avatar-area">
-          <div class="avatar-ring">
-            <div class="avatar-inner">
-              <img src="prince_memoji.png" 
-                   onerror="handleAvatarError(this, 'https://api.dicebear.com/9.x/avataaars/png?seed=PrinceCEO&backgroundColor=e8f0e8&radius=50&size=256&top=shortHairShortFlat&facialHair=beardMedium&clothing=blazerAndShirt')" 
-                   alt="Prince Tagadiya" 
-                   class="avatar-img">
-              <div class="avatar-fallback">PT</div>
+      <div class="team-card-wrapper">
+        <article class="team-card">
+          <div class="card-glare"></div>
+          <div class="avatar-area">
+            <div class="avatar-ring">
+              <div class="avatar-inner">
+                <img src="prince_memoji.png" 
+                     onerror="handleAvatarError(this, 'https://api.dicebear.com/9.x/avataaars/png?seed=PrinceCEO&backgroundColor=e8f0e8&radius=50&size=256&top=shortHairShortFlat&facialHair=beardMedium&clothing=blazerAndShirt')" 
+                     alt="Prince Tagadiya" 
+                     class="avatar-img">
+                <div class="avatar-fallback">PT</div>
+              </div>
             </div>
+            <div class="floating-badge pos-top-right">🚀</div>
+            <div class="floating-badge pos-mid-right">💡</div>
+            <div class="floating-badge pos-bottom-left">⚡</div>
           </div>
-          <div class="floating-badge pos-top-right">🚀</div>
-          <div class="floating-badge pos-mid-right">💡</div>
-          <div class="floating-badge pos-bottom-left">⚡</div>
-        </div>
 
-        <h3 class="member-name">
-          <span>Prince Tagadiya</span>
-          <span class="name-emoji">👑</span>
-        </h3>
+          <h3 class="member-name">
+            <span>Prince Tagadiya</span>
+            <span class="name-emoji">👑</span>
+          </h3>
 
-        <div class="member-role">Founder, CEO &amp; CPTO</div>
+          <div class="member-role">Founder, CEO &amp; CPTO</div>
 
-        <p class="member-desc">
-          Visionary engineering lead steering multidisciplinary hardware and software products from concept to market. Drives innovation across all technical verticals with a hands-on approach to systems architecture and product strategy.
-        </p>
+          <p class="member-desc">
+            Visionary engineering lead steering multidisciplinary hardware and software products from concept to market. Drives innovation across all technical verticals with a hands-on approach to systems architecture and product strategy.
+          </p>
 
-        <div class="skills-row">
-          <span class="skill-tag">Product Strategy</span>
-          <span class="skill-tag">Systems Architecture</span>
-          <span class="skill-tag">Hardware R&amp;D</span>
-        </div>
-      </article>
+          <div class="skills-row">
+            <span class="skill-tag">Product Strategy</span>
+            <span class="skill-tag">Systems Architecture</span>
+            <span class="skill-tag">Hardware R&amp;D</span>
+          </div>
+        </article>
+      </div>
 
       <!-- Card 2: Nisarg Patel -->
-      <article class="team-card">
-        <div class="avatar-area">
-          <div class="avatar-ring">
-            <div class="avatar-inner">
-              <img src="nisarg_memoji.png" 
-                   onerror="handleAvatarError(this, 'https://api.dicebear.com/9.x/avataaars/png?seed=NisargEngineer&backgroundColor=d1e8d1&radius=50&size=256&top=shortHairTheCaesar&facialHair=beardLight&clothing=hoodie')" 
-                   alt="Nisarg Patel" 
-                   class="avatar-img">
-              <div class="avatar-fallback">NP</div>
+      <div class="team-card-wrapper">
+        <article class="team-card">
+          <div class="card-glare"></div>
+          <div class="avatar-area">
+            <div class="avatar-ring">
+              <div class="avatar-inner">
+                <img src="nisarg_memoji.png" 
+                     onerror="handleAvatarError(this, 'https://api.dicebear.com/9.x/avataaars/png?seed=NisargEngineer&backgroundColor=d1e8d1&radius=50&size=256&top=shortHairTheCaesar&facialHair=beardLight&clothing=hoodie')" 
+                     alt="Nisarg Patel" 
+                     class="avatar-img">
+                <div class="avatar-fallback">NP</div>
+              </div>
             </div>
+            <div class="floating-badge pos-top-right">🔧</div>
+            <div class="floating-badge pos-mid-right">⚡</div>
+            <div class="floating-badge pos-bottom-left">📟</div>
           </div>
-          <div class="floating-badge pos-top-right">🔧</div>
-          <div class="floating-badge pos-mid-right">⚡</div>
-          <div class="floating-badge pos-bottom-left">📟</div>
-        </div>
 
-        <h3 class="member-name">
-          <span>Nisarg Patel</span>
-          <span class="name-emoji">🔧</span>
-        </h3>
+          <h3 class="member-name">
+            <span>Nisarg Patel</span>
+            <span class="name-emoji">🔧</span>
+          </h3>
 
-        <div class="member-role">Head of Electronics, Embedded Systems &amp; Manufacturing</div>
+          <div class="member-role">Head of Electronics, Embedded Systems &amp; Manufacturing</div>
 
-        <p class="member-desc">
-          Expert in high-reliability circuit design, power management, micro-controller firmware, and PCB manufacturing processes. Leads the electronics division with precision engineering and DFM excellence.
-        </p>
+          <p class="member-desc">
+            Expert in high-reliability circuit design, power management, micro-controller firmware, and PCB manufacturing processes. Leads the electronics division with precision engineering and DFM excellence.
+          </p>
 
-        <div class="skills-row">
-          <span class="skill-tag">Hardware Engineering</span>
-          <span class="skill-tag">Embedded C++</span>
-          <span class="skill-tag">DFM Excellence</span>
-        </div>
-      </article>
+          <div class="skills-row">
+            <span class="skill-tag">Hardware Engineering</span>
+            <span class="skill-tag">Embedded C++</span>
+            <span class="skill-tag">DFM Excellence</span>
+          </div>
+        </article>
+      </div>
 
       <!-- Card 3: Khushi Belani -->
-      <article class="team-card">
-        <div class="avatar-area">
-          <div class="avatar-ring">
-            <div class="avatar-inner">
-              <img src="khushi_memoji.png" 
-                   onerror="handleAvatarError(this, 'https://api.dicebear.com/9.x/avataaars/png?seed=KhushiDesigner&backgroundColor=ffe8d1&radius=50&size=256&top=longHairStraight&accessories=glasses&clothing=shirtVNeck')" 
-                   alt="Khushi Belani" 
-                   class="avatar-img">
-              <div class="avatar-fallback">KB</div>
+      <div class="team-card-wrapper">
+        <article class="team-card">
+          <div class="card-glare"></div>
+          <div class="avatar-area">
+            <div class="avatar-ring">
+              <div class="avatar-inner">
+                <img src="khushi_memoji.png" 
+                     onerror="handleAvatarError(this, 'https://api.dicebear.com/9.x/avataaars/png?seed=KhushiDesigner&backgroundColor=ffe8d1&radius=50&size=256&top=longHairStraight&accessories=glasses&clothing=shirtVNeck')" 
+                     alt="Khushi Belani" 
+                     class="avatar-img">
+                <div class="avatar-fallback">KB</div>
+              </div>
             </div>
+            <div class="floating-badge pos-top-right">📐</div>
+            <div class="floating-badge pos-mid-right">🎨</div>
+            <div class="floating-badge pos-bottom-left">✨</div>
           </div>
-          <div class="floating-badge pos-top-right">📐</div>
-          <div class="floating-badge pos-mid-right">🎨</div>
-          <div class="floating-badge pos-bottom-left">✨</div>
-        </div>
 
-        <h3 class="member-name">
-          <span>Khushi Belani</span>
-          <span class="name-emoji">🎨</span>
-        </h3>
+          <h3 class="member-name">
+            <span>Khushi Belani</span>
+            <span class="name-emoji">🎨</span>
+          </h3>
 
-        <div class="member-role">Head of PCB Design, Education &amp; Brand Communications</div>
+          <div class="member-role">Head of PCB Design, Education &amp; Brand Communications</div>
 
-        <p class="member-desc">
-          Directs multi-layer PCB layout, component selection, and signal integrity analysis. Oversees educational project publishing and brand outreach initiatives with creative vision and technical depth.
-        </p>
+          <p class="member-desc">
+            Directs multi-layer PCB layout, component selection, and signal integrity analysis. Oversees educational project publishing and brand outreach initiatives with creative vision and technical depth.
+          </p>
 
-        <div class="skills-row">
-          <span class="skill-tag">PCB Design</span>
-          <span class="skill-tag">Signal Integrity</span>
-          <span class="skill-tag">Quality Assurance</span>
-        </div>
-      </article>
+          <div class="skills-row">
+            <span class="skill-tag">PCB Design</span>
+            <span class="skill-tag">Signal Integrity</span>
+            <span class="skill-tag">Quality Assurance</span>
+          </div>
+        </article>
+      </div>
 
       <!-- Card 4: Rudra Chauhan -->
-      <article class="team-card">
-        <div class="avatar-area">
-          <div class="avatar-ring">
-            <div class="avatar-inner">
-              <img src="rudra_memoji.png" 
-                   onerror="handleAvatarError(this, 'https://api.dicebear.com/9.x/avataaars/png?seed=RudraDeveloper&backgroundColor=d1d8e8&radius=50&size=256&top=shortHairShortWaved&facialHair=beardLight&clothing=graphicShirt')" 
-                   alt="Rudra Chauhan" 
-                   class="avatar-img">
-              <div class="avatar-fallback">RC</div>
+      <div class="team-card-wrapper">
+        <article class="team-card">
+          <div class="card-glare"></div>
+          <div class="avatar-area">
+            <div class="avatar-ring">
+              <div class="avatar-inner">
+                <img src="rudra_memoji.png" 
+                     onerror="handleAvatarError(this, 'https://api.dicebear.com/9.x/avataaars/png?seed=RudraDeveloper&backgroundColor=d1d8e8&radius=50&size=256&top=shortHairShortWaved&facialHair=beardLight&clothing=graphicShirt')" 
+                     alt="Rudra Chauhan" 
+                     class="avatar-img">
+                <div class="avatar-fallback">RC</div>
+              </div>
             </div>
+            <div class="floating-badge pos-top-right">💻</div>
+            <div class="floating-badge pos-mid-right">🌐</div>
+            <div class="floating-badge pos-bottom-left">🎮</div>
           </div>
-          <div class="floating-badge pos-top-right">💻</div>
-          <div class="floating-badge pos-mid-right">🌐</div>
-          <div class="floating-badge pos-bottom-left">🎮</div>
-        </div>
 
-        <h3 class="member-name">
-          <span>Rudra Chauhan</span>
-          <span class="name-emoji">💻</span>
-        </h3>
+          <h3 class="member-name">
+            <span>Rudra Chauhan</span>
+            <span class="name-emoji">💻</span>
+          </h3>
 
-        <div class="member-role">Head of Software Engineering &amp; Digital Design</div>
+          <div class="member-role">Head of Software Engineering &amp; Digital Design</div>
 
-        <p class="member-desc">
-          Architects modern cloud applications, real-time IoT web portals, and interactive 3D WebGL experiences. Bridges the gap between hardware and software with cutting-edge digital solutions.
-        </p>
+          <p class="member-desc">
+            Architects modern cloud applications, real-time IoT web portals, and interactive 3D WebGL experiences. Bridges the gap between hardware and software with cutting-edge digital solutions.
+          </p>
 
-        <div class="skills-row">
-          <span class="skill-tag">Full-Stack Web</span>
-          <span class="skill-tag">Cloud Infrastructure</span>
-          <span class="skill-tag">3D WebGL</span>
-        </div>
-      </article>
+          <div class="skills-row">
+            <span class="skill-tag">Full-Stack Web</span>
+            <span class="skill-tag">Cloud Infrastructure</span>
+            <span class="skill-tag">3D WebGL</span>
+          </div>
+        </article>
+      </div>
 
     </div>
   </main>
@@ -529,6 +573,36 @@
         if (fallback) fallback.style.display = 'flex';
       }
     }
+
+    // 3D Perspective Cursor Tilt & Reflection Sheen Engine
+    document.querySelectorAll('.team-card-wrapper').forEach(wrapper => {
+      const card = wrapper.querySelector('.team-card');
+      const glare = wrapper.querySelector('.card-glare');
+
+      wrapper.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateY = ((x - centerX) / centerX) * 12;
+        const rotateX = -((y - centerY) / centerY) * 12;
+
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`;
+
+        const glowX = (x / rect.width) * 100;
+        const glowY = (y / rect.height) * 100;
+        glare.style.opacity = '1';
+        glare.style.background = `radial-gradient(circle at ${glowX}% ${glowY}%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 65%)`;
+      });
+
+      wrapper.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        glare.style.opacity = '0';
+      });
+    });
   </script>
 </body>
 </html>

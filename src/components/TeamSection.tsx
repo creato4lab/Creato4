@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { motion } from 'motion/react';
 
 interface TeamMember {
   id: string;
@@ -88,6 +89,158 @@ const TEAM_MEMBERS: TeamMember[] = [
   },
 ];
 
+interface TeamTiltCardProps {
+  member: TeamMember;
+  imgState: string;
+  imgSrc: string;
+  onImgError: (member: TeamMember) => void;
+}
+
+const TeamTiltCard: React.FC<TeamTiltCardProps> = ({ member, imgState, imgSrc, onImgError }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [rotateX, setRotateX] = useState(0);
+  const [rotateY, setRotateY] = useState(0);
+  const [glowPos, setGlowPos] = useState({ x: 50, y: 50, opacity: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rY = ((x - centerX) / centerX) * 12;
+    const rX = -((y - centerY) / centerY) * 12;
+
+    setRotateX(rX);
+    setRotateY(rY);
+
+    const glowX = (x / rect.width) * 100;
+    const glowY = (y / rect.height) * 100;
+    setGlowPos({ x: glowX, y: glowY, opacity: 1 });
+  };
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setRotateX(0);
+    setRotateY(0);
+    setGlowPos((prev) => ({ ...prev, opacity: 0 }));
+  };
+
+  return (
+    <div style={{ perspective: '1000px' }} className="w-full">
+      <motion.div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        animate={{
+          rotateX: rotateX,
+          rotateY: rotateY,
+          scale: isHovered ? 1.03 : 1,
+        }}
+        transition={{
+          type: 'spring',
+          stiffness: 300,
+          damping: 20,
+        }}
+        style={{ transformStyle: 'preserve-3d' }}
+        className="bg-white rounded-[40px] p-[36px_28px_32px] shadow-[0_12px_40px_rgba(26,58,46,0.06)] hover:shadow-[0_25px_50px_rgba(26,58,46,0.18)] border border-white/90 flex flex-col items-center text-center relative transition-shadow duration-500 cursor-pointer overflow-hidden group select-none h-full"
+      >
+        {/* Dynamic Sheen / Light Reflection Overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none transition-opacity duration-500 z-20 rounded-[40px]"
+          style={{
+            opacity: glowPos.opacity,
+            background: `radial-gradient(circle at ${glowPos.x}% ${glowPos.y}%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 65%)`,
+          }}
+        />
+
+        {/* 1. Avatar Area (TranslateZ 35px for 3D depth) */}
+        <div
+          style={{ transform: 'translateZ(35px)', transformStyle: 'preserve-3d' }}
+          className="relative w-[120px] h-[120px] mb-5 shrink-0 transition-transform duration-300"
+        >
+          <div className="w-[120px] h-[120px] rounded-full p-1 bg-gradient-to-br from-[#1a3a2e] via-[#3d7a5a] to-[#1a3a2e] shadow-[0_8px_25px_rgba(26,58,46,0.18)]">
+            <div className="w-full h-full rounded-full border-[4px] border-white overflow-hidden bg-[#1a3a2e] flex items-center justify-center relative">
+              {imgState !== 'initials' && imgSrc ? (
+                <img
+                  src={imgSrc}
+                  alt={member.name}
+                  onError={() => onImgError(member)}
+                  className="w-full h-full object-cover select-none block"
+                />
+              ) : (
+                <span className="text-white text-2xl font-extrabold select-none">
+                  {member.initials}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Floating Badges (TranslateZ 45px for ultra depth) */}
+          {member.floatingBadges.map((badge, bIdx) => (
+            <div
+              key={bIdx}
+              style={{ transform: 'translateZ(45px)' }}
+              className={`absolute ${badge.posClass} w-[30px] h-[30px] rounded-full bg-white text-[14px] shadow-[0_4px_12px_rgba(26,58,46,0.14)] border-2 border-white/95 flex items-center justify-center z-10 animate-pulse`}
+            >
+              <span>{badge.emoji}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* 2. Name + Emoji (TranslateZ 25px) */}
+        <h3
+          style={{ transform: 'translateZ(25px)' }}
+          className="text-[1.6rem] font-extrabold text-[#1a3a2e] text-center flex items-center justify-center gap-1.5 mb-1.5 tracking-tight leading-tight transition-transform duration-300"
+        >
+          <span>{member.name}</span>
+          <span className="text-[1.25rem]">{member.emoji}</span>
+        </h3>
+
+        {/* 3. Role (TranslateZ 18px) */}
+        <div
+          style={{ transform: 'translateZ(18px)' }}
+          className="text-[0.85rem] font-semibold text-[#4a7a5a] text-center leading-[1.45] mb-4 min-h-[40px] flex items-center justify-center transition-transform duration-300"
+        >
+          {member.role}
+        </div>
+
+        {/* 4. Description Paragraph (TranslateZ 12px) */}
+        <p
+          style={{ transform: 'translateZ(12px)' }}
+          className="text-[0.82rem] font-normal text-[#7a7a7a] leading-[1.65] text-center mb-5 flex-grow transition-transform duration-300"
+        >
+          {member.description}
+        </p>
+
+        {/* 5. Skill Tag Pills (TranslateZ 20px) */}
+        <div
+          style={{ transform: 'translateZ(20px)' }}
+          className="flex flex-wrap justify-center gap-2 w-full mt-auto transition-transform duration-300"
+        >
+          {member.skills.map((skill, sIdx) => (
+            <span
+              key={sIdx}
+              className="bg-[#ece9e4] text-[#2a4a3e] px-[15px] py-[7px] rounded-[100px] text-[0.74rem] font-semibold transition-all duration-200 hover:bg-[#1a3a2e] hover:text-white hover:-translate-y-0.5"
+            >
+              {skill}
+            </span>
+          ))}
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
 export const TeamSection: React.FC = () => {
   const [failedImgs, setFailedImgs] = useState<{ [id: string]: 'none' | 'dicebear' | 'initials' }>({});
 
@@ -115,7 +268,7 @@ export const TeamSection: React.FC = () => {
           </h2>
         </div>
 
-        {/* 4-Card Responsive Grid Layout (All in one view) */}
+        {/* 4-Card Responsive Grid Layout with 3D Tilt Sheen */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7">
           {TEAM_MEMBERS.map((member) => {
             const imgState = failedImgs[member.id] || 'none';
@@ -127,68 +280,13 @@ export const TeamSection: React.FC = () => {
                 : '';
 
             return (
-              <div
+              <TeamTiltCard
                 key={member.id}
-                className="bg-white rounded-[40px] p-[36px_28px_32px] shadow-[0_12px_40px_rgba(26,58,46,0.06)] border border-white/90 flex flex-col items-center text-center relative transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(26,58,46,0.12)]"
-              >
-                {/* 1. Avatar Area (120px x 120px) */}
-                <div className="relative w-[120px] h-[120px] mb-5 shrink-0">
-                  <div className="w-[120px] h-[120px] rounded-full p-1 bg-gradient-to-br from-[#1a3a2e] via-[#3d7a5a] to-[#1a3a2e] shadow-[0_8px_25px_rgba(26,58,46,0.15)]">
-                    <div className="w-full h-full rounded-full border-[4px] border-white overflow-hidden bg-[#1a3a2e] flex items-center justify-center relative">
-                      {imgState !== 'initials' && imgSrc ? (
-                        <img
-                          src={imgSrc}
-                          alt={member.name}
-                          onError={() => handleImgError(member)}
-                          className="w-full h-full object-cover select-none block"
-                        />
-                      ) : (
-                        <span className="text-white text-2xl font-extrabold select-none">
-                          {member.initials}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Floating Badges */}
-                  {member.floatingBadges.map((badge, bIdx) => (
-                    <div
-                      key={bIdx}
-                      className={`absolute ${badge.posClass} w-[30px] h-[30px] rounded-full bg-white text-[14px] shadow-[0_4px_12px_rgba(26,58,46,0.12)] border-2 border-white/95 flex items-center justify-center z-10 animate-pulse`}
-                    >
-                      <span>{badge.emoji}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* 2. Name + Emoji */}
-                <h3 className="text-[1.6rem] font-extrabold text-[#1a3a2e] text-center flex items-center justify-center gap-1.5 mb-1.5 tracking-tight leading-tight">
-                  <span>{member.name}</span>
-                  <span className="text-[1.25rem]">{member.emoji}</span>
-                </h3>
-
-                {/* 3. Role */}
-                <div className="text-[0.85rem] font-semibold text-[#4a7a5a] text-center leading-[1.45] mb-4 min-h-[40px] flex items-center justify-center">
-                  {member.role}
-                </div>
-
-                {/* 4. Description Paragraph */}
-                <p className="text-[0.82rem] font-normal text-[#7a7a7a] leading-[1.65] text-center mb-5 flex-grow">
-                  {member.description}
-                </p>
-
-                {/* 5. Skill Tag Pills */}
-                <div className="flex flex-wrap justify-center gap-2 w-full mt-auto">
-                  {member.skills.map((skill, sIdx) => (
-                    <span
-                      key={sIdx}
-                      className="bg-[#ece9e4] text-[#2a4a3e] px-[15px] py-[7px] rounded-[100px] text-[0.74rem] font-semibold transition-all duration-200 hover:bg-[#1a3a2e] hover:text-white hover:-translate-y-0.5"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </div>
+                member={member}
+                imgState={imgState}
+                imgSrc={imgSrc}
+                onImgError={handleImgError}
+              />
             );
           })}
         </div>
