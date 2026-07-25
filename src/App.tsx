@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Preloader } from './components/Preloader';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -85,6 +85,19 @@ export default function App() {
     setCartItems((prev) => prev.filter((item) => item !== id));
   };
 
+  // Footer parallax height measurement
+  const footerRef = useRef<HTMLDivElement>(null);
+  const [footerHeight, setFooterHeight] = useState(0);
+
+  useEffect(() => {
+    if (!footerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      setFooterHeight(entries[0].contentRect.height);
+    });
+    observer.observe(footerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#1A3C2F] selection:bg-[#1A3C2F] selection:text-[#FAF8F5] font-sans relative">
       {/* 1. Preloader */}
@@ -102,7 +115,7 @@ export default function App() {
         />
 
         {/* Main Content Sections */}
-        <main>
+        <main className="relative z-10 bg-[#FAF8F5] shadow-[0_20px_60px_rgba(26,60,47,0.1)]" style={{ marginBottom: footerHeight }}>
           {/* 3. Hero ("FIRST SCREEN") */}
           <Hero onOpenDiscuss={() => handleOpenDiscuss('Product & Technology Vision')} />
 
@@ -137,7 +150,9 @@ export default function App() {
         </main>
 
         {/* 13. Footer */}
-        <Footer onOpenDiscuss={() => handleOpenDiscuss('Footer Inquiry')} />
+        <div ref={footerRef} className="fixed bottom-0 left-0 right-0 z-0">
+          <Footer onOpenDiscuss={() => handleOpenDiscuss('Footer Inquiry')} />
+        </div>
       </div>
 
       {/* Interactive Modals & Drawers */}
