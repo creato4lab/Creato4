@@ -22,7 +22,7 @@ export const WORK_PROJECTS: WorkProject[] = [
     category: 'Drone Engineering · Embedded Systems · Agriculture Technology',
     tags: ['Drone Engineering', 'Embedded Systems', 'Agriculture Technology'],
     badge: 'SSIP-Funded Project',
-    image: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=800&q=80',
+    image: '/agri-titan-drone-2.png',
     description: 'Heavy-lift autonomous hexacopter drone equipped with multi-spectral NIR camera array and automated field waypoint mapping for targeted crop nutrition.',
     challenge: 'Achieving stable flight dynamics under 20kg payload conditions while maintaining precise flow-rate control synchronized with GPS ground speed.',
     solution: 'Designed carbon-fiber structural arm mounts, custom power distribution boards (PDB), and STM32 telemetry modules with real-time RTK-GPS correction.',
