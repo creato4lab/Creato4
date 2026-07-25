@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Preloader } from './components/Preloader';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -21,6 +21,33 @@ import { WorkProject, StudentProject, ServiceItem } from './types';
 
 export default function App() {
   const [preloaderDone, setPreloaderDone] = useState(false);
+
+  // Smooth scroll
+  useEffect(() => {
+    // Dynamically import Lenis to avoid any SSR issues (if next.js, but here it's Vite so it's fine either way, just standard import is ok, but we use dynamic for safety in case of build issues or just standard require)
+    import('lenis').then(({ default: Lenis }) => {
+      const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+        orientation: 'vertical', 
+        gestureOrientation: 'vertical',
+        smoothWheel: true,
+        wheelMultiplier: 1,
+        touchMultiplier: 2,
+      })
+
+      function raf(time: number) {
+        lenis.raf(time)
+        requestAnimationFrame(raf)
+      }
+
+      requestAnimationFrame(raf)
+
+      return () => {
+        lenis.destroy()
+      }
+    })
+  }, []);
 
   // Modals state
   const [discussOpen, setDiscussOpen] = useState(false);

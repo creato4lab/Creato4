@@ -1,395 +1,298 @@
-import React, { useEffect, useRef, useState } from 'react';
-import * as THREE from 'three';
-import { Layers, Eye, Move3d, RotateCw } from 'lucide-react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { Layers, RotateCw, Move3d, MousePointer, Eye, Play, Pause } from 'lucide-react';
+
+/* ═══════════════════════════════════════════════════════
+   CONFIG
+   ═══════════════════════════════════════════════════════ */
+
+const TOTAL_FRAMES = 142;
+const FRAME_PATH = '/explode-frames/frame_';
+const FRAME_EXT = '.jpg';
+
+function getFrameSrc(index: number): string {
+  const num = String(Math.max(1, Math.min(TOTAL_FRAMES, index))).padStart(4, '0');
+  return `${FRAME_PATH}${num}${FRAME_EXT}`;
+}
+
+// Lerp helper for smooth animations
+function lerp(start: number, end: number, factor: number) {
+  return start + (end - start) * factor;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TYPES
+   ═══════════════════════════════════════════════════════ */
 
 interface Exploded3DProductProps {
-  explosionFactor?: number; // 0 (assembled) to 1 (fully exploded)
+  explosionFactor?: number;
   onExplosionChange?: (val: number) => void;
 }
+
+/* ═══════════════════════════════════════════════════════
+   MAIN COMPONENT
+   ═══════════════════════════════════════════════════════ */
 
 export const Exploded3DProduct: React.FC<Exploded3DProductProps> = ({
   explosionFactor: externalExplosionFactor,
   onExplosionChange,
 }) => {
-  const mountRef = useRef<HTMLDivElement>(null);
-  const [internalExplosion, setInternalExplosion] = useState(0.85);
-  const explosion = externalExplosionFactor ?? internalExplosion;
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imagesRef = useRef<HTMLImageElement[]>([]);
+  const loadedCountRef = useRef(0);
+  const [loaded, setLoaded] = useState(false);
+  const [loadProgress, setLoadProgress] = useState(0);
 
+  // Explosion state
+  const [internalExplosion, setInternalExplosion] = useState(0);
+  const [manualControl, setManualControl] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const explosion = manualControl ? (externalExplosionFactor ?? internalExplosion) : internalExplosion;
+
+  // Ref for smooth animation loop
+  const smoothedExplosionRef = useRef(0);
+  const targetExplosionRef = useRef(0);
+  const currentDrawnFrameRef = useRef(0);
+
+  // UI state
   const [activeLayer, setActiveLayer] = useState<number | null>(null);
-  const [autoRotate, setAutoRotate] = useState(true);
 
-  // Mouse parallax refs
-  const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
+  // Current frame index from raw explosion factor (just for UI display)
+  const uiFrame = Math.max(1, Math.min(TOTAL_FRAMES, Math.round(explosion * (TOTAL_FRAMES - 1)) + 1));
 
+  // Sync React state to our target ref for the animation loop
   useEffect(() => {
-    const currentMount = mountRef.current;
-    if (!currentMount) return;
+    targetExplosionRef.current = explosion;
+  }, [explosion]);
 
-    const width = currentMount.clientWidth || 500;
-    const height = currentMount.clientHeight || 600;
+  /* ─── PRELOAD ALL FRAMES ─── */
+  useEffect(() => {
+    const images: HTMLImageElement[] = [];
+    let count = 0;
 
-    // Scene
-    const scene = new THREE.Scene();
-
-    // Camera
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-    camera.position.set(0, 0, 14);
-
-    // Renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-    currentMount.appendChild(renderer.domElement);
-
-    // Lighting Studio
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
-    scene.add(ambientLight);
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 2.0);
-    directionalLight.position.set(10, 15, 10);
-    directionalLight.castShadow = true;
-    scene.add(directionalLight);
-
-    const goldPointLight = new THREE.PointLight(0xc4a35a, 2.5, 20);
-    goldPointLight.position.set(-5, -5, 5);
-    scene.add(goldPointLight);
-
-    const bluePointLight = new THREE.PointLight(0x38bdf8, 2.0, 20);
-    bluePointLight.position.set(5, 5, 8);
-    scene.add(bluePointLight);
-
-    // Group holding the 5 exploded product layers
-    const productGroup = new THREE.Group();
-    scene.add(productGroup);
-
-    // Common dimensions
-    const layerWidth = 4.2;
-    const layerHeight = 5.2;
-    const cornerRadius = 0.4;
-
-    // Helper to create rounded rectangle shape
-    const createRoundedRect = (w: number, h: number, r: number) => {
-      const shape = new THREE.Shape();
-      const x = -w / 2;
-      const y = -h / 2;
-      shape.moveTo(x + r, y);
-      shape.lineTo(x + w - r, y);
-      shape.quadraticCurveTo(x + w, y, x + w, y + r);
-      shape.lineTo(x + w, y + h - r);
-      shape.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-      shape.lineTo(x + r, y + h);
-      shape.quadraticCurveTo(x, y + h, x, y + h - r);
-      shape.lineTo(x, y + r);
-      shape.quadraticCurveTo(x, y, x + r, y);
-      return shape;
-    };
-
-    const roundedShape = createRoundedRect(layerWidth, layerHeight, cornerRadius);
-
-    // Layers configuration
-    // Layer 5 (back): PRODUCT outer shell
-    // Layer 4: MECHANICAL gears & frame
-    // Layer 3: ELECTRONICS copper PCB & components
-    // Layer 2: EMBEDDED green circuit traces & chips
-    // Layer 1 (front): SOFTWARE translucent UI elements
-    const layersData: Array<{
-      id: number;
-      label: string;
-      title: string;
-      color: number;
-      baseZ: number;
-      maxOffsetZ: number;
-      meshGroup: THREE.Group;
-    }> = [];
-
-    // --- LAYER 5: PRODUCT OUTER SHELL (Back) ---
-    const layer5Group = new THREE.Group();
-    const shellMat = new THREE.MeshStandardMaterial({
-      color: 0xfaf8f5,
-      roughness: 0.25,
-      metalness: 0.1,
-      transparent: true,
-      opacity: 0.95,
-      side: THREE.DoubleSide,
-    });
-    const shellExtrude = new THREE.ExtrudeGeometry(roundedShape, {
-      depth: 0.3,
-      bevelEnabled: true,
-      bevelSegments: 4,
-      steps: 1,
-      bevelSize: 0.08,
-      bevelThickness: 0.08,
-    });
-    const shellMesh = new THREE.Mesh(shellExtrude, shellMat);
-    shellMesh.position.z = -0.15;
-    layer5Group.add(shellMesh);
-
-    // Decorative camera bump & logo
-    const bumpGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.1, 32);
-    const bumpMat = new THREE.MeshStandardMaterial({ color: 0x1a3c2f, roughness: 0.1 });
-    const bumpMesh = new THREE.Mesh(bumpGeo, bumpMat);
-    bumpMesh.rotation.x = Math.PI / 2;
-    bumpMesh.position.set(-1.2, 1.6, -0.2);
-    layer5Group.add(bumpMesh);
-
-    layersData.push({
-      id: 5,
-      label: '01 / PRODUCT',
-      title: 'White Matte Outer Enclosure',
-      color: 0xfaf8f5,
-      baseZ: -2.2,
-      maxOffsetZ: -2.8,
-      meshGroup: layer5Group,
-    });
-
-    // --- LAYER 4: MECHANICAL STRUCTURAL FRAME & GEARS ---
-    const layer4Group = new THREE.Group();
-    const frameMat = new THREE.MeshStandardMaterial({
-      color: 0x94a3b8,
-      metalness: 0.85,
-      roughness: 0.3,
-      transparent: true,
-      opacity: 0.92,
-    });
-
-    // Frame ring
-    const frameExtrude = new THREE.ExtrudeGeometry(roundedShape, {
-      depth: 0.12,
-      bevelEnabled: false,
-    });
-    const frameMesh = new THREE.Mesh(frameExtrude, frameMat);
-    layer4Group.add(frameMesh);
-
-    // Mechanical gears & brackets
-    for (let i = 0; i < 4; i++) {
-      const gearGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.1, 16);
-      const gearMat = new THREE.MeshStandardMaterial({ color: 0xc4a35a, metalness: 0.9, roughness: 0.2 });
-      const gearMesh = new THREE.Mesh(gearGeo, gearMat);
-      gearMesh.rotation.x = Math.PI / 2;
-      gearMesh.position.set((i % 2 === 0 ? 1 : -1) * 1.1, (i < 2 ? 1 : -1) * 1.4, 0.1);
-      layer4Group.add(gearMesh);
+    for (let i = 1; i <= TOTAL_FRAMES; i++) {
+      const img = new Image();
+      img.src = getFrameSrc(i);
+      img.onload = () => {
+        count++;
+        loadedCountRef.current = count;
+        setLoadProgress(Math.round((count / TOTAL_FRAMES) * 100));
+        if (count === TOTAL_FRAMES) {
+          setLoaded(true);
+        }
+      };
+      img.onerror = () => {
+        count++;
+        loadedCountRef.current = count;
+        if (count === TOTAL_FRAMES) {
+          setLoaded(true);
+        }
+      };
+      images.push(img);
     }
 
-    layersData.push({
-      id: 4,
-      label: '02 / MECHANICAL',
-      title: 'Silver Metallic Frame & Mounting Brackets',
-      color: 0x94a3b8,
-      baseZ: -1.1,
-      maxOffsetZ: -1.4,
-      meshGroup: layer4Group,
-    });
+    imagesRef.current = images;
+  }, []);
 
-    // --- LAYER 3: ELECTRONICS PCB & CAPACITORS ---
-    const layer3Group = new THREE.Group();
-    const pcbMat = new THREE.MeshStandardMaterial({
-      color: 0xb45309, // Copper/gold tone PCB
-      metalness: 0.7,
-      roughness: 0.3,
-      transparent: true,
-      opacity: 0.9,
-    });
-    const pcbGeo = new THREE.PlaneGeometry(layerWidth - 0.2, layerHeight - 0.2);
-    const pcbMesh = new THREE.Mesh(pcbGeo, pcbMat);
-    layer3Group.add(pcbMesh);
+  /* ─── RENDER LOOP (BUTTERY SMOOTH CANVAS DRAWING) ─── */
+  useEffect(() => {
+    if (!loaded) return;
+    
+    let rafId: number;
 
-    // Capacitors and resistors grid
-    for (let x = -1.4; x <= 1.4; x += 0.7) {
-      for (let y = -1.8; y <= 1.8; y += 0.9) {
-        if (Math.random() > 0.3) {
-          const capGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.25, 16);
-          const capMat = new THREE.MeshStandardMaterial({
-            color: Math.random() > 0.5 ? 0xc4a35a : 0x1a3c2f,
-            metalness: 0.8,
-          });
-          const capMesh = new THREE.Mesh(capGeo, capMat);
-          capMesh.rotation.x = Math.PI / 2;
-          capMesh.position.set(x, y, 0.12);
-          layer3Group.add(capMesh);
+    const render = () => {
+      // Lerp the explosion value for buttery smooth scrubbing
+      smoothedExplosionRef.current = lerp(smoothedExplosionRef.current, targetExplosionRef.current, 0.1);
+      
+      const frameToDraw = Math.max(1, Math.min(TOTAL_FRAMES, Math.round(smoothedExplosionRef.current * (TOTAL_FRAMES - 1)) + 1));
+      
+      // Only draw if the frame actually changed or if we just loaded
+      if (frameToDraw !== currentDrawnFrameRef.current) {
+        const canvas = canvasRef.current;
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            const img = imagesRef.current[frameToDraw - 1];
+            if (img && img.complete) {
+              const dpr = Math.min(window.devicePixelRatio, 2);
+              const cw = canvas.width / dpr;
+              const ch = canvas.height / dpr;
+
+              ctx.clearRect(0, 0, cw, ch);
+
+              // Draw image to fit within canvas while maintaining aspect ratio (contain)
+              const imgRatio = img.naturalWidth / img.naturalHeight;
+              const canvasRatio = cw / ch;
+
+              let drawW: number, drawH: number, drawX: number, drawY: number;
+
+              if (canvasRatio > imgRatio) {
+                drawH = ch;
+                drawW = ch * imgRatio;
+                drawX = (cw - drawW) / 2;
+                drawY = 0;
+              } else {
+                drawW = cw;
+                drawH = cw / imgRatio;
+                drawX = 0;
+                drawY = (ch - drawH) / 2;
+              }
+
+              ctx.drawImage(img, drawX, drawY, drawW, drawH);
+              currentDrawnFrameRef.current = frameToDraw;
+            }
+          }
         }
       }
-    }
 
-    layersData.push({
-      id: 3,
-      label: '03 / ELECTRONICS',
-      title: 'Gold/Copper PCB Traces & Passive Components',
-      color: 0xc4a35a,
-      baseZ: 0,
-      maxOffsetZ: 0,
-      meshGroup: layer3Group,
-    });
-
-    // --- LAYER 2: EMBEDDED SYSTEM CHIPS & TRACES ---
-    const layer2Group = new THREE.Group();
-    const embedPcbMat = new THREE.MeshStandardMaterial({
-      color: 0x15803d, // Green circuit board
-      roughness: 0.4,
-      metalness: 0.2,
-      transparent: true,
-      opacity: 0.92,
-    });
-    const embedPcbGeo = new THREE.PlaneGeometry(layerWidth - 0.1, layerHeight - 0.1);
-    const embedPcbMesh = new THREE.Mesh(embedPcbGeo, embedPcbMat);
-    layer2Group.add(embedPcbMesh);
-
-    // Microchips
-    const chipGeo = new THREE.BoxGeometry(1.2, 1.2, 0.15);
-    const chipMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.1 });
-    const chipMesh = new THREE.Mesh(chipGeo, chipMat);
-    chipMesh.position.set(0, 0.4, 0.1);
-    layer2Group.add(chipMesh);
-
-    const mcuGeo = new THREE.BoxGeometry(0.8, 0.8, 0.12);
-    const mcuMesh = new THREE.Mesh(mcuGeo, chipMat);
-    mcuMesh.position.set(0.9, -1.2, 0.08);
-    layer2Group.add(mcuMesh);
-
-    layersData.push({
-      id: 2,
-      label: '04 / EMBEDDED',
-      title: 'Green Circuit Traces, ESP32/STM32 Microchips',
-      color: 0x15803d,
-      baseZ: 1.1,
-      maxOffsetZ: 1.4,
-      meshGroup: layer2Group,
-    });
-
-    // --- LAYER 1: SOFTWARE INTERFACE GLOW (Front) ---
-    const layer1Group = new THREE.Group();
-    const uiGlassMat = new THREE.MeshPhysicalMaterial({
-      color: 0x38bdf8,
-      transmission: 0.85,
-      opacity: 0.88,
-      transparent: true,
-      roughness: 0.1,
-      ior: 1.5,
-      thickness: 0.2,
-    });
-    const uiGlassGeo = new THREE.PlaneGeometry(layerWidth, layerHeight);
-    const uiGlassMesh = new THREE.Mesh(uiGlassGeo, uiGlassMat);
-    layer1Group.add(uiGlassMesh);
-
-    // Floating UI wireframe elements
-    const lineMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, linewidth: 2 });
-    const lineGeo = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(-1.5, 1.8, 0.05),
-      new THREE.Vector3(1.5, 1.8, 0.05),
-      new THREE.Vector3(1.5, 0.8, 0.05),
-      new THREE.Vector3(-1.5, 0.8, 0.05),
-      new THREE.Vector3(-1.5, 1.8, 0.05),
-    ]);
-    const lineMesh = new THREE.Line(lineGeo, lineMat);
-    layer1Group.add(lineMesh);
-
-    layersData.push({
-      id: 1,
-      label: '05 / SOFTWARE',
-      title: 'Translucent Cyan UI Interface & Digital Nodes',
-      color: 0x38bdf8,
-      baseZ: 2.2,
-      maxOffsetZ: 2.8,
-      meshGroup: layer1Group,
-    });
-
-    // Add all layer groups to main productGroup
-    layersData.forEach((layer) => {
-      productGroup.add(layer.meshGroup);
-    });
-
-    // Mouse movement handler
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = currentMount.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
-      mouseRef.current.targetX = x * 0.4;
-      mouseRef.current.targetY = y * 0.4;
+      rafId = requestAnimationFrame(render);
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    rafId = requestAnimationFrame(render);
 
-    // Animation Loop
-    let animationFrameId: number;
+    return () => cancelAnimationFrame(rafId);
+  }, [loaded]);
 
-    const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
+  /* ─── RESIZE HANDLER ─── */
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !loaded) return;
 
-      // Smooth mouse parallax
-      mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.05;
-      mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.05;
-
-      // Rotate group slightly
-      if (autoRotate) {
-        productGroup.rotation.y += 0.005;
-      } else {
-        productGroup.rotation.y = mouseRef.current.x * 0.8;
-      }
-      productGroup.rotation.x = mouseRef.current.y * 0.5 + 0.15;
-
-      // Apply Z-axis exploded translation based on explosion factor
-      layersData.forEach((layer) => {
-        const targetZ = layer.baseZ + layer.maxOffsetZ * explosion;
-        layer.meshGroup.position.z += (targetZ - layer.meshGroup.position.z) * 0.1;
-      });
-
-      renderer.render(scene, camera);
-    };
-
-    animate();
-
-    // Resize handler
     const handleResize = () => {
-      if (!currentMount) return;
-      const newW = currentMount.clientWidth;
-      const newH = currentMount.clientHeight;
-      camera.aspect = newW / newH;
-      camera.updateProjectionMatrix();
-      renderer.setSize(newW, newH);
+      const container = canvas.parentElement;
+      if (!container) return;
+      const dpr = Math.min(window.devicePixelRatio, 2);
+      canvas.width = container.clientWidth * dpr;
+      canvas.height = container.clientHeight * dpr;
+      canvas.style.width = `${container.clientWidth}px`;
+      canvas.style.height = `${container.clientHeight}px`;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.scale(dpr, dpr);
+      
+      // Force a redraw on next frame
+      currentDrawnFrameRef.current = 0;
     };
+
+    // Initial resize setup
+    handleResize();
 
     window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [loaded]);
 
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('resize', handleResize);
-      if (currentMount.contains(renderer.domElement)) {
-        currentMount.removeChild(renderer.domElement);
-      }
-      renderer.dispose();
+  /* ─── AUTO-PLAY ANIMATION ─── */
+  useEffect(() => {
+    if (manualControl || !isPlaying) return;
+
+    let running = true;
+    let time = 0;
+    let rafId: number;
+
+    const animate = () => {
+      if (!running) return;
+      time += 0.006;
+      // Smooth sine wave oscillation 0 → 1 → 0
+      const t = (Math.sin(time) + 1) / 2;
+      const eased = t * t * (3 - 2 * t); // smoothstep
+      setInternalExplosion(eased);
+      rafId = requestAnimationFrame(animate);
     };
-  }, [autoRotate, explosion]);
+    rafId = requestAnimationFrame(animate);
 
+    return () => { 
+      running = false; 
+      cancelAnimationFrame(rafId);
+    };
+  }, [manualControl, isPlaying]);
+
+  /* ─── HANDLERS ─── */
+  const handleSliderChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value);
+    setManualControl(true);
+    setIsPlaying(false);
+    setInternalExplosion(val);
+    if (onExplosionChange) onExplosionChange(val);
+  }, [onExplosionChange]);
+
+  const handleExpand = useCallback(() => {
+    setManualControl(true);
+    setIsPlaying(false);
+    setInternalExplosion(1);
+    if (onExplosionChange) onExplosionChange(1);
+  }, [onExplosionChange]);
+
+  const handleCollapse = useCallback(() => {
+    setManualControl(true);
+    setIsPlaying(false);
+    setInternalExplosion(0);
+    if (onExplosionChange) onExplosionChange(0);
+  }, [onExplosionChange]);
+
+  const handlePlayPause = useCallback(() => {
+    if (isPlaying) {
+      setIsPlaying(false);
+    } else {
+      setManualControl(false);
+      setIsPlaying(true);
+    }
+  }, [isPlaying]);
+
+  /* ─── LAYER INFO ─── */
   const layersInfo = [
-    { id: 1, name: '05 / SOFTWARE', tag: 'UI & Cloud Logic', color: '#38BDF8' },
-    { id: 2, name: '04 / EMBEDDED', tag: 'Microcontroller & Firmware', color: '#15803D' },
-    { id: 3, name: '03 / ELECTRONICS', tag: 'PCB & Sensors', color: '#C4A35A' },
-    { id: 4, name: '02 / MECHANICAL', tag: 'Cad Frame & Gears', color: '#94A3B8' },
-    { id: 5, name: '01 / PRODUCT', tag: 'Matte Outer Enclosure', color: '#FAF8F5' },
+    { id: 7, name: '07 / ENCLOSURE', color: '#1A1A1A' },
+    { id: 6, name: '06 / DISPLAY & UI', color: '#E67E22' },
+    { id: 5, name: '05 / PCB & ELECTRONICS', color: '#C4A35A' },
+    { id: 4, name: '04 / BATTERY & POWER', color: '#111111' },
+    { id: 3, name: '03 / FRAME & STRUCTURE', color: '#B8BFC6' },
+    { id: 2, name: '02 / 3D PRINTED PARTS', color: '#6B7280' },
+    { id: 1, name: '01 / FRONT COVER', color: '#FAF8F5' },
   ];
 
   return (
-    <div className="relative w-full h-full min-h-[520px] lg:min-h-[620px] flex flex-col justify-between items-center group">
-      {/* WebGL Canvas Container */}
-      <div ref={mountRef} className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing z-10" />
+    <div className="relative w-full h-full min-h-[520px] lg:min-h-[680px] flex flex-col justify-between items-center group">
 
-      {/* Floating Layer Tag Badges on Right */}
-      <div className="absolute right-2 top-1/2 -translate-y-1/2 z-20 hidden sm:flex flex-col gap-2.5">
+      {/* Loading Indicator */}
+      {!loaded && (
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[#F5F0EA] rounded-2xl">
+          <div className="w-48 h-1 bg-[#E8E2D9] rounded-full overflow-hidden mb-3">
+            <div
+              className="h-full bg-[#1A3C2F] rounded-full transition-all duration-300"
+              style={{ width: `${loadProgress}%` }}
+            />
+          </div>
+          <span className="text-[11px] font-semibold tracking-wider text-[#5C6B60] uppercase">
+            Loading Product · {loadProgress}%
+          </span>
+        </div>
+      )}
+
+      {/* Canvas (frame display) */}
+      <div className="absolute inset-0 w-full h-full z-10 rounded-2xl overflow-hidden">
+        <canvas
+          ref={canvasRef}
+          className="w-full h-full"
+          style={{ display: loaded ? 'block' : 'none' }}
+        />
+      </div>
+
+      {/* Layer Tag Badges (Horizontal at top) */}
+      <div className="absolute top-4 left-4 right-4 z-20 hidden sm:flex flex-wrap justify-center gap-2">
         {layersInfo.map((item) => (
           <div
             key={item.id}
             onMouseEnter={() => setActiveLayer(item.id)}
             onMouseLeave={() => setActiveLayer(null)}
-            className={`px-3 py-1.5 rounded-xl border transition-all duration-300 text-[10px] font-semibold tracking-wider uppercase flex items-center gap-2 backdrop-blur-md ${
+            className={`px-2.5 py-1 rounded-xl border transition-all duration-300 text-[9px] font-semibold tracking-wider uppercase flex items-center gap-1.5 backdrop-blur-md ${
               activeLayer === item.id
                 ? 'bg-[#1A3C2F] text-[#FAF8F5] border-[#1A3C2F] scale-105 shadow-md'
                 : 'bg-[#FAF8F5]/80 text-[#5C6B60] border-[#E8E2D9] hover:bg-[#1A3C2F] hover:text-[#FAF8F5]'
             }`}
           >
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
+            <span
+              className="w-1.5 h-1.5 rounded-full border border-[#E8E2D9]"
+              style={{ backgroundColor: item.color }}
+            />
             <span>{item.name}</span>
           </div>
         ))}
@@ -398,47 +301,77 @@ export const Exploded3DProduct: React.FC<Exploded3DProductProps> = ({
       {/* Bottom Floating Interactive Controls */}
       <div className="absolute bottom-4 left-4 right-4 z-20 flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#FAF8F5]/90 backdrop-blur-md border border-[#E8E2D9] shadow-lg">
         {/* Explosion Range Slider */}
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <Layers className="w-4 h-4 text-[#1A3C2F]" />
-          <span className="text-[11px] font-bold tracking-wider text-[#1A3C2F] uppercase whitespace-nowrap">
+        <div className="flex items-center gap-3 w-full sm:flex-1">
+          <Layers className="w-4 h-4 text-[#1A3C2F] shrink-0" />
+          <span className="text-[11px] font-bold tracking-wider text-[#1A3C2F] uppercase whitespace-nowrap shrink-0">
             Explode 3D:
           </span>
           <input
             type="range"
             min="0"
             max="1"
-            step="0.01"
+            step="0.001"
             value={explosion}
-            onChange={(e) => {
-              const val = parseFloat(e.target.value);
-              setInternalExplosion(val);
-              if (onExplosionChange) onExplosionChange(val);
-            }}
-            className="w-full sm:w-32 h-1.5 bg-[#E8E2D9] rounded-lg appearance-none cursor-pointer accent-[#1A3C2F]"
+            onChange={handleSliderChange}
+            className="w-full h-1.5 bg-[#E8E2D9] rounded-lg appearance-none cursor-pointer accent-[#1A3C2F]"
           />
-          <span className="text-[11px] font-mono text-[#5C6B60] min-w-[36px]">
+          <span className="text-[11px] font-mono text-[#5C6B60] min-w-[32px] shrink-0 text-right">
             {Math.round(explosion * 100)}%
           </span>
         </div>
 
-        {/* Auto Rotate Toggle & 3D Hint */}
+        {/* Controls */}
         <div className="flex items-center gap-2">
+          {/* Play/Pause */}
           <button
-            onClick={() => setAutoRotate(!autoRotate)}
+            onClick={handlePlayPause}
             className={`p-1.5 rounded-lg border text-[10px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
-              autoRotate
+              isPlaying && !manualControl
                 ? 'bg-[#1A3C2F] text-[#FAF8F5] border-[#1A3C2F]'
                 : 'bg-[#FAF8F5] text-[#5C6B60] border-[#E8E2D9] hover:text-[#1A3C2F]'
             }`}
           >
-            <RotateCw className={`w-3.5 h-3.5 ${autoRotate ? 'animate-spin-slow' : ''}`} />
-            <span>Orbit</span>
+            {isPlaying && !manualControl ? (
+              <><Pause className="w-3.5 h-3.5" /><span>Pause</span></>
+            ) : (
+              <><Play className="w-3.5 h-3.5" /><span>Auto</span></>
+            )}
           </button>
 
-          <span className="hidden md:inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-widest text-[#5C6B60] pl-2 border-l border-[#E8E2D9]">
-            <Move3d className="w-3.5 h-3.5 text-[#C4A35A]" /> Drag to Inspect
-          </span>
+          <button
+            onClick={handleExpand}
+            className={`px-2.5 py-1 rounded-lg border text-[10px] font-semibold cursor-pointer transition-colors ${
+              explosion >= 0.95
+                ? 'bg-[#1A3C2F] text-[#FAF8F5] border-[#1A3C2F]'
+                : 'bg-[#FAF8F5] text-[#5C6B60] border-[#E8E2D9] hover:bg-[#1A3C2F] hover:text-[#FAF8F5]'
+            }`}
+          >
+            Expand
+          </button>
+          <button
+            onClick={handleCollapse}
+            className={`px-2.5 py-1 rounded-lg border text-[10px] font-semibold cursor-pointer transition-colors ${
+              explosion <= 0.05
+                ? 'bg-[#1A3C2F] text-[#FAF8F5] border-[#1A3C2F]'
+                : 'bg-[#FAF8F5] text-[#5C6B60] border-[#E8E2D9] hover:bg-[#1A3C2F] hover:text-[#FAF8F5]'
+            }`}
+          >
+            Collapse
+          </button>
         </div>
+      </div>
+
+      {/* Bottom Interaction Hints */}
+      <div className="absolute bottom-[-36px] left-0 right-0 z-20 flex items-center justify-center gap-6">
+        <span className="flex items-center gap-1.5 text-[10px] text-[#5C6B60] font-medium tracking-wide">
+          <Eye className="w-3 h-3" /> Frame {uiFrame} / {TOTAL_FRAMES}
+        </span>
+        <span className="flex items-center gap-1.5 text-[10px] text-[#5C6B60] font-medium tracking-wide">
+          <Layers className="w-3 h-3" /> Slide to explode
+        </span>
+        <span className="flex items-center gap-1.5 text-[10px] text-[#5C6B60] font-medium tracking-wide">
+          <MousePointer className="w-3 h-3" /> Click Expand / Collapse
+        </span>
       </div>
     </div>
   );
