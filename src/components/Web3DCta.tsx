@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { motion } from 'motion/react';
-import { ArrowRight, Sparkles, Monitor } from 'lucide-react';
+import { ArrowRight, Sparkles, Code, Monitor } from 'lucide-react';
 
 interface Web3DCtaProps {
   onOpenDiscuss: () => void;
@@ -31,129 +31,48 @@ export const Web3DCta: React.FC<Web3DCtaProps> = ({ onOpenDiscuss }) => {
     const shapesGroup = new THREE.Group();
     scene.add(shapesGroup);
 
-    // 1. Lighting Setup
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-    scene.add(ambientLight);
-
-    // Interactive Gold Point Light following cursor
-    const pointLight = new THREE.PointLight(0xc4a35a, 2.5, 30);
-    pointLight.position.set(0, 0, 8);
-    scene.add(pointLight);
-
-    // Secondary Accent Rim Light
-    const rimLight = new THREE.DirectionalLight(0x3d7a5a, 1.5);
-    rimLight.position.set(-10, 10, -5);
-    scene.add(rimLight);
-
-    // 2. Geometries & Dual-Layer Metallic / Wireframe Materials
-    const matInner = new THREE.MeshPhongMaterial({
-      color: 0x1a3c2f,
-      emissive: 0x0a1e17,
-      specular: 0xc4a35a,
-      shininess: 40,
-      transparent: true,
-      opacity: 0.35,
-      flatShading: true,
-    });
-
-    const matGoldWire = new THREE.MeshBasicMaterial({
-      color: 0xc4a35a,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.45,
-    });
-
-    const matCreamWire = new THREE.MeshBasicMaterial({
+    const matSolid = new THREE.MeshBasicMaterial({
       color: 0xfaf8f5,
-      wireframe: true,
+      transparent: true,
+      opacity: 0.08,
+      wireframe: false,
+    });
+
+    const matWire = new THREE.MeshBasicMaterial({
+      color: 0xc4a35a,
       transparent: true,
       opacity: 0.25,
+      wireframe: true,
     });
 
-    // 8 Floating 3D Geometries
-    const geometries = [
-      new THREE.IcosahedronGeometry(2, 0),
-      new THREE.TorusKnotGeometry(1.4, 0.4, 64, 16),
-      new THREE.DodecahedronGeometry(1.8, 0),
-      new THREE.OctahedronGeometry(2.2, 0),
-      new THREE.TorusGeometry(1.8, 0.5, 16, 32),
-      new THREE.RingGeometry(1.2, 2.2, 32),
-      new THREE.TetrahedronGeometry(1.8, 0),
-      new THREE.IcosahedronGeometry(1.5, 1),
+    // Shapes geometries
+    const cubeGeo = new THREE.BoxGeometry(2, 2, 2);
+    const sphereGeo = new THREE.SphereGeometry(1.5, 16, 16);
+    const torusGeo = new THREE.TorusGeometry(1.8, 0.5, 16, 32);
+    const octaGeo = new THREE.OctahedronGeometry(2);
+
+    const items = [
+      { geo: cubeGeo, pos: [-6, 3, -2], rot: [0.01, 0.02, 0] },
+      { geo: sphereGeo, pos: [6, -3, -1], rot: [0.02, 0.01, 0] },
+      { geo: torusGeo, pos: [-7, -4, -3], rot: [0.015, 0.015, 0] },
+      { geo: octaGeo, pos: [7, 4, -2], rot: [0.01, 0.02, 0.01] },
     ];
 
-    const positions = [
-      [-7.5, 3.5, -2],
-      [7.5, -3.5, -1],
-      [-8, -4, -3],
-      [8, 4, -2],
-      [-4.5, 5, -4],
-      [5, -5, -3],
-      [-9, 0.5, -5],
-      [9, -0.5, -4],
-    ];
+    const meshes: Array<{ mesh: THREE.Mesh; wireMesh: THREE.Mesh; rotSpeed: number[] }> = [];
 
-    const meshes: Array<{
-      mesh: THREE.Mesh;
-      wireMesh: THREE.Mesh;
-      rotSpeed: number[];
-      initialY: number;
-      floatSpeed: number;
-      offset: number;
-    }> = [];
+    items.forEach((item) => {
+      const mesh = new THREE.Mesh(item.geo, matSolid);
+      mesh.position.set(item.pos[0], item.pos[1], item.pos[2]);
 
-    positions.forEach((pos, idx) => {
-      const geo = geometries[idx % geometries.length];
-      const wireMat = idx % 2 === 0 ? matGoldWire : matCreamWire;
-
-      const mesh = new THREE.Mesh(geo, matInner);
-      mesh.position.set(pos[0], pos[1], pos[2]);
-
-      const wireMesh = new THREE.Mesh(geo, wireMat);
+      const wireMesh = new THREE.Mesh(item.geo, matWire);
       wireMesh.scale.set(1.02, 1.02, 1.02);
       mesh.add(wireMesh);
 
       shapesGroup.add(mesh);
-
-      meshes.push({
-        mesh,
-        wireMesh,
-        rotSpeed: [
-          (Math.random() - 0.5) * 0.012 + 0.005,
-          (Math.random() - 0.5) * 0.012 + 0.008,
-          (Math.random() - 0.5) * 0.008,
-        ],
-        initialY: pos[1],
-        floatSpeed: 0.8 + Math.random() * 0.6,
-        offset: idx * 0.7,
-      });
+      meshes.push({ mesh, wireMesh, rotSpeed: item.rot });
     });
 
-    // 3. Interactive Floating Starfield Particle System
-    const particleCount = 350;
-    const particleGeo = new THREE.BufferGeometry();
-    const particlePositions = new Float32Array(particleCount * 3);
-
-    for (let i = 0; i < particleCount * 3; i += 3) {
-      particlePositions[i] = (Math.random() - 0.5) * 35;
-      particlePositions[i + 1] = (Math.random() - 0.5) * 25;
-      particlePositions[i + 2] = (Math.random() - 0.5) * 20 - 2;
-    }
-
-    particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-
-    const particleMat = new THREE.PointsMaterial({
-      color: 0xc4a35a,
-      size: 0.08,
-      transparent: true,
-      opacity: 0.45,
-      blending: THREE.AdditiveBlending,
-    });
-
-    const particleSystem = new THREE.Points(particleGeo, particleMat);
-    scene.add(particleSystem);
-
-    // Mouse Parallax & Dynamic Light Target
+    // Parallax mouse handler
     let targetX = 0;
     let targetY = 0;
 
@@ -166,31 +85,16 @@ export const Web3DCta: React.FC<Web3DCtaProps> = ({ onOpenDiscuss }) => {
     window.addEventListener('mousemove', handleMouseMove);
 
     let animationFrameId: number;
-    let clock = new THREE.Clock();
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
-      const elapsedTime = clock.getElapsedTime();
 
-      // Smooth camera / group parallax inertia
-      shapesGroup.rotation.y += (targetX * 0.25 - shapesGroup.rotation.y) * 0.04;
-      shapesGroup.rotation.x += (-targetY * 0.25 - shapesGroup.rotation.x) * 0.04;
+      shapesGroup.rotation.y += (targetX * 0.2 - shapesGroup.rotation.y) * 0.05;
+      shapesGroup.rotation.x += (-targetY * 0.2 - shapesGroup.rotation.x) * 0.05;
 
-      // Update interactive gold point light position
-      pointLight.position.x += (targetX * 10 - pointLight.position.x) * 0.08;
-      pointLight.position.y += (-targetY * 6 - pointLight.position.y) * 0.08;
-
-      // Rotate particles slowly
-      particleSystem.rotation.y = elapsedTime * 0.02;
-
-      // Animate 3D meshes: floating sine waves + 3-axis rotation
-      meshes.forEach(({ mesh, rotSpeed, initialY, floatSpeed, offset }) => {
+      meshes.forEach(({ mesh, rotSpeed }) => {
         mesh.rotation.x += rotSpeed[0];
         mesh.rotation.y += rotSpeed[1];
-        mesh.rotation.z += rotSpeed[2];
-
-        // Sinusoidal floating wave motion
-        mesh.position.y = initialY + Math.sin(elapsedTime * floatSpeed + offset) * 0.45;
       });
 
       renderer.render(scene, camera);
@@ -235,7 +139,7 @@ export const Web3DCta: React.FC<Web3DCtaProps> = ({ onOpenDiscuss }) => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FAF8F5]/10 border border-[#FAF8F5]/20 text-[0.75rem] font-bold uppercase tracking-[0.2em] text-[#FAF8F5]/80 mb-8 shadow-sm backdrop-blur-xs"
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FAF8F5]/10 border border-[#FAF8F5]/20 text-[0.75rem] font-bold uppercase tracking-[0.2em] text-[#FAF8F5]/80 mb-8"
         >
           <Sparkles className="w-3.5 h-3.5 text-[#C4A35A]" />
           <span>WEBGL · THREE.JS · NEXT-GEN WEB</span>
@@ -247,7 +151,7 @@ export const Web3DCta: React.FC<Web3DCtaProps> = ({ onOpenDiscuss }) => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.15 }}
-          className="heading-h1 font-extrabold text-[#FAF8F5] leading-tight mb-6 tracking-tight drop-shadow-md"
+          className="heading-h1 font-extrabold text-[#FAF8F5] leading-tight mb-6 tracking-tight"
         >
           LOVE THIS DIGITAL EXPERIENCE? <br />
           <span className="text-[#C4A35A]">WE CRAFT NEXT-GEN SITES</span> JUST LIKE IT

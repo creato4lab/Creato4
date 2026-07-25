@@ -20,13 +20,13 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+      <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto no-scrollbar">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
-          className="relative bg-[#FAF8F5] border border-[#E8E2D9] rounded-3xl max-w-3xl w-full p-8 lg:p-10 shadow-2xl overflow-hidden my-8 max-h-[90vh] overflow-y-auto"
+          className="relative bg-[#FAF8F5] border border-[#E8E2D9] rounded-3xl max-w-3xl w-full p-8 lg:p-10 shadow-2xl overflow-hidden my-8 max-h-[90vh] overflow-y-auto no-scrollbar"
         >
           {/* Close button */}
           <button
