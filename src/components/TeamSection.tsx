@@ -27,13 +27,13 @@ const TEAM_MEMBERS: TeamMember[] = [
       'https://api.dicebear.com/9.x/avataaars/png?seed=PrinceCEO&backgroundColor=e8f0e8&radius=50&size=256&top=shortHairShortFlat&facialHair=beardMedium&clothing=blazerAndShirt',
     role: 'Founder, CEO & CPTO',
     description:
-      'Visionary engineering lead steering multidisciplinary hardware and software products from concept to market. Drives innovation across all technical verticals with a hands-on approach to systems architecture and product strategy.',
+      'Founder / Product & Technology Leader — sets overall product vision and technology direction. CEO / Business Leader — drives business strategy, fundraising and external representation. Chief Product Development Officer — owns end-to-end product design, development & delivery. Head of Sales, Business Development & Partnerships; Head of Media Production & Content Strategy.',
     floatingBadges: [
       { emoji: '🚀', posClass: '-top-[2px] -right-[2px]' },
       { emoji: '💡', posClass: 'top-[40px] -right-[10px]' },
       { emoji: '⚡', posClass: '-bottom-[2px] -left-[2px]' },
     ],
-    skills: ['Product Strategy', 'Systems Architecture', 'Hardware R&D'],
+    skills: ['Product Vision', 'Business Strategy', 'Media Production', 'Sales & Partnerships'],
     linkedinUrl: 'https://www.linkedin.com/in/prince-tagadiya/',
   },
   {
@@ -44,15 +44,15 @@ const TEAM_MEMBERS: TeamMember[] = [
     avatarUrl: '/nisarg_memoji.png',
     dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=NisargEngineer&backgroundColor=d1e8d1&radius=50&size=256&top=shortHairTheCaesar&facialHair=beardLight&clothing=hoodie',
-    role: 'Head of Electronics, Embedded Systems & Manufacturing',
+    role: 'HEAD OF ELECTRONICS, EMBEDDED SYSTEMS & MANUFACTURING',
     description:
-      'Expert in high-reliability circuit design, power management, micro-controller firmware, and PCB manufacturing processes. Leads the electronics division with precision engineering and DFM excellence.',
+      'Head of Electronics, PCB Design & Hardware Validation — leads PCB design and hardware validation. Head of Embedded Systems & Firmware Development — owns firmware and embedded architecture. Head of Mechanical Design, CAD & Prototyping — leads CAD modeling and physical prototyping. Head of Product Manufacturing, Supply Chain & Operations.',
     floatingBadges: [
       { emoji: '🔧', posClass: '-top-[2px] -right-[2px]' },
       { emoji: '⚡', posClass: 'top-[40px] -right-[10px]' },
       { emoji: '📟', posClass: '-bottom-[2px] -left-[2px]' },
     ],
-    skills: ['Hardware Engineering', 'Embedded C++', 'DFM Excellence'],
+    skills: ['PCB & Hardware Design', 'Firmware & Embedded', 'Mechanical CAD & Prototyping', 'Operations'],
     linkedinUrl: 'https://www.linkedin.com/in/nisarg-patel-774908357/',
   },
   {
@@ -63,15 +63,15 @@ const TEAM_MEMBERS: TeamMember[] = [
     avatarUrl: '/khushi_memoji.png',
     dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=KhushiDesigner&backgroundColor=ffe8d1&radius=50&size=256&top=longHairStraight&accessories=glasses&clothing=shirtVNeck',
-    role: 'Head of PCB Design, Education & Brand Communications',
+    role: 'HEAD OF PCB DESIGN, EDUCATION & BRAND COMMUNICATIONS',
     description:
-      'Directs multi-layer PCB layout, component selection, and signal integrity analysis. Oversees educational project publishing and brand outreach initiatives with creative vision and technical depth.',
+      'Head of Electronics, PCB Design & Hardware Validation — supports PCB design and validation. Head of Education, Courses & Training Programs — designs and manages learning content. Lead Content Creator / Face of the Brand — represents the brand across public content. Research & Innovation; Quality Assurance & Testing; Graphic Design; Customer Success.',
     floatingBadges: [
       { emoji: '📐', posClass: '-top-[2px] -right-[2px]' },
       { emoji: '🎨', posClass: 'top-[40px] -right-[10px]' },
       { emoji: '✨', posClass: '-bottom-[2px] -left-[2px]' },
     ],
-    skills: ['PCB Design', 'Signal Integrity', 'Quality Assurance'],
+    skills: ['PCB & Testing Support', 'STEM Education Courses', 'Brand Content Creation', 'Graphic Design & CS'],
     linkedinUrl: 'https://www.linkedin.com/in/khushi-belani-18ba52375/',
   },
   {
@@ -82,15 +82,15 @@ const TEAM_MEMBERS: TeamMember[] = [
     avatarUrl: '/rudra_memoji.png',
     dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=RudraDeveloper&backgroundColor=d1d8e8&radius=50&size=256&top=shortHairShortWaved&facialHair=beardLight&clothing=graphicShirt',
-    role: 'Head of Software Engineering & Digital Design',
+    role: 'HEAD OF SOFTWARE ENGINEERING & DIGITAL DESIGN',
     description:
-      'Architects modern cloud applications, real-time IoT web portals, and interactive 3D WebGL experiences. Bridges the gap between hardware and software with cutting-edge digital solutions.',
+      'Head of Software Engineering — leads web, mobile, backend & cloud development. System Architecture — designs scalable software architecture across platforms. Graphic Design, Thumbnail & Branding Lead — supports visual design and branding assets. App & Web Experience; DevOps & Cloud Infrastructure.',
     floatingBadges: [
       { emoji: '💻', posClass: '-top-[2px] -right-[2px]' },
       { emoji: '🌐', posClass: 'top-[40px] -right-[10px]' },
       { emoji: '🎮', posClass: '-bottom-[2px] -left-[2px]' },
     ],
-    skills: ['Full-Stack Web', 'Cloud Infrastructure', '3D WebGL'],
+    skills: ['Software Engineering', 'System Architecture', 'UI/UX & Branding', 'DevOps & Cloud'],
     linkedinUrl: 'https://www.linkedin.com/in/rudra-chauhan24/',
   },
 ];
