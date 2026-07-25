@@ -61,10 +61,10 @@ export const CustomCursor: React.FC = () => {
       <motion.div
         className="fixed top-0 left-0 w-2 h-2 rounded-full bg-[#FAF8F5] pointer-events-none z-[9999] mix-blend-difference"
         style={{
+          left: -4,
+          top: -4,
           x: mouseX,
           y: mouseY,
-          translateX: '-50%',
-          translateY: '-50%',
         }}
         animate={{
           scale: isHovered ? 0 : 1,
@@ -77,10 +77,10 @@ export const CustomCursor: React.FC = () => {
       <motion.div
         className="fixed top-0 left-0 rounded-full border border-[#FAF8F5] pointer-events-none z-[9998] mix-blend-difference flex items-center justify-center"
         style={{
+          left: -16,
+          top: -16,
           x: smoothX,
           y: smoothY,
-          translateX: '-50%',
-          translateY: '-50%',
           width: 32,
           height: 32,
         }}

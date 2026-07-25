@@ -293,13 +293,7 @@ export const TeamSection: React.FC = () => {
         {/* 4-Card Responsive Grid Layout with 3D Tilt Sheen */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7">
           {TEAM_MEMBERS.map((member) => {
-            const imgState = failedImgs[member.id] || 'none';
-            const imgSrc =
-              imgState === 'none'
-                ? member.avatarUrl
-                : imgState === 'dicebear'
-                ? member.dicebearUrl
-                : '';
+            const imgSrc = member.dicebearUrl;
 
             return (
               <TeamTiltCard
