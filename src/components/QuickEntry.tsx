@@ -37,40 +37,22 @@ export const QuickEntry: React.FC<QuickEntryProps> = ({ onSelectOption }) => {
             onClick={() => onSelectOption('idea')}
             className="group relative bg-[#FAF8F5] border border-[#E8E2D9] hover:border-[#1A3C2F] rounded-3xl p-8 lg:p-10 flex flex-col justify-between transition-all duration-400 hover:-translate-y-1.5 shadow-xs hover:shadow-xl cursor-pointer overflow-hidden"
           >
-            {/* 3D Visual Box: Pencil Sketch to Photorealistic Transformation */}
+            {/* 3D Visual Box: Minimal Sketch to Prototype */}
             <div className="relative w-full h-[200px] rounded-2xl bg-[#F5F0EA] border border-[#E8E2D9] flex items-center justify-center overflow-hidden mb-8">
-              
-              {/* Sketch Wireframe layer */}
-              <div
-                className={`absolute inset-0 flex items-center justify-center transition-opacity duration-500 ${
-                  hoveredCard === 'idea' ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
-                }`}
-              >
-                <div className="relative w-28 h-28 border-2 border-dashed border-[#5C6B60] rounded-xl flex items-center justify-center rotate-6">
-                  <PencilRuler className="w-10 h-10 text-[#5C6B60]" />
-                  <span className="absolute -top-3 -left-3 text-[9px] font-mono text-[#5C6B60] bg-[#FAF8F5] px-1.5 py-0.5 rounded border border-[#E8E2D9]">
-                    CAD_SKETCH.dxf
-                  </span>
-                </div>
-              </div>
-
-              {/* Photorealistic Product Transformation Layer */}
-              <div
-                className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-500 ${
-                  hoveredCard === 'idea'
-                    ? 'opacity-100 scale-105 bg-gradient-to-br from-[#1D3E31] via-[#224838] to-[#122A21] text-[#FAF8F5]'
-                    : 'opacity-0 scale-90'
-                }`}
-              >
-                {/* Subtle technical grid background */}
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(196,163,90,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(196,163,90,0.04)_1px,transparent_1px)] bg-[size:16px_16px]" />
-                
-                <div className="relative z-10 w-20 h-20 rounded-2xl bg-white/[0.04] backdrop-blur-xs border border-[#C4A35A]/50 flex items-center justify-center mb-2 shadow-[0_0_25px_rgba(196,163,90,0.25)]">
-                  <Cpu className="w-10 h-10 text-[#C4A35A] drop-shadow-[0_0_8px_rgba(196,163,90,0.5)]" />
-                </div>
-                <span className="relative z-10 text-[10px] uppercase font-mono tracking-widest text-[#C4A35A] font-semibold drop-shadow-[0_0_4px_rgba(196,163,90,0.3)]">
-                  PROTOTYPE_RENDER.3D
+              <div className={`relative w-28 h-28 bg-[#E8E2D9] border-2 border-dashed border-[#5C6B60]/50 rounded-xl flex items-center justify-center transition-all duration-500 ${hoveredCard === 'idea' ? 'scale-110 rotate-3 shadow-xl border-[#1A3C2F]' : ''}`}>
+                <PencilRuler className={`w-10 h-10 transition-colors duration-500 ${hoveredCard === 'idea' ? 'text-[#C4A35A]' : 'text-[#5C6B60]'}`} />
+                <span className={`absolute -top-3 -left-3 text-[9px] font-mono px-1.5 py-0.5 rounded border transition-all duration-500 ${hoveredCard === 'idea' ? 'bg-[#1A3C2F] text-[#FAF8F5] border-[#1A3C2F]' : 'bg-[#FAF8F5] text-[#5C6B60] border-[#E8E2D9]'}`}>
+                  CAD_SKETCH.dxf
                 </span>
+                
+                {/* CPU chip that floats in on hover */}
+                <motion.div 
+                  initial={false}
+                  animate={{ opacity: hoveredCard === 'idea' ? 1 : 0, y: hoveredCard === 'idea' ? 0 : 10, x: 20 }}
+                  className="absolute -bottom-4 -right-4 w-12 h-12 bg-[#FAF8F5] border border-[#E8E2D9] rounded-lg shadow-lg flex items-center justify-center z-10"
+                >
+                   <Cpu className="w-6 h-6 text-[#1A3C2F]" />
+                </motion.div>
               </div>
             </div>
 
@@ -87,7 +69,10 @@ export const QuickEntry: React.FC<QuickEntryProps> = ({ onSelectOption }) => {
             {/* CTA */}
             <div className="pt-4 border-t border-[#E8E2D9] flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[#1A3C2F] group-hover:text-[#1A3C2F]">
               <span>Start a Custom Project</span>
-              <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:rotate-45 group-hover:translate-x-1" />
+              <div className="relative overflow-hidden w-4 h-4">
+                <ArrowUpRight className="absolute inset-0 w-full h-full transition-transform duration-300 group-hover:translate-x-full group-hover:-translate-y-full" />
+                <ArrowUpRight className="absolute inset-0 w-full h-full -translate-x-full translate-y-full transition-transform duration-300 group-hover:translate-x-0 group-hover:translate-y-0" />
+              </div>
             </div>
           </motion.div>
 
@@ -143,7 +128,10 @@ export const QuickEntry: React.FC<QuickEntryProps> = ({ onSelectOption }) => {
             {/* CTA */}
             <div className="pt-4 border-t border-[#E8E2D9] flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[#1A3C2F]">
               <span>Browse Projects</span>
-              <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:rotate-45 group-hover:translate-x-1" />
+              <div className="relative overflow-hidden w-4 h-4">
+                <ArrowUpRight className="absolute inset-0 w-full h-full transition-transform duration-300 group-hover:translate-x-full group-hover:-translate-y-full" />
+                <ArrowUpRight className="absolute inset-0 w-full h-full -translate-x-full translate-y-full transition-transform duration-300 group-hover:translate-x-0 group-hover:translate-y-0" />
+              </div>
             </div>
           </motion.div>
 
@@ -201,7 +189,10 @@ export const QuickEntry: React.FC<QuickEntryProps> = ({ onSelectOption }) => {
             {/* CTA */}
             <div className="pt-4 border-t border-[#E8E2D9] flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[#1A3C2F]">
               <span>Explore Digital Services</span>
-              <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:rotate-45 group-hover:translate-x-1" />
+              <div className="relative overflow-hidden w-4 h-4">
+                <ArrowUpRight className="absolute inset-0 w-full h-full transition-transform duration-300 group-hover:translate-x-full group-hover:-translate-y-full" />
+                <ArrowUpRight className="absolute inset-0 w-full h-full -translate-x-full translate-y-full transition-transform duration-300 group-hover:translate-x-0 group-hover:translate-y-0" />
+              </div>
             </div>
           </motion.div>
 

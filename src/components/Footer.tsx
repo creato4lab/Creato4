@@ -1,15 +1,26 @@
 import React from 'react';
 import { Linkedin, Instagram, Twitter, Github, Mail, Phone, MapPin, ArrowUpRight } from 'lucide-react';
 import { Creato4LabLogoMark } from './LogoMark';
+import { motion, useMotionValue, useMotionTemplate } from 'motion/react';
 
 interface FooterProps {
   onOpenDiscuss: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    const { currentTarget, clientX, clientY } = e;
+    const { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
+  };
+
   return (
-    <footer className="bg-[#1A3C2F] text-[#FAF8F5] pt-20 pb-12 border-t border-[#234B3C] px-6 sm:px-10 lg:px-16 xl:px-20">
-      <div className="max-w-[1800px] mx-auto">
+    <footer onMouseMove={handleMouseMove} className="relative bg-[#1A3C2F] text-[#FAF8F5] pt-20 pb-12 border-t border-[#234B3C] px-6 sm:px-10 lg:px-16 xl:px-20 overflow-hidden">
+      <div className="max-w-[1800px] mx-auto relative z-10">
         
         {/* Top Row Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16">
@@ -32,10 +43,13 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
 
             <button
               onClick={onOpenDiscuss}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#FAF8F5] text-[#1A3C2F] text-xs font-bold uppercase tracking-wider hover:bg-[#FAF8F5]/90 transition-all w-fit"
+              className="group inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#FAF8F5] text-[#1A3C2F] text-xs font-bold uppercase tracking-wider hover:bg-[#FAF8F5]/90 transition-all w-fit"
             >
               <span>Schedule Tech Consultation</span>
-              <ArrowUpRight className="w-4 h-4" />
+              <div className="relative overflow-hidden w-4 h-4">
+                <ArrowUpRight className="absolute inset-0 w-full h-full transition-transform duration-300 group-hover:translate-x-full group-hover:-translate-y-full" />
+                <ArrowUpRight className="absolute inset-0 w-full h-full -translate-x-full translate-y-full transition-transform duration-300 group-hover:translate-x-0 group-hover:translate-y-0" />
+              </div>
             </button>
           </div>
 
@@ -230,11 +244,25 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
 
         </div>
 
-        {/* Giant Footer Typography */}
-        <div className="w-full mt-16 mb-8 flex justify-center items-center pointer-events-none select-none">
+        {/* Giant Footer Typography with Mouse Spotlight Glow */}
+        <div className="w-full mt-16 mb-8 flex justify-center items-center pointer-events-none select-none relative">
+          
+          {/* Base faint text */}
           <h1 className="text-[clamp(4rem,14vw,18rem)] font-black tracking-[-0.04em] text-[#FAF8F5] opacity-[0.03] leading-[0.8] w-full text-center overflow-hidden">
             CREATO4
           </h1>
+          
+          {/* Spotlight glow text */}
+          <motion.h1 
+            className="absolute inset-0 text-[clamp(4rem,14vw,18rem)] font-black tracking-[-0.04em] text-[#C4A35A] leading-[0.8] w-full text-center overflow-hidden"
+            style={{
+              WebkitMaskImage: useMotionTemplate`radial-gradient(350px circle at ${mouseX}px ${mouseY}px, black 0%, transparent 100%)`,
+              maskImage: useMotionTemplate`radial-gradient(350px circle at ${mouseX}px ${mouseY}px, black 0%, transparent 100%)`
+            }}
+          >
+            CREATO4
+          </motion.h1>
+
         </div>
 
         {/* Bottom Row */}
