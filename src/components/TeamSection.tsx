@@ -40,9 +40,8 @@ const TEAM_MEMBERS: TeamMember[] = [
     name: 'Nisarg Patel',
     emoji: '🔧',
     initials: 'NP',
-    avatarUrl: '/nisarg_memoji.png',
-    dicebearUrl:
-      'https://api.dicebear.com/9.x/avataaars/png?seed=NisargEngineer&backgroundColor=d1e8d1&radius=50&size=256&top=shortHairTheCaesar&facialHair=beardLight&clothing=hoodie',
+    avatarUrl: '/nisarg_photo.png',
+    dicebearUrl: '/nisarg_photo.png',
     role: 'HEAD OF ELECTRONICS, EMBEDDED SYSTEMS & MANUFACTURING',
     description:
       'Head of Electronics, PCB Design & Hardware Validation — leads PCB design and hardware validation. Head of Embedded Systems & Firmware Development — owns firmware and embedded architecture. Head of Mechanical Design, CAD & Prototyping — leads CAD modeling and physical prototyping. Head of Product Manufacturing, Supply Chain & Operations.',
