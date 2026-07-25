@@ -33,7 +33,7 @@ export const StudentProjects: React.FC<StudentProjectsProps> = ({ onSelectProjec
   };
 
   return (
-    <section id="student-projects" className="py-20 lg:py-32 bg-[#F5F0EA] border-b border-[#E8E2D9] px-6 sm:px-10 lg:px-16 xl:px-20">
+    <section id="student-projects" className="py-20 lg:py-32 bg-[#FAF8F5] border-b border-[#E8E2D9] px-6 sm:px-10 lg:px-16 xl:px-20">
       <div className="max-w-[1800px] mx-auto">
         
         {/* Header */}

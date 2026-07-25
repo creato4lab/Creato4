@@ -256,7 +256,7 @@ export const TeamSection: React.FC = () => {
   };
 
   return (
-    <section id="team" className="w-full bg-[#f5f0eb] py-20 px-6 sm:px-10 lg:px-16 xl:px-20 font-sans">
+    <section id="team" className="w-full bg-[#FAF8F5] border-t border-[#E8E2D9] py-20 lg:py-32 px-6 sm:px-10 lg:px-16 xl:px-20 font-sans">
       <div className="max-w-[1800px] mx-auto">
         {/* Section Header */}
         <div className="text-center mb-14">
