@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, User, ShoppingBag, ArrowUpRight, Menu, X, ChevronDown } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from 'motion/react';
 import { Creato4LabLogoMark } from './LogoMark';
 
 interface NavbarProps {
@@ -11,6 +11,8 @@ interface NavbarProps {
   cartCount?: number;
 }
 
+const EASING: [number, number, number, number] = [0.4, 0, 0.2, 1];
+
 export const Navbar: React.FC<NavbarProps> = ({
   onOpenDiscuss,
   onOpenSearch,
@@ -18,22 +20,41 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenCart,
   cartCount = 0,
 }) => {
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolled, setIsScrolled]     = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
+  // Spring-driven scroll progress (0 = top, 1 = scrolled)
+  const scrollProgress = useMotionValue(0);
+  const spring = useSpring(scrollProgress, { stiffness: 160, damping: 28, mass: 0.6 });
+
   useEffect(() => {
-    const handleScroll = () => {
+    const onScroll = () => {
+      const p = Math.min(window.scrollY / 100, 1);
+      scrollProgress.set(p);
       setIsScrolled(window.scrollY > 80);
     };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [scrollProgress]);
+
+  // Derived animated values from the spring
+  const borderRadius  = useTransform(spring, [0, 1], [0, 9999]);
+  const topPad        = useTransform(spring, [0, 1], [0, 14]);
+  const sidePad       = useTransform(spring, [0, 1], [0, 24]);
+  const innerPadY     = useTransform(spring, [0, 1], [14, 9]);
+  const innerPadX     = useTransform(spring, [0, 1], [32, 16]);
+  const bgAlpha       = useTransform(spring, [0, 0.3, 1], [0, 0, 0.86]);
+  const blurVal       = useTransform(spring, [0, 1], [0, 24]);
+  const shadowAlpha   = useTransform(spring, [0, 0.5, 1], [0, 0, 0.13]);
+  const maxWidthVal   = useTransform(spring, [0, 1], [1800, 940]);
+  const logoSize      = useTransform(spring, [0, 1], [40, 34]);
+  const brandSize     = useTransform(spring, [0, 1], [22, 16]);
+  const linkSize      = useTransform(spring, [0, 1], [11.5, 10.5]);
 
   const navLinks = [
     {
-      name: 'WORK',
-      href: '#work',
+      name: 'WORK', href: '#work',
       dropdown: [
         { label: 'Smart Privacy Health Kiosk', href: '#work' },
         { label: 'Agri-Titan X6 Drone', href: '#work' },
@@ -44,8 +65,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       ],
     },
     {
-      name: 'SERVICES',
-      href: '#services',
+      name: 'SERVICES', href: '#services',
       dropdown: [
         { label: 'Product Engineering', href: '#services' },
         { label: 'Mechanical Design & CAD', href: '#services' },
@@ -56,8 +76,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       ],
     },
     {
-      name: 'STUDENT PROJECTS',
-      href: '#student-projects',
+      name: 'STUDENT PROJECTS', href: '#student-projects',
       dropdown: [
         { label: 'Featured Blueprints', href: '#student-projects' },
         { label: 'Popular DIY Kits', href: '#student-projects' },
@@ -65,16 +84,14 @@ export const Navbar: React.FC<NavbarProps> = ({
       ],
     },
     {
-      name: 'PROCESS',
-      href: '#process',
+      name: 'PROCESS', href: '#process',
       dropdown: [
         { label: '8-Step Engineering Methodology', href: '#process' },
         { label: 'Proof of Concept & Feasibility', href: '#process' },
       ],
     },
     {
-      name: 'ABOUT',
-      href: '#team',
+      name: 'ABOUT', href: '#team',
       dropdown: [
         { label: 'Engineering Lab Team', href: '#team' },
         { label: 'Lab Achievements & Awards', href: '#trust' },
@@ -84,238 +101,204 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <>
-      {/* ─── TOP BAR (before scroll) ─────────────────────────── */}
-      <AnimatePresence>
-        {!isScrolled && (
-          <motion.header
-            key="top-bar"
-            initial={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3, ease: 'easeIn' }}
-            className="fixed top-0 left-0 right-0 h-[72px] z-[100] bg-transparent"
-          >
-            <div className="max-w-[1800px] w-full h-full mx-auto px-6 sm:px-10 lg:px-16 xl:px-20 flex items-center justify-between">
-              {/* Brand */}
-              <a href="#" className="flex items-center gap-3 group text-[#1A3C2F] transition-transform duration-200 active:scale-95">
-                <Creato4LabLogoMark size={40} />
-                <span className="text-xl lg:text-2xl font-extrabold tracking-tight">CREATO4</span>
-              </a>
-
-              {/* Desktop Nav */}
-              <nav className="hidden lg:flex items-center gap-8">
-                {navLinks.map((link) => (
-                  <div
-                    key={link.name}
-                    className="relative py-6"
-                    onMouseEnter={() => setActiveDropdown(link.name)}
-                    onMouseLeave={() => setActiveDropdown(null)}
-                  >
-                    <a
-                      href={link.href}
-                      className="group inline-flex items-center gap-1 text-[0.72rem] font-semibold tracking-[0.18em] text-[#5C6B60] hover:text-[#1A3C2F] transition-colors duration-200 uppercase relative"
-                    >
-                      <span>{link.name}</span>
-                      <ChevronDown className="w-3 h-3 transition-transform duration-200 group-hover:rotate-180" />
-                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-[#1A3C2F] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center" />
-                    </a>
-                    <AnimatePresence>
-                      {activeDropdown === link.name && link.dropdown && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 8 }}
-                          transition={{ duration: 0.2, ease: 'easeOut' }}
-                          className="absolute top-full left-0 w-64 py-3 px-2 bg-[#FAF8F5]/95 border border-[#E8E2D9] rounded-2xl shadow-xl backdrop-blur-xl z-50"
-                        >
-                          {link.dropdown.map((item, idx) => (
-                            <a
-                              key={idx}
-                              href={item.href}
-                              onClick={() => setActiveDropdown(null)}
-                              className="block px-4 py-2.5 rounded-xl text-xs font-medium text-[#5C6B60] hover:text-[#1A3C2F] hover:bg-[#F5F0EA] transition-all duration-150 flex items-center justify-between group/item"
-                            >
-                              <span>{item.label}</span>
-                              <ArrowUpRight className="w-3 h-3 opacity-0 group-hover/item:opacity-100 transition-opacity" />
-                            </a>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                ))}
-              </nav>
-
-              {/* Right CTAs */}
-              <div className="hidden lg:flex items-center gap-6">
-                <button
-                  onClick={onOpenDiscuss}
-                  className="group inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#1A3C2F] text-[#FAF8F5] text-xs font-semibold tracking-wider hover:bg-[#234B3C] transition-all duration-300 shadow-sm cursor-pointer"
-                >
-                  <span>Discuss Your Idea</span>
-                  <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:rotate-45" />
-                </button>
-                <div className="flex items-center gap-4 border-l border-[#E8E2D9] pl-6 text-[#5C6B60]">
-                  <button onClick={onOpenSearch} aria-label="Search" className="p-1.5 hover:text-[#1A3C2F] transition-colors rounded-full hover:bg-[#F5F0EA] cursor-pointer">
-                    <Search className="w-5 h-5 stroke-[1.5]" />
-                  </button>
-                  <button onClick={onOpenAccount} aria-label="Account" className="p-1.5 hover:text-[#1A3C2F] transition-colors rounded-full hover:bg-[#F5F0EA] cursor-pointer">
-                    <User className="w-5 h-5 stroke-[1.5]" />
-                  </button>
-                  <button onClick={onOpenCart} aria-label="Cart" className="p-1.5 hover:text-[#1A3C2F] transition-colors rounded-full hover:bg-[#F5F0EA] relative cursor-pointer">
-                    <ShoppingBag className="w-5 h-5 stroke-[1.5]" />
-                    {cartCount > 0 && (
-                      <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#C4A35A] text-[#1A3C2F] text-[10px] font-extrabold flex items-center justify-center">
-                        {cartCount}
-                      </span>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Mobile toggle */}
-              <div className="flex lg:hidden items-center gap-3">
-                <button onClick={onOpenDiscuss} className="px-3.5 py-1.5 rounded-full bg-[#1A3C2F] text-[#FAF8F5] text-[11px] font-semibold cursor-pointer">
-                  Discuss
-                </button>
-                <button
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="p-2 text-[#1A3C2F] hover:bg-[#F5F0EA] rounded-lg transition-colors cursor-pointer"
-                  aria-label="Toggle Navigation Menu"
-                >
-                  {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                </button>
-              </div>
-            </div>
-          </motion.header>
-        )}
-      </AnimatePresence>
-
-      {/* ─── FLOATING PILL NAVBAR (after scroll) ─────────────── */}
-      <AnimatePresence>
-        {isScrolled && (
+      {/* ─────────────────────────────────────────────────────────────
+          MORPHING NAVBAR — single element, spring-animated shape
+      ───────────────────────────────────────────────────────────── */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 z-[100] flex justify-center pointer-events-none"
+        style={{ paddingTop: topPad, paddingLeft: sidePad, paddingRight: sidePad }}
+      >
+        <motion.div
+          className="pointer-events-auto w-full overflow-visible"
+          style={{
+            maxWidth: maxWidthVal,
+            borderRadius,
+            // Glass background
+            backgroundColor: useTransform(bgAlpha, (a) => `rgba(250,248,245,${a})`),
+            backdropFilter: useTransform(blurVal, (b) => `blur(${b}px)`),
+            WebkitBackdropFilter: useTransform(blurVal, (b) => `blur(${b}px)`),
+            // Outline border for glass look
+            boxShadow: useTransform(shadowAlpha, (a) =>
+              a > 0.01
+                ? `0 8px 40px rgba(26,60,47,${a}), 0 1px 0 rgba(255,255,255,0.55) inset, 0 0 0 1px rgba(232,226,217,${a * 1.5})`
+                : 'none'
+            ),
+          }}
+        >
           <motion.div
-            key="pill-nav"
-            initial={{ opacity: 0, y: -28, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.96 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed top-4 left-1/2 z-[100] -translate-x-1/2"
-            style={{ width: 'min(90vw, 920px)' }}
+            className="flex items-center justify-between"
+            style={{ paddingTop: innerPadY, paddingBottom: innerPadY, paddingLeft: innerPadX, paddingRight: innerPadX }}
           >
-            <div
-              className="flex items-center justify-between gap-4 px-4 py-2.5 rounded-full border border-white/20 shadow-2xl"
-              style={{
-                background: 'rgba(250,248,245,0.82)',
-                backdropFilter: 'blur(24px)',
-                WebkitBackdropFilter: 'blur(24px)',
-                boxShadow: '0 8px 40px rgba(26,60,47,0.12), 0 1px 0 rgba(255,255,255,0.5) inset',
-              }}
-            >
-              {/* Logo mark */}
-              <a href="#" className="flex items-center gap-2.5 group shrink-0">
-                <Creato4LabLogoMark size={34} />
-                <span className="text-sm font-extrabold tracking-tight text-[#1A3C2F] hidden sm:block">CREATO4</span>
-              </a>
 
-              {/* Nav links — compact */}
-              <nav className="hidden lg:flex items-center gap-1">
-                {navLinks.map((link) => (
-                  <div
-                    key={link.name}
-                    className="relative"
-                    onMouseEnter={() => setActiveDropdown('pill-' + link.name)}
-                    onMouseLeave={() => setActiveDropdown(null)}
+            {/* ── BRAND LOGO ─────────────────────────────── */}
+            <a href="#" className="flex items-center gap-2.5 group shrink-0">
+              <motion.div style={{ width: logoSize, height: logoSize }}>
+                <MotionLogoMark size={logoSize} />
+              </motion.div>
+              <motion.span
+                className="font-extrabold tracking-tight text-[#1A3C2F] hidden sm:block"
+                style={{ fontSize: brandSize }}
+              >
+                CREATO4
+              </motion.span>
+            </a>
+
+            {/* ── DESKTOP NAV LINKS ─────────────────────── */}
+            <nav className="hidden lg:flex items-center">
+              {navLinks.map((link) => (
+                <div
+                  key={link.name}
+                  className="relative"
+                  onMouseEnter={() => setActiveDropdown(link.name)}
+                  onMouseLeave={() => setActiveDropdown(null)}
+                >
+                  <motion.a
+                    href={link.href}
+                    className="group inline-flex items-center gap-0.5 font-semibold tracking-[0.16em] text-[#5C6B60] hover:text-[#1A3C2F] transition-colors duration-200 uppercase relative"
+                    style={{
+                      fontSize: linkSize,
+                      paddingLeft: useTransform(spring, [0, 1], [16, 10]),
+                      paddingRight: useTransform(spring, [0, 1], [16, 10]),
+                      paddingTop: useTransform(spring, [0, 1], [24, 10]),
+                      paddingBottom: useTransform(spring, [0, 1], [24, 10]),
+                      borderRadius: useTransform(spring, [0, 1], [0, 999]),
+                    }}
                   >
-                    <a
-                      href={link.href}
-                      className="inline-flex items-center gap-0.5 px-3 py-1.5 rounded-full text-[0.68rem] font-semibold tracking-[0.14em] text-[#5C6B60] hover:text-[#1A3C2F] hover:bg-[#1A3C2F]/6 transition-all duration-200 uppercase"
-                    >
-                      {link.name}
-                      <ChevronDown className="w-2.5 h-2.5 transition-transform duration-200" style={{ transform: activeDropdown === 'pill-' + link.name ? 'rotate(180deg)' : 'rotate(0deg)' }} />
-                    </a>
+                    <span>{link.name}</span>
+                    <ChevronDown
+                      className="w-2.5 h-2.5 transition-transform duration-200 shrink-0"
+                      style={{ transform: activeDropdown === link.name ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                    />
+                    {/* Underline — only visible before scroll */}
+                    <motion.span
+                      className="absolute bottom-3 left-0 w-full h-[1px] bg-[#1A3C2F] origin-center"
+                      style={{
+                        scaleX: 0,
+                        opacity: useTransform(spring, [0.6, 1], [1, 0]),
+                      }}
+                    />
+                  </motion.a>
 
-                    {/* Dropdown */}
-                    <AnimatePresence>
-                      {activeDropdown === 'pill-' + link.name && link.dropdown && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 6, scale: 0.97 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 6, scale: 0.97 }}
-                          transition={{ duration: 0.18, ease: 'easeOut' }}
-                          className="absolute top-full mt-2 left-0 w-60 py-2 px-2 rounded-2xl border border-[#E8E2D9] shadow-2xl z-50"
-                          style={{
-                            background: 'rgba(250,248,245,0.96)',
-                            backdropFilter: 'blur(20px)',
-                            WebkitBackdropFilter: 'blur(20px)',
-                          }}
-                        >
-                          {link.dropdown.map((item, idx) => (
-                            <a
-                              key={idx}
-                              href={item.href}
-                              onClick={() => setActiveDropdown(null)}
-                              className="flex items-center justify-between px-3 py-2 rounded-xl text-[11px] font-medium text-[#5C6B60] hover:text-[#1A3C2F] hover:bg-[#F5F0EA] transition-all group/item"
-                            >
-                              <span>{item.label}</span>
-                              <ArrowUpRight className="w-3 h-3 opacity-0 group-hover/item:opacity-100 transition-opacity" />
-                            </a>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                ))}
-              </nav>
-
-              {/* Right side */}
-              <div className="flex items-center gap-2 shrink-0">
-                <div className="hidden lg:flex items-center gap-1 text-[#5C6B60]">
-                  <button onClick={onOpenSearch} aria-label="Search" className="p-1.5 hover:text-[#1A3C2F] transition-colors rounded-full hover:bg-[#1A3C2F]/6 cursor-pointer">
-                    <Search className="w-4 h-4 stroke-[1.5]" />
-                  </button>
-                  <button onClick={onOpenAccount} aria-label="Account" className="p-1.5 hover:text-[#1A3C2F] transition-colors rounded-full hover:bg-[#1A3C2F]/6 cursor-pointer">
-                    <User className="w-4 h-4 stroke-[1.5]" />
-                  </button>
-                  <button onClick={onOpenCart} aria-label="Cart" className="p-1.5 hover:text-[#1A3C2F] transition-colors rounded-full hover:bg-[#1A3C2F]/6 relative cursor-pointer">
-                    <ShoppingBag className="w-4 h-4 stroke-[1.5]" />
-                    {cartCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#C4A35A] text-[#1A3C2F] text-[9px] font-extrabold flex items-center justify-center">
-                        {cartCount}
-                      </span>
+                  {/* Dropdown */}
+                  <AnimatePresence>
+                    {activeDropdown === link.name && link.dropdown && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 6, scale: 0.97 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 6, scale: 0.97 }}
+                        transition={{ duration: 0.18, ease: 'easeOut' }}
+                        className="absolute top-full mt-1 left-0 w-64 py-2.5 px-2 rounded-2xl border border-[#E8E2D9] shadow-2xl z-50"
+                        style={{
+                          background: 'rgba(250,248,245,0.97)',
+                          backdropFilter: 'blur(20px)',
+                          WebkitBackdropFilter: 'blur(20px)',
+                        }}
+                      >
+                        {link.dropdown.map((item, idx) => (
+                          <a
+                            key={idx}
+                            href={item.href}
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#5C6B60] hover:text-[#1A3C2F] hover:bg-[#F5F0EA] transition-all group/item"
+                          >
+                            <span>{item.label}</span>
+                            <ArrowUpRight className="w-3 h-3 opacity-0 group-hover/item:opacity-100 transition-opacity" />
+                          </a>
+                        ))}
+                      </motion.div>
                     )}
-                  </button>
+                  </AnimatePresence>
                 </div>
+              ))}
+            </nav>
 
-                <button
-                  onClick={onOpenDiscuss}
-                  className="group inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1A3C2F] text-[#FAF8F5] text-[11px] font-semibold tracking-wide hover:bg-[#234B3C] transition-all duration-300 shadow-sm cursor-pointer"
-                >
+            {/* ── RIGHT ACTIONS ──────────────────────────── */}
+            <div className="hidden lg:flex items-center gap-2 shrink-0">
+              {/* Icon cluster */}
+              <motion.div
+                className="flex items-center gap-1 text-[#5C6B60]"
+                style={{
+                  paddingRight: useTransform(spring, [0, 1], [16, 4]),
+                  borderRight: '1px solid',
+                  borderColor: useTransform(spring, [0, 0.5, 1], [
+                    'rgba(232,226,217,1)', 'rgba(232,226,217,0.6)', 'rgba(232,226,217,0.4)'
+                  ]),
+                }}
+              >
+                <button onClick={onOpenSearch} aria-label="Search" className="p-1.5 hover:text-[#1A3C2F] hover:bg-[#1A3C2F]/6 rounded-full transition-colors cursor-pointer">
+                  <Search className="w-4 h-4 stroke-[1.5]" />
+                </button>
+                <button onClick={onOpenAccount} aria-label="Account" className="p-1.5 hover:text-[#1A3C2F] hover:bg-[#1A3C2F]/6 rounded-full transition-colors cursor-pointer">
+                  <User className="w-4 h-4 stroke-[1.5]" />
+                </button>
+                <button onClick={onOpenCart} aria-label="Cart" className="p-1.5 hover:text-[#1A3C2F] hover:bg-[#1A3C2F]/6 rounded-full transition-colors relative cursor-pointer">
+                  <ShoppingBag className="w-4 h-4 stroke-[1.5]" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#C4A35A] text-[#1A3C2F] text-[9px] font-extrabold flex items-center justify-center">
+                      {cartCount}
+                    </span>
+                  )}
+                </button>
+              </motion.div>
+
+              {/* CTA Button — label morphs too */}
+              <motion.button
+                onClick={onOpenDiscuss}
+                className="group flex items-center justify-center rounded-full bg-[#1A3C2F] text-[#FAF8F5] font-semibold hover:bg-[#234B3C] shadow-sm cursor-pointer whitespace-nowrap overflow-hidden"
+                style={{
+                  paddingLeft: useTransform(spring, [0, 1], [24, 16]),
+                  paddingRight: useTransform(spring, [0, 1], [24, 16]),
+                  paddingTop: useTransform(spring, [0, 1], [10, 8]),
+                  paddingBottom: useTransform(spring, [0, 1], [10, 8]),
+                  fontSize: useTransform(spring, [0, 1], [12, 11]),
+                  letterSpacing: useTransform(spring, (v) => `${0.06 - v * 0.02}em`),
+                  gap: useTransform(spring, [0, 1], [6, 4]),
+                }}
+              >
+                <div className="flex items-center">
                   <span>Discuss</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:rotate-45" />
-                </button>
-
-                {/* Mobile hamburger (inside pill) */}
-                <button
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="lg:hidden p-1.5 text-[#1A3C2F] hover:bg-[#1A3C2F]/6 rounded-full transition-colors cursor-pointer"
-                  aria-label="Toggle Navigation"
-                >
-                  {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-                </button>
-              </div>
+                  <motion.span
+                    style={{
+                      display: 'inline-block',
+                      overflow: 'hidden',
+                      whiteSpace: 'pre',
+                      width: useTransform(spring, [0, 1], [68, 0]),
+                      opacity: useTransform(spring, [0, 0.8], [1, 0]),
+                    }}
+                  >
+                    {" Your Idea"}
+                  </motion.span>
+                </div>
+                <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:rotate-45 shrink-0" />
+              </motion.button>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      {/* ─── Mobile Drawer ───────────────────────────────────── */}
+            {/* ── MOBILE HAMBURGER ───────────────────────── */}
+            <div className="flex lg:hidden items-center gap-2">
+              <button onClick={onOpenDiscuss} className="px-3.5 py-1.5 rounded-full bg-[#1A3C2F] text-[#FAF8F5] text-[11px] font-semibold cursor-pointer">
+                Discuss
+              </button>
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2 text-[#1A3C2F] hover:bg-[#1A3C2F]/6 rounded-full transition-colors cursor-pointer"
+                aria-label="Toggle Navigation"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
+
+          </motion.div>
+        </motion.div>
+      </motion.div>
+
+      {/* ─── MOBILE DRAWER ───────────────────────────────────────── */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
             className="fixed inset-y-0 right-0 w-full max-w-sm bg-[#FAF8F5] shadow-2xl z-[101] flex flex-col justify-between p-8 border-l border-[#E8E2D9] lg:hidden"
           >
             <div className="flex items-center justify-between border-b border-[#E8E2D9] pb-6">
@@ -366,5 +349,17 @@ export const Navbar: React.FC<NavbarProps> = ({
         )}
       </AnimatePresence>
     </>
+  );
+};
+
+// Helper: animated logo size via motion value
+const MotionLogoMark: React.FC<{ size: any }> = ({ size }) => {
+  return (
+    <motion.img
+      src="/creato4logo.png"
+      alt="Creato4 Lab Logo"
+      style={{ width: size, height: size, borderRadius: 12, objectFit: 'cover', flexShrink: 0 }}
+      className="shadow-sm"
+    />
   );
 };
