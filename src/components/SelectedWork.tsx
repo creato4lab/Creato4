@@ -15,10 +15,10 @@ export const SelectedWork: React.FC<SelectedWorkProps> = ({ onSelectProject }) =
         
         {/* Section Header */}
         <div className="mb-16">
-          <span className="text-[0.75rem] uppercase font-bold tracking-[0.2em] text-[#5C6B60] block mb-3">
+          <span className="text-[0.75rem] uppercase font-bold tracking-[0.2em] text-[#C4A35A] block mb-3">
             SELECTED ENGINEERING WORK
           </span>
-          <h2 className="heading-h1 text-[#1A3C2F] font-extrabold tracking-tight">
+          <h2 className="heading-h1 text-[#FAF8F5] font-extrabold tracking-tight">
             THINGS WE’VE ACTUALLY BUILT
           </h2>
         </div>
