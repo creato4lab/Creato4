@@ -51,7 +51,7 @@ export const WORK_PROJECTS: WorkProject[] = [
     category: 'Hardware · Embedded Systems · Safety Technology',
     tags: ['Hardware', 'Embedded Systems', 'Safety Technology'],
     badge: 'State-Level Winning Project',
-    image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80',
+    image: '/smart-safety-helmet.jpg',
     description: 'Intelligent hard hat with impact detection, toxic gas monitoring (CO/Methane), optical thermal wear detection, and fall alerts connected to central site dashboards.',
     challenge: 'Ultra-low power constraints and lightweight ergonomic balancing for 12-hour continuous wear.',
     solution: 'Custom curved PCB fitting inside helmet shock absorption liners, Bluetooth Mesh mesh networking, and sub-100mW power consumption profile.',
