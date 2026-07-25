@@ -1,458 +1,427 @@
-import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import React, { useEffect, useRef, useState } from 'react';
+import { motion } from 'motion/react';
 
 interface PreloaderProps {
   onComplete: () => void;
 }
 
-// Easing curves for premium motion
-const EXPO_OUT = [0.16, 1, 0.3, 1] as const;
-const CIRC_OUT = [0, 0.55, 0.45, 1] as const;
-const SOFT_SPRING = { type: 'spring', stiffness: 60, damping: 20 };
+// ── Brand palette from creato4-logo.svg ──────────────────────
+const C = {
+  green:  '#1C482A',
+  cream:  '#F6F1E5',
+  gold:   '#C4A35A',
+  dark:   '#14371F',
+};
+
+// Helpers ─────────────────────────────────────────────────────
+const lerp    = (a: number, b: number, t: number) => a + (b - a) * t;
+const clamp   = (t: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, t));
+const easeOut = (t: number, p = 3) => 1 - Math.pow(1 - t, p);
+const easeIO  = (t: number) => t < 0.5 ? 4*t*t*t : 1 - (-2*t+2)**3/2;
+
+const prog = (t: number, s: number, e: number, fn = easeOut) =>
+  fn(clamp((t - s) / (e - s)));
+
+const hex2rgb = (h: string) => {
+  const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(h)!;
+  return [parseInt(r[1],16), parseInt(r[2],16), parseInt(r[3],16)] as const;
+};
+const rgba = (hex: string, a: number) => {
+  const [r,g,b] = hex2rgb(hex);
+  return `rgba(${r},${g},${b},${a})`;
+};
 
 export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
-  const [tick, setTick] = useState(0); // 0–7 phases over 5s
-  const prefersReducedMotion = useReducedMotion();
+  const canvasRef  = useRef<HTMLCanvasElement>(null);
+  const rafRef     = useRef<number>(0);
+  const startRef   = useRef<number>(0);
+
+  const [showLogo,    setShowLogo]    = useState(false);
+  const [showTag,     setShowTag]     = useState(false);
+  const [dissolving,  setDissolving]  = useState(false);
+  const [gone,        setGone]        = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
 
-    // Phase schedule (ms from start):
-    // 0ms   → phase 0: black canvas
-    // 300ms → phase 1: first geometric forms emerge
-    // 1000ms → phase 2: second layer, forms breathe
-    // 2000ms → phase 3: elements begin gravitating
-    // 3000ms → phase 4: convergence, alignment
-    // 4000ms → phase 5: logo appears
-    // 4500ms → phase 6: hold
-    // 5000ms → phase 7: dissolve out
+    const canvas = canvasRef.current!;
+    const ctx    = canvas.getContext('2d')!;
 
-    const schedule = prefersReducedMotion
-      ? [0, 100, 200, 300, 400, 500, 600, 700]
-      : [0, 300, 1000, 2000, 3000, 4000, 4600, 5400];
+    const resize = () => {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
 
-    const timers = schedule.map((ms, i) =>
-      setTimeout(() => setTick(i), ms)
-    );
+    /* ── State flags so we only fire React state updates once ── */
+    let did = { logo: false, tag: false, dissolve: false, done: false };
 
-    const done = setTimeout(() => {
-      document.body.style.overflow = 'unset';
-      onComplete();
-    }, prefersReducedMotion ? 900 : 6000);
+    /* ─────────────────────────────────────────────────────────
+       DRAW LOOP — everything is drawn here, pure canvas, 60fps
+    ───────────────────────────────────────────────────────── */
+    const draw = (ts: number) => {
+      if (!startRef.current) startRef.current = ts;
+      const t  = (ts - startRef.current) / 1000;   // seconds elapsed
+      const W  = canvas.width;
+      const H  = canvas.height;
+      const cx = W / 2;
+      const cy = H / 2;
+      const S  = Math.min(W, H);                    // shortest dimension
+
+      /* CLEAR */
+      ctx.clearRect(0, 0, W, H);
+
+      /* ── BACKGROUND ───────────────────────────── */
+      ctx.fillStyle = C.green;
+      ctx.fillRect(0, 0, W, H);
+
+      /* Soft centre radial glow */
+      {
+        const a = prog(t, 0.3, 1.4) * 0.4;
+        if (a > 0) {
+          const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, S * 0.55);
+          g.addColorStop(0,   rgba(C.dark, a));
+          g.addColorStop(0.6, rgba(C.dark, a * 0.2));
+          g.addColorStop(1,   rgba(C.dark, 0));
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, W, H);
+        }
+      }
+
+      /* ── PHASE 1 ── SCANNER LINES  (0.1 → 1.1s) ─ */
+      /* Horizontal cream sweep */
+      {
+        const p = prog(t, 0.1, 0.85);
+        if (p > 0 && p < 1) {
+          const x = lerp(-200, W + 40, p);
+          const g = ctx.createLinearGradient(x - 280, 0, x + 8, 0);
+          g.addColorStop(0,    rgba(C.cream, 0));
+          g.addColorStop(0.4,  rgba(C.cream, 0.06));
+          g.addColorStop(0.85, rgba(C.cream, 0.28));
+          g.addColorStop(1,    rgba(C.cream, 0.75));
+          ctx.strokeStyle = g;
+          ctx.lineWidth   = 1.5;
+          ctx.setLineDash([]);
+          ctx.beginPath();
+          ctx.moveTo(Math.max(0, x - 300), cy);
+          ctx.lineTo(Math.min(W, x), cy);
+          ctx.stroke();
+          // leading dot
+          ctx.fillStyle = rgba(C.cream, 0.9);
+          ctx.beginPath(); ctx.arc(x, cy, 2, 0, Math.PI*2); ctx.fill();
+        }
+      }
+
+      /* Vertical gold sweep (starts 0.25s after) */
+      {
+        const p = prog(t, 0.35, 1.1);
+        if (p > 0 && p < 1) {
+          const y = lerp(-200, H + 40, p);
+          const g = ctx.createLinearGradient(0, y - 280, 0, y + 8);
+          g.addColorStop(0,    rgba(C.gold, 0));
+          g.addColorStop(0.4,  rgba(C.gold, 0.05));
+          g.addColorStop(0.85, rgba(C.gold, 0.22));
+          g.addColorStop(1,    rgba(C.gold, 0.65));
+          ctx.strokeStyle = g;
+          ctx.lineWidth   = 1;
+          ctx.beginPath();
+          ctx.moveTo(cx, Math.max(0, y - 300));
+          ctx.lineTo(cx, Math.min(H, y));
+          ctx.stroke();
+          ctx.fillStyle = rgba(C.gold, 0.85);
+          ctx.beginPath(); ctx.arc(cx, y, 1.5, 0, Math.PI*2); ctx.fill();
+        }
+      }
+
+      /* After sweep, faint crosshair stays */
+      {
+        const a = prog(t, 1.0, 1.6) * 0.08 * (1 - prog(t, 3.6, 4.2));
+        if (a > 0) {
+          ctx.strokeStyle = rgba(C.cream, a);
+          ctx.lineWidth   = 0.5;
+          ctx.setLineDash([]);
+          ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(W, cy); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
+        }
+      }
+
+      /* ── PHASE 2 ── SPARSE DOT GRID  (0.8 → 3.8s) ─ */
+      {
+        const fadeIn  = prog(t, 0.8, 1.6);
+        const fadeOut = 1 - prog(t, 3.6, 4.3);
+        const a       = fadeIn * fadeOut;
+        if (a > 0.01) {
+          const sp = S * 0.065;
+          const cols = Math.ceil(W / sp) + 2;
+          const rows = Math.ceil(H / sp) + 2;
+          for (let c = -1; c <= cols; c++) {
+            for (let r = -1; r <= rows; r++) {
+              const dx = (c + 0.5) * sp - cx;
+              const dy = (r + 0.5) * sp - cy;
+              const dist   = Math.hypot(dx, dy);
+              const falloff = 1 - dist / (Math.hypot(cx, cy) * 1.1);
+              const da = a * falloff * 0.22;
+              if (da > 0.01) {
+                ctx.fillStyle = rgba(C.cream, da);
+                ctx.beginPath();
+                ctx.arc(cx + dx, cy + dy, 0.9, 0, Math.PI*2);
+                ctx.fill();
+              }
+            }
+          }
+        }
+      }
+
+      /* ── PHASE 3 ── CONCENTRIC RINGS  (1.0 → 4.0s) ─ */
+      {
+        const NUM = 7;
+        for (let i = 0; i < NUM; i++) {
+          const delay   = 1.0 + i * 0.14;
+          const fadeIn  = prog(t, delay, delay + 0.55);
+          const fadeOut = 1 - prog(t, 3.4, 4.1);
+          const a       = fadeIn * fadeOut;
+          if (a < 0.01) continue;
+
+          const baseR  = S * (0.055 + i * 0.065);
+          const radius = baseR * lerp(0.85, 1, fadeIn);
+          const gold   = i === 0 || i === 4;
+          const color  = gold ? C.gold : C.cream;
+          const opac   = a * (gold ? 0.45 : 0.18 - i * 0.01);
+
+          ctx.strokeStyle = rgba(color, Math.max(0, opac));
+          ctx.lineWidth   = gold ? 1 : 0.5;
+          ctx.setLineDash([]);
+          ctx.beginPath();
+          ctx.arc(cx, cy, radius, 0, Math.PI*2);
+          ctx.stroke();
+        }
+      }
+
+      /* ── PHASE 4 ── ORBITING ARC FRAGMENTS  (1.6 → 4.2s) ─ */
+      {
+        const NUM     = 5;
+        const fadeOut = 1 - prog(t, 3.8, 4.3);
+        const ORBIT_R = S * 0.28;
+
+        for (let i = 0; i < NUM; i++) {
+          const delay      = 1.6 + i * 0.18;
+          const fadeIn     = prog(t, delay, delay + 0.7);
+          const a          = fadeIn * fadeOut;
+          if (a < 0.01) continue;
+
+          const baseAngle  = (i / NUM) * Math.PI * 2;
+          const converge   = prog(t, 2.8, 4.0, easeIO);  // 0=orbit, 1=center
+          const orbitR     = ORBIT_R * (1 - converge);
+          const spin       = t * 0.4 * (1 - converge);
+          const angle      = baseAngle + spin;
+
+          const px = cx + Math.cos(angle) * orbitR;
+          const py = cy + Math.sin(angle) * orbitR;
+
+          const colors = [C.cream, C.gold, C.cream, C.gold, C.cream];
+          const col    = colors[i];
+
+          // Arc segment
+          const arcLen  = Math.PI * (0.35 + converge * 0.15);
+          const arcRot  = angle + t * 0.7;
+          const arcR    = 10 + (1 - converge) * 10;
+
+          ctx.strokeStyle = rgba(col, a * (0.7 + converge * 0.3));
+          ctx.lineWidth   = 1 + converge * 0.5;
+          ctx.setLineDash([]);
+          ctx.beginPath();
+          ctx.arc(px, py, arcR, arcRot, arcRot + arcLen);
+          ctx.stroke();
+
+          // Glowing endpoint
+          const epx = px + Math.cos(arcRot) * arcR;
+          const epy = py + Math.sin(arcRot) * arcR;
+          ctx.fillStyle = rgba(col, a * 0.9);
+          ctx.beginPath(); ctx.arc(epx, epy, 1.8, 0, Math.PI*2); ctx.fill();
+
+          // Converging dashed line to centre
+          if (converge > 0.25) {
+            const la = clamp((converge - 0.25) / 0.5) * fadeOut * 0.35;
+            ctx.strokeStyle = rgba(col, la);
+            ctx.lineWidth   = 0.5;
+            ctx.setLineDash([3, 5]);
+            ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(cx, cy); ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        }
+      }
+
+      /* ── PHASE 5 ── PULSING CENTRE POINT  (1.2 → 4.3s) ─ */
+      {
+        const fadeIn  = prog(t, 1.2, 1.8);
+        const fadeOut = 1 - prog(t, 4.0, 4.4);
+        const a       = fadeIn * fadeOut;
+        if (a > 0.01) {
+          const pulse = 1 + Math.sin(t * 4) * 0.35 * (1 - prog(t, 3.5, 4.0));
+          const glowR = 32 * pulse;
+          const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR);
+          g.addColorStop(0,   rgba(C.gold, a * 0.2));
+          g.addColorStop(0.5, rgba(C.gold, a * 0.08));
+          g.addColorStop(1,   rgba(C.gold, 0));
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(cx, cy, glowR, 0, Math.PI*2); ctx.fill();
+          ctx.fillStyle = rgba(C.gold, a * 0.95);
+          ctx.beginPath(); ctx.arc(cx, cy, 2.2, 0, Math.PI*2); ctx.fill();
+        }
+      }
+
+      /* ── PHASE 6 ── GOLDEN ARC TRACE  (3.8 → 4.7s) ─ */
+      {
+        const p      = prog(t, 3.8, 4.7);
+        const fadeOut = 1 - prog(t, 4.9, 5.3);
+        if (p > 0) {
+          const r = S * 0.12;
+          // outer gold ring draws clockwise
+          ctx.strokeStyle = rgba(C.gold,  p * fadeOut * 0.75);
+          ctx.lineWidth   = 1.2;
+          ctx.setLineDash([]);
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, -Math.PI/2, -Math.PI/2 + Math.PI*2*p);
+          ctx.stroke();
+          // inner cream ring (slight delay)
+          const p2 = prog(t, 3.95, 4.8);
+          if (p2 > 0) {
+            ctx.strokeStyle = rgba(C.cream, p2 * fadeOut * 0.25);
+            ctx.lineWidth   = 0.5;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r * 0.72, -Math.PI/2, -Math.PI/2 + Math.PI*2*p2);
+            ctx.stroke();
+          }
+          // bright leading dot
+          if (p < 1) {
+            const da = -Math.PI/2 + Math.PI*2*p;
+            ctx.fillStyle = rgba(C.gold, fadeOut);
+            ctx.beginPath();
+            ctx.arc(cx + Math.cos(da)*r, cy + Math.sin(da)*r, 2.5, 0, Math.PI*2);
+            ctx.fill();
+          }
+        }
+      }
+
+      /* ── CORNER L-BRACKETS ────────────────────── */
+      {
+        const a = prog(t, 0.3, 1.0) * 0.45;
+        if (a > 0) {
+          const M = 26, L = 16;
+          const corners = [
+            [M, M, 1, 1], [W-M, M, -1, 1], [M, H-M, 1, -1], [W-M, H-M, -1, -1],
+          ];
+          ctx.strokeStyle = rgba(C.cream, a);
+          ctx.lineWidth   = 1;
+          ctx.setLineDash([]);
+          for (const [x, y, sx, sy] of corners) {
+            ctx.beginPath();
+            ctx.moveTo(x + sx*L, y);
+            ctx.lineTo(x, y);
+            ctx.lineTo(x, y + sy*L);
+            ctx.stroke();
+          }
+        }
+      }
+
+      /* ── REACT STATE TRIGGERS ─────────────────── */
+      if (t > 4.4 && !did.logo)     { did.logo    = true; setShowLogo(true); }
+      if (t > 5.2 && !did.tag)      { did.tag     = true; setShowTag(true);  }
+      if (t > 6.0 && !did.dissolve) { did.dissolve= true; setDissolving(true); }
+      if (t > 7.6 && !did.done)     {
+        did.done = true;
+        document.body.style.overflow = 'unset';
+        onComplete();
+      }
+
+      if (t < 8) rafRef.current = requestAnimationFrame(draw);
+    };
+
+    rafRef.current = requestAnimationFrame(draw);
 
     return () => {
-      [...timers, done].forEach(clearTimeout);
+      cancelAnimationFrame(rafRef.current);
+      window.removeEventListener('resize', resize);
       document.body.style.overflow = 'unset';
     };
-  }, [onComplete, prefersReducedMotion]);
+  }, [onComplete]);
 
-  const isVisible = tick >= 1 && tick < 7;
-  const formsActive = tick >= 1;
-  const secondLayerActive = tick >= 2;
-  const gravitating = tick >= 3;
-  const converging = tick >= 4;
-  const logoVisible = tick >= 5;
-  const dissolving = tick === 7;
+  const EXPO: [number,number,number,number] = [0.16, 1, 0.3, 1];
+
+  if (gone) return null;
 
   return (
-    <AnimatePresence>
-      {tick < 7 && (
+    <div className="fixed inset-0 z-[9999] select-none" style={{ pointerEvents: 'none' }}>
+
+      {/* ── Canvas — all motion graphic elements ── */}
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+
+      {/* ── Logo — natural conclusion ─────────── */}
+      <motion.div
+        className="absolute flex flex-col items-center"
+        style={{ top: '50%', left: '50%' }}
+        initial={{ x: '-50%', y: '-54%', opacity: 0, scale: 0.88 }}
+        animate={{ opacity: showLogo ? 1 : 0, scale: showLogo ? 1 : 0.88 }}
+        transition={{ duration: 1.0, ease: EXPO }}
+      >
+        {/* Warm halo */}
+        <div style={{
+          position: 'absolute', width: 200, height: 200, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(196,163,90,0.18) 0%, transparent 65%)',
+          filter: 'blur(28px)',
+          top: '50%', left: '50%', transform: 'translate(-50%,-54%)',
+        }} />
+        <img
+          src="/creato4-logo.svg"
+          alt="Creato4"
+          style={{ width: 100, height: 100, borderRadius: 18, position: 'relative', zIndex: 1 }}
+        />
+      </motion.div>
+
+      {/* ── Tagline ───────────────────────────── */}
+      <motion.div
+        className="absolute flex flex-col items-center gap-2"
+        style={{ top: '50%', left: '50%' }}
+        initial={{ x: '-50%', y: 'calc(-50% + 72px)', opacity: 0 }}
+        animate={{
+          opacity: showTag ? 1 : 0,
+          y: showTag ? 'calc(-50% + 70px)' : 'calc(-50% + 80px)',
+        }}
+        transition={{ duration: 0.75, ease: EXPO }}
+      >
         <motion.div
-          key="preloader"
-          initial={{ opacity: 1 }}
-          animate={{ opacity: dissolving ? 0 : 1 }}
-          transition={{ duration: dissolving ? 1.2 : 0, ease: 'easeInOut' }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden pointer-events-none select-none"
-          style={{ background: '#FAF8F5' }}
-        >
-          {/* ─────────────────────────────────────────────
-              LAYER A: Large ambient orbs (slowest, furthest back)
-          ───────────────────────────────────────────── */}
-          <motion.div
-            className="absolute rounded-full"
-            style={{
-              width: '60vmax',
-              height: '60vmax',
-              background: 'radial-gradient(circle, rgba(26,60,47,0.05) 0%, transparent 70%)',
-              top: '50%',
-              left: '50%',
-            }}
-            initial={{ x: '-50%', y: '-50%', scale: 0.3, opacity: 0 }}
-            animate={{
-              x: '-50%',
-              y: '-50%',
-              scale: formsActive ? (converging ? 1.0 : 1.2) : 0.3,
-              opacity: formsActive ? (dissolving ? 0 : 0.8) : 0,
-            }}
-            transition={{ duration: 2.5, ease: EXPO_OUT }}
-          />
+          style={{ width: 36, height: 1, background: C.gold, opacity: 0.55 }}
+          initial={{ scaleX: 0 }} animate={{ scaleX: showTag ? 1 : 0 }}
+          transition={{ duration: 0.5, ease: EXPO, delay: 0.15 }}
+        />
+        <span style={{
+          fontSize: 9, letterSpacing: '0.28em', fontWeight: 600,
+          textTransform: 'uppercase', whiteSpace: 'nowrap',
+          color: 'rgba(246,241,229,0.6)',
+        }}>
+          MULTIDISCIPLINARY PRODUCT &amp; TECHNOLOGY LAB
+        </span>
+      </motion.div>
 
-          {/* ─────────────────────────────────────────────
-              LAYER B: Precision rings — The discipline circles
-              Each starts offset, then converges to centre
-          ───────────────────────────────────────────── */}
-
-          {/* Ring 1 — top-left origin → converges */}
-          <motion.div
-            className="absolute rounded-full border"
-            style={{ borderColor: 'rgba(26,60,47,0.12)', width: '36vmin', height: '36vmin' }}
-            initial={{ x: '-45vw', y: '-30vh', opacity: 0, scale: 0.6 }}
-            animate={{
-              x: formsActive ? (converging ? '-50%' : '-40vw') : '-45vw',
-              y: formsActive ? (converging ? '-50%' : '-25vh') : '-30vh',
-              opacity: formsActive ? (dissolving ? 0 : converging ? 0 : 0.7) : 0,
-              scale: formsActive ? (converging ? 1.4 : 1) : 0.6,
-              top: '50%',
-              left: '50%',
-            }}
-            transition={converging
-              ? { duration: 1.0, ease: CIRC_OUT }
-              : { duration: 1.4, ease: EXPO_OUT }
-            }
-          />
-
-          {/* Ring 2 — bottom-right origin → converges */}
-          <motion.div
-            className="absolute rounded-full border"
-            style={{ borderColor: 'rgba(26,60,47,0.08)', width: '52vmin', height: '52vmin' }}
-            initial={{ x: '42vw', y: '28vh', opacity: 0, scale: 0.5 }}
-            animate={{
-              x: formsActive ? (converging ? '-50%' : '38vw') : '42vw',
-              y: formsActive ? (converging ? '-50%' : '22vh') : '28vh',
-              opacity: formsActive ? (dissolving ? 0 : converging ? 0 : 0.5) : 0,
-              scale: formsActive ? (converging ? 1.6 : 1) : 0.5,
-              top: '50%',
-              left: '50%',
-            }}
-            transition={converging
-              ? { duration: 1.1, ease: CIRC_OUT, delay: 0.05 }
-              : { duration: 1.6, ease: EXPO_OUT, delay: 0.1 }
-            }
-          />
-
-          {/* Ring 3 — right-side origin → converges to gold */}
-          <motion.div
-            className="absolute rounded-full border"
-            style={{ borderColor: 'rgba(196,163,90,0.2)', width: '24vmin', height: '24vmin' }}
-            initial={{ x: '40vw', y: '-15vh', opacity: 0, scale: 0.4 }}
-            animate={{
-              x: secondLayerActive ? (converging ? '-50%' : '32vw') : '40vw',
-              y: secondLayerActive ? (converging ? '-50%' : '-12vh') : '-15vh',
-              opacity: secondLayerActive ? (dissolving ? 0 : converging ? 0 : 0.9) : 0,
-              scale: secondLayerActive ? (converging ? 1.2 : 1) : 0.4,
-              top: '50%',
-              left: '50%',
-            }}
-            transition={converging
-              ? { duration: 0.9, ease: CIRC_OUT, delay: 0.1 }
-              : { duration: 1.2, ease: EXPO_OUT, delay: 0.15 }
-            }
-          />
-
-          {/* ─────────────────────────────────────────────
-              LAYER C: Translucent rectangle slabs
-              Represent discipline layers, glass-like
-          ───────────────────────────────────────────── */}
-
-          {/* Slab 1 — horizontal, top, from left */}
-          <motion.div
-            className="absolute"
-            style={{
-              width: '40vw',
-              height: '1px',
-              background: 'linear-gradient(90deg, transparent, rgba(26,60,47,0.15), transparent)',
-              top: '50%',
-              left: '50%',
-            }}
-            initial={{ x: '-80vw', y: '-18vh', opacity: 0, scaleX: 0.2 }}
-            animate={{
-              x: formsActive ? (converging ? '-50%' : '-55vw') : '-80vw',
-              y: formsActive ? (converging ? '-50%' : '-15vh') : '-18vh',
-              opacity: formsActive ? (dissolving ? 0 : converging ? 0 : 1) : 0,
-              scaleX: formsActive ? 1 : 0.2,
-            }}
-            transition={converging
-              ? { duration: 0.8, ease: EXPO_OUT }
-              : { duration: 1.2, ease: EXPO_OUT, delay: 0.2 }
-            }
-          />
-
-          {/* Slab 2 — horizontal, bottom, from right */}
-          <motion.div
-            className="absolute"
-            style={{
-              width: '30vw',
-              height: '1px',
-              background: 'linear-gradient(90deg, transparent, rgba(196,163,90,0.3), transparent)',
-              top: '50%',
-              left: '50%',
-            }}
-            initial={{ x: '50vw', y: '20vh', opacity: 0, scaleX: 0.2 }}
-            animate={{
-              x: secondLayerActive ? (converging ? '-50%' : '30vw') : '50vw',
-              y: secondLayerActive ? (converging ? '-50%' : '16vh') : '20vh',
-              opacity: secondLayerActive ? (dissolving ? 0 : converging ? 0 : 1) : 0,
-              scaleX: secondLayerActive ? 1 : 0.2,
-            }}
-            transition={converging
-              ? { duration: 0.85, ease: EXPO_OUT, delay: 0.05 }
-              : { duration: 1.2, ease: EXPO_OUT, delay: 0.3 }
-            }
-          />
-
-          {/* Slab 3 — vertical accent */}
-          <motion.div
-            className="absolute"
-            style={{
-              width: '1px',
-              height: '22vh',
-              background: 'linear-gradient(180deg, transparent, rgba(26,60,47,0.12), transparent)',
-              top: '50%',
-              left: '50%',
-            }}
-            initial={{ x: '28vw', y: '-30vh', opacity: 0, scaleY: 0.2 }}
-            animate={{
-              x: secondLayerActive ? (converging ? '-50%' : '22vw') : '28vw',
-              y: secondLayerActive ? (converging ? '-50%' : '-25vh') : '-30vh',
-              opacity: secondLayerActive ? (dissolving ? 0 : converging ? 0 : 0.8) : 0,
-              scaleY: secondLayerActive ? 1 : 0.2,
-            }}
-            transition={converging
-              ? { duration: 0.9, ease: EXPO_OUT, delay: 0.08 }
-              : { duration: 1.3, ease: EXPO_OUT, delay: 0.4 }
-            }
-          />
-
-          {/* ─────────────────────────────────────────────
-              LAYER D: Small precision dots — alignment anchors
-          ───────────────────────────────────────────── */}
-
-          {[
-            { x: '-38vw', y: '-22vh', delay: 0.3, cx: '-38vw', cy: '-22vh', size: 3 },
-            { x: '35vw',  y: '18vh',  delay: 0.4, cx: '35vw',  cy: '18vh',  size: 2.5 },
-            { x: '-20vw', y: '28vh',  delay: 0.5, cx: '-20vw', cy: '28vh',  size: 2 },
-            { x: '18vw',  y: '-30vh', delay: 0.6, cx: '18vw',  cy: '-30vh', size: 3 },
-            { x: '-30vw', y: '8vh',   delay: 0.7, cx: '-30vw', cy: '8vh',   size: 2.5 },
-          ].map((dot, i) => (
-            <motion.div
-              key={`dot-${i}`}
-              className="absolute rounded-full"
-              style={{
-                width: `${dot.size * 2}px`,
-                height: `${dot.size * 2}px`,
-                background: i % 2 === 0 ? 'rgba(26,60,47,0.3)' : 'rgba(196,163,90,0.5)',
-                top: '50%',
-                left: '50%',
-              }}
-              initial={{ x: `calc(${dot.x} - ${dot.size}px)`, y: `calc(${dot.y} - ${dot.size}px)`, opacity: 0, scale: 0 }}
-              animate={{
-                x: secondLayerActive
-                  ? converging
-                    ? `calc(-50% - ${dot.size}px)`
-                    : `calc(${dot.cx} - ${dot.size}px)`
-                  : `calc(${dot.x} - ${dot.size}px)`,
-                y: secondLayerActive
-                  ? converging
-                    ? `calc(-50% - ${dot.size}px)`
-                    : `calc(${dot.cy} - ${dot.size}px)`
-                  : `calc(${dot.y} - ${dot.size}px)`,
-                opacity: secondLayerActive ? (dissolving ? 0 : converging ? 0 : 1) : 0,
-                scale: secondLayerActive ? 1 : 0,
-              }}
-              transition={converging
-                ? { duration: 0.7, ease: EXPO_OUT, delay: i * 0.04 }
-                : { duration: 0.6, ease: EXPO_OUT, delay: dot.delay }
-              }
-            />
-          ))}
-
-          {/* ─────────────────────────────────────────────
-              LAYER E: Glass panels (frosted rectangles — the disciplines)
-          ───────────────────────────────────────────── */}
-
-          {[
-            { label: 'PRODUCT',     startX: '-60vw', startY: '-12vh', convergeX: '-50%', convergeY: '-50%', delay: 0, h: '28vmin' },
-            { label: 'MECHANICAL',  startX: '55vw',  startY: '-8vh',  convergeX: '-50%', convergeY: '-50%', delay: 0.06, h: '20vmin' },
-            { label: 'ELECTRONICS', startX: '-50vw', startY: '22vh',  convergeX: '-50%', convergeY: '-50%', delay: 0.12, h: '16vmin' },
-            { label: 'EMBEDDED',    startX: '48vw',  startY: '20vh',  convergeX: '-50%', convergeY: '-50%', delay: 0.18, h: '24vmin' },
-            { label: 'SOFTWARE',    startX: '0vw',   startY: '-38vh', convergeX: '-50%', convergeY: '-50%', delay: 0.24, h: '18vmin' },
-          ].map((panel, i) => (
-            <motion.div
-              key={`panel-${i}`}
-              className="absolute flex items-end justify-start overflow-hidden"
-              style={{
-                width: '1px',
-                height: panel.h,
-                background: 'rgba(26,60,47,0.03)',
-                borderLeft: '1px solid rgba(26,60,47,0.08)',
-                top: '50%',
-                left: '50%',
-              }}
-              initial={{
-                x: panel.startX,
-                y: panel.startY,
-                opacity: 0,
-                scaleY: 0,
-                originY: '100%',
-              }}
-              animate={{
-                x: gravitating ? (converging ? panel.convergeX : panel.startX) : panel.startX,
-                y: gravitating ? (converging ? panel.convergeY : panel.startY) : panel.startY,
-                opacity: gravitating ? (dissolving ? 0 : converging ? 0 : 0.9) : 0,
-                scaleY: gravitating ? 1 : 0,
-              }}
-              transition={converging
-                ? { duration: 0.8, ease: CIRC_OUT, delay: panel.delay }
-                : { duration: 1.0, ease: EXPO_OUT, delay: panel.delay }
-              }
-            />
-          ))}
-
-          {/* ─────────────────────────────────────────────
-              LAYER F: Converging golden arc
-              Appears only during convergence phase
-          ───────────────────────────────────────────── */}
-          <svg
-            className="absolute pointer-events-none"
-            style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '30vmin', height: '30vmin', overflow: 'visible' }}
-          >
-            <motion.circle
-              cx="50%"
-              cy="50%"
-              r="48%"
-              fill="none"
-              stroke="rgba(196,163,90,0.25)"
-              strokeWidth="0.5"
-              pathLength="1"
-              initial={{ pathLength: 0, opacity: 0, scale: 0.5 }}
-              animate={{
-                pathLength: converging ? 1 : 0,
-                opacity: converging ? (logoVisible ? 0 : 1) : 0,
-                scale: converging ? 1 : 0.5,
-              }}
-              transition={{ duration: 0.9, ease: EXPO_OUT }}
-            />
-          </svg>
-
-          {/* ─────────────────────────────────────────────
-              LAYER G: LOGO — appears as the natural conclusion
-          ───────────────────────────────────────────── */}
-          <motion.div
-            className="absolute flex items-center justify-center"
-            style={{ top: '50%', left: '50%' }}
-            initial={{ x: '-50%', y: '-50%', opacity: 0, scale: 0.85 }}
-            animate={{
-              x: '-50%',
-              y: '-50%',
-              opacity: logoVisible ? (dissolving ? 0 : 1) : 0,
-              scale: logoVisible ? 1 : 0.85,
-            }}
-            transition={{ duration: 0.8, ease: EXPO_OUT }}
-          >
-            {/* Soft ambient glow behind logo */}
-            <motion.div
-              className="absolute rounded-full"
-              style={{
-                width: '160px',
-                height: '160px',
-                background: 'radial-gradient(circle, rgba(26,60,47,0.06) 0%, transparent 70%)',
-                filter: 'blur(20px)',
-              }}
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{
-                scale: logoVisible ? 1.5 : 0.5,
-                opacity: logoVisible ? (dissolving ? 0 : 1) : 0,
-              }}
-              transition={{ duration: 1.2, ease: EXPO_OUT }}
-            />
-
-            {/* The official Creato4 logo — untouched, unmodified */}
-            <img
-              src="/creato4-logo.svg"
-              alt="Creato4"
-              className="relative z-10"
-              style={{ width: '96px', height: '96px', borderRadius: '18px' }}
-            />
-          </motion.div>
-
-          {/* ─────────────────────────────────────────────
-              LAYER H: Tagline beneath logo — fades in after logo
-          ───────────────────────────────────────────── */}
-          <motion.div
-            className="absolute flex flex-col items-center gap-1"
-            style={{ top: '50%', left: '50%' }}
-            initial={{ x: '-50%', y: 'calc(-50% + 76px)', opacity: 0 }}
-            animate={{
-              x: '-50%',
-              y: 'calc(-50% + 76px)',
-              opacity: logoVisible ? (dissolving ? 0 : 1) : 0,
-            }}
-            transition={{ duration: 0.6, ease: EXPO_OUT, delay: logoVisible ? 0.3 : 0 }}
-          >
-            <div
-              style={{
-                fontSize: '10px',
-                letterSpacing: '0.28em',
-                color: 'rgba(92,107,96,0.8)',
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                fontFamily: 'inherit',
-              }}
-            >
-              MULTIDISCIPLINARY PRODUCT & TECHNOLOGY LAB
-            </div>
-          </motion.div>
-
-          {/* ─────────────────────────────────────────────
-              LAYER I: Corner alignment marks — precision cues
-          ───────────────────────────────────────────── */}
-          {[
-            { corner: 'top-8 left-8', tx: '0', ty: '0' },
-            { corner: 'top-8 right-8', tx: '0', ty: '0' },
-            { corner: 'bottom-8 left-8', tx: '0', ty: '0' },
-            { corner: 'bottom-8 right-8', tx: '0', ty: '0' },
-          ].map((mark, i) => (
-            <motion.div
-              key={`mark-${i}`}
-              className={`absolute ${mark.corner}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: formsActive ? (dissolving ? 0 : 0.25) : 0 }}
-              transition={{ duration: 0.8, ease: 'easeOut', delay: 0.5 + i * 0.08 }}
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                {/* L-shaped corner mark */}
-                <line
-                  x1={i === 1 || i === 3 ? '16' : '0'}
-                  y1={i >= 2 ? '16' : '0'}
-                  x2={i === 1 || i === 3 ? '8' : '8'}
-                  y2={i >= 2 ? '16' : '0'}
-                  stroke="rgba(26,60,47,0.6)" strokeWidth="1"
-                />
-                <line
-                  x1={i === 1 || i === 3 ? '16' : '0'}
-                  y1={i >= 2 ? '8' : '8'}
-                  x2={i === 1 || i === 3 ? '16' : '0'}
-                  y2={i >= 2 ? '16' : '0'}
-                  stroke="rgba(26,60,47,0.6)" strokeWidth="1"
-                />
-              </svg>
-            </motion.div>
-          ))}
-
-          {/* ─────────────────────────────────────────────
-              LAYER J: Final curtain dissolve (white overlay)
-              Seamlessly merges preloader into homepage
-          ───────────────────────────────────────────── */}
-          <motion.div
-            className="absolute inset-0"
-            style={{ background: '#FAF8F5', pointerEvents: 'none' }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: dissolving ? 1 : 0 }}
-            transition={{ duration: 1.0, ease: 'easeInOut' }}
-          />
-
-        </motion.div>
+      {/* ── Dissolve overlays ─────────────────── */}
+      <motion.div
+        className="absolute inset-0"
+        style={{ background: C.green, zIndex: 50 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: dissolving ? 1 : 0 }}
+        transition={{ duration: 0.8, ease: 'easeInOut' }}
+      />
+      {dissolving && (
+        <motion.div
+          className="absolute inset-0"
+          style={{ background: '#FAF8F5', zIndex: 51 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.9, ease: 'easeIn', delay: 0.4 }}
+          onAnimationComplete={() => setGone(true)}
+        />
       )}
-    </AnimatePresence>
+    </div>
   );
 };
