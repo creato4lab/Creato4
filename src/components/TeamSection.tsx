@@ -58,9 +58,8 @@ const TEAM_MEMBERS: TeamMember[] = [
     name: 'Khushi Belani',
     emoji: '🎨',
     initials: 'KB',
-    avatarUrl: '/khushi_memoji.png',
-    dicebearUrl:
-      'https://api.dicebear.com/9.x/avataaars/png?seed=KhushiDesigner&backgroundColor=ffe8d1&radius=50&size=256&top=longHairStraight&accessories=glasses&clothing=shirtVNeck',
+    avatarUrl: '/khushi_photo.png',
+    dicebearUrl: '/khushi_photo.png',
     role: 'HEAD OF PCB DESIGN, EDUCATION & BRAND COMMUNICATIONS',
     description:
       'Head of Electronics, PCB Design & Hardware Validation — supports PCB design and validation. Head of Education, Courses & Training Programs — designs and manages learning content. Lead Content Creator / Face of the Brand — represents the brand across public content. Research & Innovation; Quality Assurance & Testing; Graphic Design; Customer Success.',
