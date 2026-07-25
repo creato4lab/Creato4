@@ -15,10 +15,7 @@ export const CustomCursor: React.FC = () => {
   const smoothY = useSpring(mouseY, springConfig);
 
   useEffect(() => {
-    // Only run on desktop/devices with a fine pointer
-    if (window.matchMedia('(pointer: coarse)').matches) {
-      return;
-    }
+    // Removed pointer:coarse check so it works even when DevTools simulates touch
 
     setIsVisible(true);
 

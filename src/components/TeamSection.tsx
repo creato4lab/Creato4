@@ -22,7 +22,7 @@ const TEAM_MEMBERS: TeamMember[] = [
     name: 'Prince Tagadiya',
     emoji: '👑',
     initials: 'PT',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Prince+Tagadiya&background=1a3a2e&color=fff&size=256',
+    avatarUrl: '/prince_memoji.png',
     dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=PrinceCEO&backgroundColor=e8f0e8&radius=50&size=256&top=shortHairShortFlat&facialHair=beardMedium&clothing=blazerAndShirt',
     role: 'Founder, CEO & CPTO',
@@ -41,7 +41,7 @@ const TEAM_MEMBERS: TeamMember[] = [
     name: 'Nisarg Patel',
     emoji: '🔧',
     initials: 'NP',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Nisarg+Patel&background=1a3a2e&color=fff&size=256',
+    avatarUrl: '/nisarg_memoji.png',
     dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=NisargEngineer&backgroundColor=d1e8d1&radius=50&size=256&top=shortHairTheCaesar&facialHair=beardLight&clothing=hoodie',
     role: 'Head of Electronics, Embedded Systems & Manufacturing',
@@ -60,7 +60,7 @@ const TEAM_MEMBERS: TeamMember[] = [
     name: 'Khushi Belani',
     emoji: '🎨',
     initials: 'KB',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Khushi+Belani&background=1a3a2e&color=fff&size=256',
+    avatarUrl: '/khushi_memoji.png',
     dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=KhushiDesigner&backgroundColor=ffe8d1&radius=50&size=256&top=longHairStraight&accessories=glasses&clothing=shirtVNeck',
     role: 'Head of PCB Design, Education & Brand Communications',
@@ -79,7 +79,7 @@ const TEAM_MEMBERS: TeamMember[] = [
     name: 'Rudra Chauhan',
     emoji: '💻',
     initials: 'RC',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Rudra+Chauhan&background=1a3a2e&color=fff&size=256',
+    avatarUrl: '/rudra_memoji.png',
     dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=RudraDeveloper&backgroundColor=d1d8e8&radius=50&size=256&top=shortHairShortWaved&facialHair=beardLight&clothing=graphicShirt',
     role: 'Head of Software Engineering & Digital Design',
@@ -293,7 +293,7 @@ export const TeamSection: React.FC = () => {
         {/* 4-Card Responsive Grid Layout with 3D Tilt Sheen */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7">
           {TEAM_MEMBERS.map((member) => {
-            const imgSrc = member.dicebearUrl;
+            const imgSrc = member.avatarUrl;
 
             return (
               <TeamTiltCard
