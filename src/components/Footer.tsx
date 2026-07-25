@@ -25,10 +25,10 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
       <div className="w-full max-w-[1700px] mx-auto relative z-10">
         
         {/* Top Row Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 pb-16 border-b border-[#FAF8F5]/10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 pb-16 border-b border-[#FAF8F5]/10">
           
-          {/* Column 1: Brand & Bio (4 cols) */}
-          <div className="lg:col-span-4 flex flex-col justify-between space-y-6">
+          {/* Column 1: Brand & Bio Card (4 cols) */}
+          <div className="lg:col-span-4 bg-[#FAF8F5]/[0.04] p-6 sm:p-7 rounded-2xl border border-[#FAF8F5]/10 flex flex-col justify-between space-y-6">
             <div>
               <a href="#" className="inline-flex items-center gap-3 text-2xl font-extrabold tracking-tight text-[#FAF8F5] mb-2 group">
                 <Creato4LabLogoMark size={36} />
@@ -37,7 +37,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
               <div className="text-xs uppercase font-mono tracking-[0.2em] text-[#C4A35A] mb-4">
                 Design · Engineer · Build
               </div>
-              <p className="text-xs text-[#FAF8F5]/70 max-w-md leading-relaxed mb-6">
+              <p className="text-xs text-[#FAF8F5]/70 leading-relaxed mb-4">
                 A multidisciplinary product & technology lab transforming ideas into working physical hardware,
                 embedded systems, custom software, and 3D digital experiences.
               </p>
@@ -55,8 +55,8 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
             </button>
           </div>
 
-          {/* Column 2: 4 Navigation Columns (5 cols) */}
-          <div className="lg:col-span-5 grid grid-cols-2 sm:grid-cols-4 gap-6 lg:gap-8 xl:gap-12">
+          {/* Column 2: 4 Navigation Columns Card (5 cols) */}
+          <div className="lg:col-span-5 bg-[#FAF8F5]/[0.04] p-6 sm:p-7 rounded-2xl border border-[#FAF8F5]/10 grid grid-cols-2 sm:grid-cols-4 gap-6 lg:gap-8">
             
             {/* WORK */}
             <div>
