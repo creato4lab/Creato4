@@ -12,18 +12,18 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onSelectServ
   const getServiceIcon = (iconName: string) => {
     switch (iconName) {
       case 'Cpu':
-        return <Cpu className="w-7 h-7 text-[#1A3C2F]" />;
+        return <Cpu className="w-7 h-7 text-current" />;
       case 'Boxes':
-        return <Boxes className="w-7 h-7 text-[#1A3C2F]" />;
+        return <Boxes className="w-7 h-7 text-current" />;
       case 'Zap':
-        return <Zap className="w-7 h-7 text-[#1A3C2F]" />;
+        return <Zap className="w-7 h-7 text-current" />;
       case 'Radio':
-        return <Radio className="w-7 h-7 text-[#1A3C2F]" />;
+        return <Radio className="w-7 h-7 text-current" />;
       case 'Code2':
-        return <Code2 className="w-7 h-7 text-[#1A3C2F]" />;
+        return <Code2 className="w-7 h-7 text-current" />;
       case 'Sparkles':
       default:
-        return <Sparkles className="w-7 h-7 text-[#1A3C2F]" />;
+        return <Sparkles className="w-7 h-7 text-current" />;
     }
   };
 
@@ -55,10 +55,8 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onSelectServ
             >
               <div>
                 {/* 56px Icon Square */}
-                <div className="w-14 h-14 rounded-2xl bg-[#1A3C2F]/10 group-hover:bg-[#1A3C2F] flex items-center justify-center mb-6 transition-colors duration-300">
-                  <div className="group-hover:text-[#FAF8F5] transition-colors">
-                    {getServiceIcon(service.iconName)}
-                  </div>
+                <div className="w-14 h-14 rounded-2xl bg-[#1A3C2F]/10 text-[#1A3C2F] group-hover:bg-[#1A3C2F] group-hover:text-[#FAF8F5] flex items-center justify-center mb-6 transition-colors duration-300">
+                  {getServiceIcon(service.iconName)}
                 </div>
 
                 <h3 className="text-2xl font-bold text-[#1A3C2F] mb-3">
