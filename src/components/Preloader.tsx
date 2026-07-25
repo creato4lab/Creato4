@@ -398,9 +398,11 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
 
         @keyframes containerGlowFade {
           0% {
+            opacity: 1;
             text-shadow: 0 0 0px rgba(201,169,110,0);
           }
           100% {
+            opacity: 1;
             text-shadow: 0 0 50px rgba(201,169,110,.12);
           }
         }
@@ -636,7 +638,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       </div>
 
       {/* ── PHASE 2: Logo Reveal (3.8s — 6.0s) ── */}
-      <div className="absolute flex flex-col items-center justify-center pointer-events-none">
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
         {/* Atmosphere Glow (300px x 300px) */}
         <div
           className="absolute w-[300px] h-[300px] rounded-full pointer-events-none opacity-0"
@@ -686,7 +688,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
 
         {/* 3D Crystal Cube Container (160px x 160px, perspective 1200px) */}
         <div
-          className="relative w-[160px] h-[160px] flex items-center justify-center opacity-0"
+          className="relative w-[160px] h-[160px] flex items-center justify-center opacity-0 mb-4"
           style={{
             perspective: '1200px',
             animation: 'crystalCubeEntrance 1s cubic-bezier(.23,1,.32,1) 3.9s forwards',
@@ -846,19 +848,9 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           </div>
         </div>
 
-        {/* Light Sweep (Trigger 5.0s) */}
-        <div
-          className="relative w-full h-[1px] my-2 pointer-events-none opacity-0"
-          style={{
-            background:
-              'linear-gradient(90deg, transparent, rgba(201,169,110,.4), transparent)',
-            animation: 'lightSweepScan 0.8s ease-out 5.0s forwards',
-          }}
-        />
-
         {/* Brand Name "CRETO4" */}
         <div
-          className="flex gap-[3px] mt-8 select-none opacity-0"
+          className="flex gap-[3px] select-none relative z-20"
           style={{
             animation: 'containerGlowFade 0.5s ease 5.3s forwards',
           }}
@@ -927,9 +919,19 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           </span>
         </div>
 
+        {/* Light Sweep (Trigger 5.0s) */}
+        <div
+          className="relative w-[280px] h-[1px] my-2 pointer-events-none opacity-0"
+          style={{
+            background:
+              'linear-gradient(90deg, transparent, rgba(201,169,110,.4), transparent)',
+            animation: 'lightSweepScan 0.8s ease-out 5.0s forwards',
+          }}
+        />
+
         {/* Tagline (5.3s) */}
         <p
-          className="text-[0.75rem] font-medium text-[rgba(255,255,255,.35)] uppercase mt-2 opacity-0"
+          className="text-[0.75rem] font-medium text-[rgba(255,255,255,.35)] uppercase mt-1 opacity-0 text-center"
           style={{
             animation: 'taglineCinematic 0.7s ease 5.3s forwards',
           }}
