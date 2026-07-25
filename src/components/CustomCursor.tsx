@@ -15,13 +15,10 @@ export const CustomCursor: React.FC = () => {
   const smoothY = useSpring(mouseY, springConfig);
 
   useEffect(() => {
-    // Removed pointer:coarse check so it works even when DevTools simulates touch
-
-    setIsVisible(true);
-
     const updateMousePosition = (e: MouseEvent) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
+      if (!isVisible) setIsVisible(true);
     };
 
     const handleMouseOver = (e: MouseEvent) => {
@@ -48,7 +45,7 @@ export const CustomCursor: React.FC = () => {
       window.removeEventListener('mousemove', updateMousePosition);
       window.removeEventListener('mouseover', handleMouseOver);
     };
-  }, [mouseX, mouseY]);
+  }, [mouseX, mouseY, isVisible]);
 
   if (!isVisible) return null;
 
