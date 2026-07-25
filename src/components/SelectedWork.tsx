@@ -10,12 +10,12 @@ interface SelectedWorkProps {
 
 export const SelectedWork: React.FC<SelectedWorkProps> = ({ onSelectProject }) => {
   return (
-    <section id="work" className="py-20 lg:py-32 bg-[#1A3C2F] text-[#FAF8F5] px-6 sm:px-10 lg:px-16 xl:px-20">
+    <section id="work" className="pt-12 lg:pt-16 pb-16 lg:pb-24 bg-[#1A3C2F] text-[#FAF8F5] px-6 sm:px-10 lg:px-16 xl:px-20">
       <div className="max-w-[1800px] mx-auto">
         
         {/* Section Header */}
-        <div className="mb-16 pt-4 sm:pt-6">
-          <span className="text-[0.75rem] uppercase font-bold tracking-[0.2em] text-[#C4A35A] block mb-3">
+        <div className="mb-8 lg:mb-10">
+          <span className="text-[0.75rem] uppercase font-bold tracking-[0.2em] text-[#C4A35A] block mb-2">
             SELECTED ENGINEERING WORK
           </span>
           <h2 className="heading-h1 text-[#FAF8F5] font-extrabold tracking-tight">
