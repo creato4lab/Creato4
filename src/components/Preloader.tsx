@@ -190,30 +190,30 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
         }
 
         /* PHASE 2 KEYFRAMES */
-        @keyframes radialBurstEntrance {
+        @keyframes atmosphereEntrance {
           0% {
             opacity: 0;
-            transform: scale(0.5);
+            transform: scale(0.3);
           }
           100% {
-            opacity: 0.6;
-            transform: scale(1.2);
+            opacity: 1;
+            transform: scale(1);
           }
         }
 
-        @keyframes radialBurstPulse {
+        @keyframes atmosphereLoop {
           0%, 100% {
             transform: scale(1);
           }
           50% {
-            transform: scale(1.1);
+            transform: scale(1.15);
           }
         }
 
-        @keyframes crystalEntrance {
+        @keyframes crystalCubeEntrance {
           0% {
             opacity: 0;
-            transform: translateY(40px) scale(0.5);
+            transform: translateY(50px) scale(0);
           }
           100% {
             opacity: 1;
@@ -221,28 +221,52 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           }
         }
 
-        @keyframes crystalFloat {
+        @keyframes crystalCubeSpin {
           0% {
-            transform: translateY(-8px);
+            transform: rotateX(-25deg) rotateY(45deg);
           }
           100% {
-            transform: translateY(8px);
+            transform: rotateX(-25deg) rotateY(405deg);
           }
         }
 
-        @keyframes crystalSpin {
+        @keyframes crystalCubeFloat {
           0% {
-            transform: rotateX(-20deg) rotateY(30deg);
+            transform: translateY(-10px);
           }
           100% {
-            transform: rotateX(-20deg) rotateY(390deg);
+            transform: translateY(10px);
           }
         }
 
-        @keyframes gyroEntrance {
+        @keyframes faceShimmerSweep {
+          0% {
+            transform: translateX(-100%) rotate(45deg);
+          }
+          100% {
+            transform: translateX(200%) rotate(45deg);
+          }
+        }
+
+        @keyframes shockwaveBurst {
+          0% {
+            width: 0px;
+            height: 0px;
+            border: 1px solid rgba(201,169,110,.3);
+            opacity: 0.6;
+          }
+          100% {
+            width: 400px;
+            height: 400px;
+            border: 1px solid rgba(201,169,110,.3);
+            opacity: 0;
+          }
+        }
+
+        @keyframes gyroRingsEntrance {
           0% {
             opacity: 0;
-            transform: scale(0.8);
+            transform: scale(0.5);
           }
           100% {
             opacity: 1;
@@ -250,85 +274,138 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           }
         }
 
-        @keyframes gyroRing1Spin {
+        @keyframes gyro1Rotation {
           0% {
-            transform: rotateX(75deg) rotateZ(0deg);
+            transform: rotateX(70deg) rotateZ(0deg);
           }
           100% {
-            transform: rotateX(75deg) rotateZ(360deg);
+            transform: rotateX(70deg) rotateZ(360deg);
           }
         }
 
-        @keyframes gyroRing2Spin {
+        @keyframes gyro2Rotation {
           0% {
-            transform: rotateY(75deg) rotateZ(0deg);
+            transform: rotateY(70deg) rotateZ(0deg);
           }
           100% {
-            transform: rotateY(75deg) rotateZ(-360deg);
+            transform: rotateY(70deg) rotateZ(-360deg);
           }
         }
 
-        @keyframes gyroRing3Spin {
+        @keyframes gyro3Rotation {
           0% {
-            transform: rotateX(60deg) rotateY(20deg) rotateZ(0deg);
+            transform: rotateX(55deg) rotateY(15deg) rotateZ(0deg);
           }
           100% {
-            transform: rotateX(60deg) rotateY(20deg) rotateZ(360deg);
+            transform: rotateX(55deg) rotateY(15deg) rotateZ(360deg);
           }
         }
 
-        @keyframes orbitDot0 {
+        @keyframes orbit4Dot0 {
           0% {
-            transform: rotate(0deg) translateX(70px) rotate(0deg);
+            transform: rotate(0deg) translateX(75px) rotate(0deg);
           }
           100% {
-            transform: rotate(360deg) translateX(70px) rotate(-360deg);
+            transform: rotate(360deg) translateX(75px) rotate(-360deg);
           }
         }
 
-        @keyframes orbitDot120 {
+        @keyframes orbit4Dot90 {
           0% {
-            transform: rotate(120deg) translateX(70px) rotate(-120deg);
+            transform: rotate(90deg) translateX(75px) rotate(-90deg);
           }
           100% {
-            transform: rotate(480deg) translateX(70px) rotate(-480deg);
+            transform: rotate(450deg) translateX(75px) rotate(-450deg);
           }
         }
 
-        @keyframes orbitDot240 {
+        @keyframes orbit4Dot180 {
           0% {
-            transform: rotate(240deg) translateX(70px) rotate(-240deg);
+            transform: rotate(180deg) translateX(75px) rotate(-180deg);
           }
           100% {
-            transform: rotate(600deg) translateX(70px) rotate(-600deg);
+            transform: rotate(540deg) translateX(75px) rotate(-540deg);
           }
         }
 
-        @keyframes trailFade {
+        @keyframes orbit4Dot270 {
           0% {
-            opacity: 0.3;
-            transform: scale(0.8);
+            transform: rotate(270deg) translateX(75px) rotate(-270deg);
+          }
+          100% {
+            transform: rotate(630deg) translateX(75px) rotate(-630deg);
+          }
+        }
+
+        @keyframes dotPulse {
+          0%, 100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.3);
+          }
+        }
+
+        @keyframes dotTrailFade {
+          0% {
+            opacity: 0.4;
+            transform: scale(1);
           }
           100% {
             opacity: 0;
-            transform: scale(0.4);
+            transform: scale(0.3);
           }
         }
 
-        @keyframes letterReveal {
+        @keyframes particleDrift {
+          0% {
+            transform: translateY(-20px) translateX(-15px);
+          }
+          100% {
+            transform: translateY(20px) translateX(15px);
+          }
+        }
+
+        @keyframes lightSweepScan {
+          0% {
+            transform: translateY(-50px);
+            opacity: 0;
+          }
+          30% {
+            opacity: 1;
+          }
+          70% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100px);
+            opacity: 0;
+          }
+        }
+
+        @keyframes letterFlipIn {
           0% {
             opacity: 0;
-            filter: blur(12px);
-            transform: translateY(30px);
+            filter: blur(15px);
+            transform: translateY(40px) rotateX(-90deg);
           }
           100% {
             opacity: 1;
             filter: blur(0);
-            transform: translateY(0);
+            transform: translateY(0) rotateX(0deg);
           }
         }
 
-        @keyframes goldShimmer {
+        @keyframes containerGlowFade {
+          0% {
+            text-shadow: 0 0 0px rgba(201,169,110,0);
+          }
+          100% {
+            text-shadow: 0 0 50px rgba(201,169,110,.12);
+          }
+        }
+
+        @keyframes goldShimmerSweep {
           0% {
             background-position: 0% 50%;
           }
@@ -337,14 +414,16 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           }
         }
 
-        @keyframes taglineFadeIn {
+        @keyframes taglineCinematic {
           0% {
             opacity: 0;
-            transform: translateY(10px);
+            transform: translateY(15px);
+            letter-spacing: 10px;
           }
           100% {
             opacity: 1;
             transform: translateY(0);
+            letter-spacing: 6px;
           }
         }
 
@@ -558,275 +637,301 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
 
       {/* ── PHASE 2: Logo Reveal (3.8s — 6.0s) ── */}
       <div className="absolute flex flex-col items-center justify-center pointer-events-none">
-        {/* Radial Burst Glow */}
+        {/* Atmosphere Glow (300px x 300px) */}
         <div
-          className="absolute w-[200px] h-[200px] rounded-full pointer-events-none opacity-0"
+          className="absolute w-[300px] h-[300px] rounded-full pointer-events-none opacity-0"
           style={{
-            background: 'radial-gradient(circle, rgba(201,169,110,.15) 0%, transparent 70%)',
+            background:
+              'radial-gradient(circle, rgba(201,169,110,.12) 0%, rgba(26,58,46,.2) 40%, transparent 70%)',
             animation:
-              'radialBurstEntrance 1s ease-out 3.9s forwards, radialBurstPulse 3s ease-in-out 4.9s infinite alternate',
+              'atmosphereEntrance 1.2s cubic-bezier(.23,1,.32,1) 3.8s forwards, atmosphereLoop 4s ease-in-out 5.0s infinite alternate',
           }}
         />
 
-        {/* 3D Crystal Cube Floating & Entrance Container */}
+        {/* Shockwave Burst (Trigger at 4.0s) */}
         <div
-          className="relative w-[140px] h-[140px] flex items-center justify-center opacity-0"
+          className="absolute rounded-full pointer-events-none opacity-0"
           style={{
-            perspective: '1000px',
-            animation: 'crystalEntrance 0.9s cubic-bezier(.23,1,.32,1) 3.8s forwards',
+            animation: 'shockwaveBurst 1s ease-out 4.0s forwards',
+          }}
+        />
+
+        {/* Floating Particles (12) around cube */}
+        <div className="absolute w-[300px] h-[300px] pointer-events-none">
+          {[
+            { x: -110, y: -90, speed: '3.2s', delay: '0s' },
+            { x: 120, y: -70, speed: '4.1s', delay: '0.4s' },
+            { x: -80, y: 110, speed: '3.8s', delay: '0.8s' },
+            { x: 95, y: 85, speed: '4.5s', delay: '0.2s' },
+            { x: -130, y: 30, speed: '3.5s', delay: '1.0s' },
+            { x: 140, y: -20, speed: '4.8s', delay: '0.6s' },
+            { x: -40, y: -130, speed: '3.9s', delay: '1.2s' },
+            { x: 60, y: -110, speed: '4.3s', delay: '0.3s' },
+            { x: -95, y: -45, speed: '3.6s', delay: '0.7s' },
+            { x: 110, y: 40, speed: '4.7s', delay: '1.1s' },
+            { x: -65, y: 95, speed: '3.4s', delay: '0.5s' },
+            { x: 75, y: 130, speed: '4.2s', delay: '0.9s' },
+          ].map((pt, idx) => (
+            <div
+              key={idx}
+              className="absolute w-[4px] h-[4px] rounded-full bg-[#c9a96e] opacity-60"
+              style={{
+                top: `calc(50% + ${pt.y}px)`,
+                left: `calc(50% + ${pt.x}px)`,
+                animation: `particleDrift ${pt.speed} ease-in-out ${pt.delay} infinite alternate`,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* 3D Crystal Cube Container (160px x 160px, perspective 1200px) */}
+        <div
+          className="relative w-[160px] h-[160px] flex items-center justify-center opacity-0"
+          style={{
+            perspective: '1200px',
+            animation: 'crystalCubeEntrance 1s cubic-bezier(.23,1,.32,1) 3.9s forwards',
           }}
         >
           {/* Continuous Float Wrapper */}
           <div
             className="w-full h-full flex items-center justify-center relative"
             style={{
-              animation: 'crystalFloat 3s ease-in-out 4.7s infinite alternate',
+              animation: 'crystalCubeFloat 3s ease-in-out 4.9s infinite alternate',
             }}
           >
-            {/* Triple Gyroscope Rings */}
+            {/* Gyroscope Rings (Entrance 4.1s) */}
             <div
               className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0"
               style={{
-                animation: 'gyroEntrance 0.8s ease-out 4.0s forwards',
+                animation: 'gyroRingsEntrance 0.9s ease-out 4.1s forwards',
               }}
             >
-              {/* Ring 1 */}
+              {/* Gyroscope Ring 1 (Inner) - inset -35px */}
               <div
-                className="absolute -inset-[30px] rounded-full"
+                className="absolute -inset-[35px] rounded-full"
                 style={{
-                  border: '1.5px solid rgba(201,169,110,.25)',
+                  border: '2px solid rgba(201,169,110,.3)',
+                  boxShadow: '0 0 20px rgba(201,169,110,.08)',
                   transformStyle: 'preserve-3d',
-                  animation: 'gyroRing1Spin 6s linear 4.0s infinite',
+                  animation: 'gyro1Rotation 5s linear 4.1s infinite',
                 }}
               />
-              {/* Ring 2 */}
+              {/* Gyroscope Ring 2 (Middle) - inset -55px */}
               <div
-                className="absolute -inset-[50px] rounded-full"
+                className="absolute -inset-[55px] rounded-full"
                 style={{
-                  border: '1px solid rgba(201,169,110,.15)',
+                  border: '1.5px solid rgba(201,169,110,.2)',
+                  boxShadow: '0 0 20px rgba(201,169,110,.08)',
                   transformStyle: 'preserve-3d',
-                  animation: 'gyroRing2Spin 10s linear 4.0s infinite',
+                  animation: 'gyro2Rotation 8s linear 4.1s infinite',
                 }}
               />
-              {/* Ring 3 */}
+              {/* Gyroscope Ring 3 (Outer) - inset -75px */}
               <div
-                className="absolute -inset-[70px] rounded-full"
+                className="absolute -inset-[75px] rounded-full"
                 style={{
-                  border: '1px dashed rgba(201,169,110,.1)',
+                  border: '1px dashed rgba(201,169,110,.12)',
+                  boxShadow: '0 0 20px rgba(201,169,110,.08)',
                   transformStyle: 'preserve-3d',
-                  animation: 'gyroRing3Spin 14s linear 4.0s infinite',
+                  animation: 'gyro3Rotation 12s linear 4.1s infinite',
                 }}
               >
-                {/* Orbiting Gold Dots & Fading Trails on Ring 3 Path */}
+                {/* Orbiting Dots (4) - 10px x 10px, bg #e8d5a3, radius 75px, speed 3.5s */}
                 {/* Dot 1 (0°) */}
                 <div
-                  className="absolute top-1/2 left-1/2 w-[8px] h-[8px] -mt-[4px] -ml-[4px] rounded-full"
+                  className="absolute top-1/2 left-1/2 w-[10px] h-[10px] -mt-[5px] -ml-[5px] rounded-full bg-[#e8d5a3]"
                   style={{
-                    backgroundColor: '#c9a96e',
-                    boxShadow: '0 0 12px 3px rgba(201,169,110,.5)',
-                    animation: 'orbitDot0 4s linear 4.0s infinite',
+                    boxShadow:
+                      '0 0 15px 4px rgba(201,169,110,.6), 0 0 30px 8px rgba(201,169,110,.15)',
+                    animation:
+                      'orbit4Dot0 3.5s linear 4.1s infinite, dotPulse 1.5s ease-in-out 4.1s infinite',
                   }}
                 >
                   <div
-                    className="absolute inset-0 rounded-full bg-[#c9a96e]"
-                    style={{
-                      animation: 'trailFade 0.8s ease-out infinite',
-                    }}
+                    className="absolute inset-0 rounded-full bg-[#e8d5a3]"
+                    style={{ animation: 'dotTrailFade 0.6s ease-out infinite' }}
                   />
                 </div>
-                {/* Dot 2 (120°) */}
+
+                {/* Dot 2 (90°) */}
                 <div
-                  className="absolute top-1/2 left-1/2 w-[8px] h-[8px] -mt-[4px] -ml-[4px] rounded-full"
+                  className="absolute top-1/2 left-1/2 w-[10px] h-[10px] -mt-[5px] -ml-[5px] rounded-full bg-[#e8d5a3]"
                   style={{
-                    backgroundColor: '#c9a96e',
-                    boxShadow: '0 0 12px 3px rgba(201,169,110,.5)',
-                    animation: 'orbitDot120 4s linear 4.0s infinite',
+                    boxShadow:
+                      '0 0 15px 4px rgba(201,169,110,.6), 0 0 30px 8px rgba(201,169,110,.15)',
+                    animation:
+                      'orbit4Dot90 3.5s linear 4.1s infinite, dotPulse 1.5s ease-in-out 4.4s infinite',
                   }}
                 >
                   <div
-                    className="absolute inset-0 rounded-full bg-[#c9a96e]"
-                    style={{
-                      animation: 'trailFade 0.8s ease-out infinite',
-                    }}
+                    className="absolute inset-0 rounded-full bg-[#e8d5a3]"
+                    style={{ animation: 'dotTrailFade 0.6s ease-out infinite' }}
                   />
                 </div>
-                {/* Dot 3 (240°) */}
+
+                {/* Dot 3 (180°) */}
                 <div
-                  className="absolute top-1/2 left-1/2 w-[8px] h-[8px] -mt-[4px] -ml-[4px] rounded-full"
+                  className="absolute top-1/2 left-1/2 w-[10px] h-[10px] -mt-[5px] -ml-[5px] rounded-full bg-[#e8d5a3]"
                   style={{
-                    backgroundColor: '#c9a96e',
-                    boxShadow: '0 0 12px 3px rgba(201,169,110,.5)',
-                    animation: 'orbitDot240 4s linear 4.0s infinite',
+                    boxShadow:
+                      '0 0 15px 4px rgba(201,169,110,.6), 0 0 30px 8px rgba(201,169,110,.15)',
+                    animation:
+                      'orbit4Dot180 3.5s linear 4.1s infinite, dotPulse 1.5s ease-in-out 4.7s infinite',
                   }}
                 >
                   <div
-                    className="absolute inset-0 rounded-full bg-[#c9a96e]"
-                    style={{
-                      animation: 'trailFade 0.8s ease-out infinite',
-                    }}
+                    className="absolute inset-0 rounded-full bg-[#e8d5a3]"
+                    style={{ animation: 'dotTrailFade 0.6s ease-out infinite' }}
+                  />
+                </div>
+
+                {/* Dot 4 (270°) */}
+                <div
+                  className="absolute top-1/2 left-1/2 w-[10px] h-[10px] -mt-[5px] -ml-[5px] rounded-full bg-[#e8d5a3]"
+                  style={{
+                    boxShadow:
+                      '0 0 15px 4px rgba(201,169,110,.6), 0 0 30px 8px rgba(201,169,110,.15)',
+                    animation:
+                      'orbit4Dot270 3.5s linear 4.1s infinite, dotPulse 1.5s ease-in-out 5.0s infinite',
+                  }}
+                >
+                  <div
+                    className="absolute inset-0 rounded-full bg-[#e8d5a3]"
+                    style={{ animation: 'dotTrailFade 0.6s ease-out infinite' }}
                   />
                 </div>
               </div>
             </div>
 
-            {/* 3D Crystal Cube (70px x 70px, translateZ(35px)) */}
+            {/* 3D Crystal Cube (80px x 80px, translateZ(40px)) */}
             <div
-              className="w-[70px] h-[70px] relative"
+              className="w-[80px] h-[80px] relative"
               style={{
                 transformStyle: 'preserve-3d',
-                animation: 'crystalSpin 7s linear 3.8s infinite',
+                animation: 'crystalCubeSpin 8s linear 3.9s infinite',
               }}
             >
-              {/* Face 1: Front */}
-              <div
-                className="absolute inset-0 rounded-sm"
-                style={{
-                  border: '1px solid rgba(201,169,110,.4)',
-                  background:
-                    'linear-gradient(135deg, rgba(201,169,110,.08), rgba(232,213,163,.03))',
-                  backdropFilter: 'blur(2px)',
-                  boxShadow: 'inset 0 0 15px rgba(201,169,110,.1)',
-                  transform: 'translateZ(35px)',
-                }}
-              />
-              {/* Face 2: Back */}
-              <div
-                className="absolute inset-0 rounded-sm"
-                style={{
-                  border: '1px solid rgba(201,169,110,.4)',
-                  background:
-                    'linear-gradient(135deg, rgba(201,169,110,.08), rgba(232,213,163,.03))',
-                  backdropFilter: 'blur(2px)',
-                  boxShadow: 'inset 0 0 15px rgba(201,169,110,.1)',
-                  transform: 'rotateY(180deg) translateZ(35px)',
-                }}
-              />
-              {/* Face 3: Right */}
-              <div
-                className="absolute inset-0 rounded-sm"
-                style={{
-                  border: '1px solid rgba(201,169,110,.4)',
-                  background:
-                    'linear-gradient(135deg, rgba(201,169,110,.08), rgba(232,213,163,.03))',
-                  backdropFilter: 'blur(2px)',
-                  boxShadow: 'inset 0 0 15px rgba(201,169,110,.1)',
-                  transform: 'rotateY(90deg) translateZ(35px)',
-                }}
-              />
-              {/* Face 4: Left */}
-              <div
-                className="absolute inset-0 rounded-sm"
-                style={{
-                  border: '1px solid rgba(201,169,110,.4)',
-                  background:
-                    'linear-gradient(135deg, rgba(201,169,110,.08), rgba(232,213,163,.03))',
-                  backdropFilter: 'blur(2px)',
-                  boxShadow: 'inset 0 0 15px rgba(201,169,110,.1)',
-                  transform: 'rotateY(-90deg) translateZ(35px)',
-                }}
-              />
-              {/* Face 5: Top */}
-              <div
-                className="absolute inset-0 rounded-sm"
-                style={{
-                  border: '1px solid rgba(201,169,110,.4)',
-                  background:
-                    'linear-gradient(135deg, rgba(201,169,110,.08), rgba(232,213,163,.03))',
-                  backdropFilter: 'blur(2px)',
-                  boxShadow: 'inset 0 0 15px rgba(201,169,110,.1)',
-                  transform: 'rotateX(90deg) translateZ(35px)',
-                }}
-              />
-              {/* Face 6: Bottom */}
-              <div
-                className="absolute inset-0 rounded-sm"
-                style={{
-                  border: '1px solid rgba(201,169,110,.4)',
-                  background:
-                    'linear-gradient(135deg, rgba(201,169,110,.08), rgba(232,213,163,.03))',
-                  backdropFilter: 'blur(2px)',
-                  boxShadow: 'inset 0 0 15px rgba(201,169,110,.1)',
-                  transform: 'rotateX(-90deg) translateZ(35px)',
-                }}
-              />
+              {[
+                'translateZ(40px)',
+                'rotateY(180deg) translateZ(40px)',
+                'rotateY(90deg) translateZ(40px)',
+                'rotateY(-90deg) translateZ(40px)',
+                'rotateX(90deg) translateZ(40px)',
+                'rotateX(-90deg) translateZ(40px)',
+              ].map((transformStr, fIdx) => (
+                <div
+                  key={fIdx}
+                  className="absolute inset-0 rounded-sm overflow-hidden"
+                  style={{
+                    border: '1px solid rgba(201,169,110,.5)',
+                    background:
+                      'linear-gradient(135deg, rgba(201,169,110,.1), rgba(232,213,163,.05))',
+                    backdropFilter: 'blur(3px)',
+                    boxShadow: 'inset 0 0 20px rgba(201,169,110,.15)',
+                    transform: transformStr,
+                  }}
+                >
+                  {/* Face Shimmer Sweep Overlay */}
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background:
+                        'linear-gradient(90deg, transparent, rgba(255,255,255,.15), transparent)',
+                      animation: 'faceShimmerSweep 4s linear infinite',
+                    }}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
+        {/* Light Sweep (Trigger 5.0s) */}
+        <div
+          className="relative w-full h-[1px] my-2 pointer-events-none opacity-0"
+          style={{
+            background:
+              'linear-gradient(90deg, transparent, rgba(201,169,110,.4), transparent)',
+            animation: 'lightSweepScan 0.8s ease-out 5.0s forwards',
+          }}
+        />
+
         {/* Brand Name "CRETO4" */}
         <div
-          className="flex gap-[2px] mt-10 select-none"
+          className="flex gap-[3px] mt-8 select-none opacity-0"
           style={{
-            textShadow: '0 0 40px rgba(201,169,110,.15)',
+            animation: 'containerGlowFade 0.5s ease 5.3s forwards',
           }}
         >
-          {/* C */}
+          {/* C (4.4s) */}
           <span
-            className="text-[clamp(2.8rem,7vw,4.5rem)] font-black text-white tracking-[-4px] opacity-0"
+            className="text-[clamp(3rem,8vw,5rem)] font-black text-white tracking-[-5px] opacity-0"
             style={{
-              animation: 'letterReveal 0.7s cubic-bezier(.23,1,.32,1) 4.3s forwards',
+              animation: 'letterFlipIn 0.8s cubic-bezier(.23,1,.32,1) 4.4s forwards',
             }}
           >
             C
           </span>
-          {/* R */}
+          {/* R (4.48s) */}
           <span
-            className="text-[clamp(2.8rem,7vw,4.5rem)] font-black text-white tracking-[-4px] opacity-0"
+            className="text-[clamp(3rem,8vw,5rem)] font-black text-white tracking-[-5px] opacity-0"
             style={{
-              animation: 'letterReveal 0.7s cubic-bezier(.23,1,.32,1) 4.38s forwards',
+              animation: 'letterFlipIn 0.8s cubic-bezier(.23,1,.32,1) 4.48s forwards',
             }}
           >
             R
           </span>
-          {/* E */}
+          {/* E (4.56s) */}
           <span
-            className="text-[clamp(2.8rem,7vw,4.5rem)] font-black text-white tracking-[-4px] opacity-0"
+            className="text-[clamp(3rem,8vw,5rem)] font-black text-white tracking-[-5px] opacity-0"
             style={{
-              animation: 'letterReveal 0.7s cubic-bezier(.23,1,.32,1) 4.46s forwards',
+              animation: 'letterFlipIn 0.8s cubic-bezier(.23,1,.32,1) 4.56s forwards',
             }}
           >
             E
           </span>
-          {/* T */}
+          {/* T (4.64s) */}
           <span
-            className="text-[clamp(2.8rem,7vw,4.5rem)] font-black text-white tracking-[-4px] opacity-0"
+            className="text-[clamp(3rem,8vw,5rem)] font-black text-white tracking-[-5px] opacity-0"
             style={{
-              animation: 'letterReveal 0.7s cubic-bezier(.23,1,.32,1) 4.54s forwards',
+              animation: 'letterFlipIn 0.8s cubic-bezier(.23,1,.32,1) 4.64s forwards',
             }}
           >
             T
           </span>
-          {/* O */}
+          {/* O (4.72s) */}
           <span
-            className="text-[clamp(2.8rem,7vw,4.5rem)] font-black text-white tracking-[-4px] opacity-0"
+            className="text-[clamp(3rem,8vw,5rem)] font-black text-white tracking-[-5px] opacity-0"
             style={{
-              animation: 'letterReveal 0.7s cubic-bezier(.23,1,.32,1) 4.62s forwards',
+              animation: 'letterFlipIn 0.8s cubic-bezier(.23,1,.32,1) 4.72s forwards',
             }}
           >
             O
           </span>
-          {/* 4 (Gold Gradient + Shimmer) */}
+          {/* 4 (4.8s + Gold Shimmer) */}
           <span
-            className="text-[clamp(2.8rem,7vw,4.5rem)] font-black tracking-[-4px] opacity-0"
+            className="text-[clamp(3rem,8vw,5rem)] font-black tracking-[-5px] opacity-0"
             style={{
               backgroundImage:
                 'linear-gradient(135deg, #c9a96e, #e8d5a3, #f5f0eb, #c9a96e)',
               backgroundSize: '200% auto',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
+              textShadow:
+                '0 0 30px rgba(201,169,110,.3), 0 0 60px rgba(201,169,110,.1)',
               animation:
-                'letterReveal 0.7s cubic-bezier(.23,1,.32,1) 4.7s forwards, goldShimmer 3s linear 4.7s infinite',
+                'letterFlipIn 0.8s cubic-bezier(.23,1,.32,1) 4.8s forwards, goldShimmerSweep 3s linear 4.8s infinite',
             }}
           >
             4
           </span>
         </div>
 
-        {/* Tagline */}
+        {/* Tagline (5.3s) */}
         <p
-          className="text-[0.75rem] font-medium text-[rgba(255,255,255,.35)] tracking-[5px] uppercase mt-2 opacity-0"
+          className="text-[0.75rem] font-medium text-[rgba(255,255,255,.35)] uppercase mt-2 opacity-0"
           style={{
-            animation: 'taglineFadeIn 0.6s ease 5.2s forwards',
+            animation: 'taglineCinematic 0.7s ease 5.3s forwards',
           }}
         >
           MULTIDISCIPLINARY PRODUCT DESIGN STUDIO
