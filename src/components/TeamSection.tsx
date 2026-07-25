@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'motion/react';
+import { Linkedin } from 'lucide-react';
 
 interface TeamMember {
   id: string;
@@ -12,6 +13,7 @@ interface TeamMember {
   description: string;
   floatingBadges: { emoji: string; posClass: string }[];
   skills: string[];
+  linkedinUrl?: string;
 }
 
 const TEAM_MEMBERS: TeamMember[] = [
@@ -20,7 +22,7 @@ const TEAM_MEMBERS: TeamMember[] = [
     name: 'Prince Tagadiya',
     emoji: '👑',
     initials: 'PT',
-    avatarUrl: '/prince_memoji.png',
+    avatarUrl: 'https://ui-avatars.com/api/?name=Prince+Tagadiya&background=1a3a2e&color=fff&size=256',
     dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=PrinceCEO&backgroundColor=e8f0e8&radius=50&size=256&top=shortHairShortFlat&facialHair=beardMedium&clothing=blazerAndShirt',
     role: 'Founder, CEO & CPTO',
@@ -32,13 +34,14 @@ const TEAM_MEMBERS: TeamMember[] = [
       { emoji: '⚡', posClass: '-bottom-[2px] -left-[2px]' },
     ],
     skills: ['Product Strategy', 'Systems Architecture', 'Hardware R&D'],
+    linkedinUrl: 'https://www.linkedin.com/in/prince-tagadiya/',
   },
   {
     id: 'nisarg-patel',
     name: 'Nisarg Patel',
     emoji: '🔧',
     initials: 'NP',
-    avatarUrl: '/nisarg_memoji.png',
+    avatarUrl: 'https://ui-avatars.com/api/?name=Nisarg+Patel&background=1a3a2e&color=fff&size=256',
     dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=NisargEngineer&backgroundColor=d1e8d1&radius=50&size=256&top=shortHairTheCaesar&facialHair=beardLight&clothing=hoodie',
     role: 'Head of Electronics, Embedded Systems & Manufacturing',
@@ -50,13 +53,14 @@ const TEAM_MEMBERS: TeamMember[] = [
       { emoji: '📟', posClass: '-bottom-[2px] -left-[2px]' },
     ],
     skills: ['Hardware Engineering', 'Embedded C++', 'DFM Excellence'],
+    linkedinUrl: 'https://www.linkedin.com/in/nisarg-patel-774908357/',
   },
   {
     id: 'khushi-belani',
     name: 'Khushi Belani',
     emoji: '🎨',
     initials: 'KB',
-    avatarUrl: '/khushi_memoji.png',
+    avatarUrl: 'https://ui-avatars.com/api/?name=Khushi+Belani&background=1a3a2e&color=fff&size=256',
     dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=KhushiDesigner&backgroundColor=ffe8d1&radius=50&size=256&top=longHairStraight&accessories=glasses&clothing=shirtVNeck',
     role: 'Head of PCB Design, Education & Brand Communications',
@@ -68,13 +72,14 @@ const TEAM_MEMBERS: TeamMember[] = [
       { emoji: '✨', posClass: '-bottom-[2px] -left-[2px]' },
     ],
     skills: ['PCB Design', 'Signal Integrity', 'Quality Assurance'],
+    linkedinUrl: 'https://www.linkedin.com/in/khushi-belani-18ba52375/',
   },
   {
     id: 'rudra-chauhan',
     name: 'Rudra Chauhan',
     emoji: '💻',
     initials: 'RC',
-    avatarUrl: '/rudra_memoji.png',
+    avatarUrl: 'https://ui-avatars.com/api/?name=Rudra+Chauhan&background=1a3a2e&color=fff&size=256',
     dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=RudraDeveloper&backgroundColor=d1d8e8&radius=50&size=256&top=shortHairShortWaved&facialHair=beardLight&clothing=graphicShirt',
     role: 'Head of Software Engineering & Digital Design',
@@ -86,6 +91,7 @@ const TEAM_MEMBERS: TeamMember[] = [
       { emoji: '🎮', posClass: '-bottom-[2px] -left-[2px]' },
     ],
     skills: ['Full-Stack Web', 'Cloud Infrastructure', '3D WebGL'],
+    linkedinUrl: 'https://www.linkedin.com/in/rudra-chauhan24/',
   },
 ];
 
@@ -236,6 +242,22 @@ const TeamTiltCard: React.FC<TeamTiltCardProps> = ({ member, imgState, imgSrc, o
             </span>
           ))}
         </div>
+
+        {/* 6. LinkedIn Button (TranslateZ 25px) */}
+        {member.linkedinUrl && (
+          <div style={{ transform: 'translateZ(25px)' }} className="mt-5 w-full transition-transform duration-300">
+            <a
+              href={member.linkedinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()} // Prevent card tilt interference
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-[100px] bg-[#0A66C2]/10 hover:bg-[#0A66C2] text-[#0A66C2] hover:text-white font-bold text-[0.8rem] transition-all duration-300"
+            >
+              <Linkedin className="w-4 h-4" />
+              <span>Connect</span>
+            </a>
+          </div>
+        )}
       </motion.div>
     </div>
   );
