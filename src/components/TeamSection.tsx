@@ -77,6 +77,8 @@ const TEAM_MEMBERS: TeamMember[] = [
   {
     id: 'rudra-chauhan',
     name: 'Rudra Chauhan',
+    emoji: '💻',
+    initials: 'RC',
     avatarUrl: '/rudra_photo.png',
     dicebearUrl: '/rudra_photo.png',
     role: 'Head of Software Engineering & Digital Design',
