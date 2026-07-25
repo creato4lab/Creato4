@@ -102,7 +102,7 @@ export const WORK_PROJECTS: WorkProject[] = [
     category: 'Embedded Systems · Smart City · Automation · Computer Vision',
     tags: ['Embedded Systems', 'Smart City', 'Automation', 'Computer Vision'],
     badge: 'Smart City Solution',
-    image: 'https://images.unsplash.com/photo-1506521782020-18925f44c05a?auto=format&fit=crop&w=800&q=80',
+    image: '/density-traffic-controller.jpg',
     description: 'An adaptive traffic signal control system utilizing ultrasonic distance sensors, infrared vehicle counters, and camera vision feeds to dynamically adjust green light duration based on real-time junction congestion.',
     challenge: 'Replacing fixed timer traffic signals with low-latency adaptive algorithms to reduce urban traffic gridlock and prioritize emergency vehicles.',
     solution: 'Integrated ultrasonic sensor arrays per lane with microcontroller interrupt timers and custom priority routing for emergency ambulances equipped with RF transponders.',
