@@ -36,15 +36,22 @@ export const SelectedWork: React.FC<SelectedWorkProps> = ({ onSelectProject }) =
               className="group relative bg-[#F5F0EA] rounded-[20px] overflow-hidden border border-[#E8E2D9] shadow-sm hover:shadow-xl transition-all duration-400 hover:-translate-y-1.5 cursor-pointer flex flex-col justify-between h-[420px]"
             >
               {/* Image */}
-              <div className="relative w-full h-[220px] overflow-hidden">
+              <div className="relative w-full h-[220px] overflow-hidden bg-[#FAF8F5] flex items-center justify-center border-b border-[#E8E2D9]">
+                {/* Blurry background image for filling space premiumly */}
+                <img
+                  src={project.image}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover blur-[6px] opacity-25 scale-110 pointer-events-none"
+                />
+                {/* Clean, contained front image (no cropping) */}
                 <img
                   src={project.image}
                   alt={project.title}
-                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  className="relative z-10 max-w-full max-h-full object-contain transition-transform duration-700 ease-out group-hover:scale-105"
                   loading="lazy"
                 />
                 {project.badge && (
-                  <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-[#C4A35A] text-[#1A3C2F] text-[10px] font-extrabold uppercase tracking-wider shadow-sm">
+                  <div className="absolute top-4 right-4 z-20 px-3 py-1 rounded-full bg-[#C4A35A] text-[#1A3C2F] text-[10px] font-extrabold uppercase tracking-wider shadow-sm">
                     {project.badge}
                   </div>
                 )}

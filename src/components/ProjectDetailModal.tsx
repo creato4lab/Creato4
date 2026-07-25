@@ -37,15 +37,25 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           </button>
 
           {/* Header Image */}
-          <div className="relative w-full h-64 lg:h-80 rounded-2xl overflow-hidden mb-8 border border-[#E8E2D9]">
+          <div className="relative w-full h-64 lg:h-80 rounded-2xl overflow-hidden mb-8 border border-[#E8E2D9] bg-[#FAF8F5] flex items-center justify-center">
+            {/* Blurry background image for filling space premiumly */}
+            <img
+              src={project.image}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover blur-[8px] opacity-30 scale-110 pointer-events-none"
+            />
+            
+            {/* Clean, contained front image (no cropping) */}
             <img
               src={project.image}
               alt={project.title}
-              className="w-full h-full object-cover"
+              className="relative z-10 max-w-full max-h-full object-contain"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#1A3C2F]/80 via-transparent to-transparent" />
             
-            <div className="absolute bottom-6 left-6 right-6 text-[#FAF8F5]">
+            {/* Dark gradient for text readability */}
+            <div className="absolute inset-0 z-15 bg-gradient-to-t from-[#1A3C2F]/90 via-transparent to-transparent" />
+            
+            <div className="absolute bottom-6 left-6 right-6 z-20 text-[#FAF8F5]">
               <span className="text-[10px] font-bold uppercase tracking-widest text-[#C4A35A] block mb-1">
                 {isWork ? (project as WorkProject).category : `STUDENT BLUEPRINT · ${(project as StudentProject).category}`}
               </span>
