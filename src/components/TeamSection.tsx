@@ -8,14 +8,9 @@ interface TeamMemberSlide {
   avatarUrl: string;
   dicebearUrl: string;
   role: string;
-  departmentHtml: string;
-  location: string;
   description: string;
-  achievements: string[];
-  stats: { value: string; label: string }[];
   floatingBadges: { emoji: string; posClass: string }[];
   skills: string[];
-  socials: { emoji: string; label: string; link: string }[];
 }
 
 const TEAM_SLIDES: TeamMemberSlide[] = [
@@ -28,31 +23,14 @@ const TEAM_SLIDES: TeamMemberSlide[] = [
     dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=PrinceCEO&backgroundColor=e8f0e8&radius=50&size=256&top=shortHairShortFlat&facialHair=beardMedium&clothing=blazerAndShirt',
     role: 'Founder, CEO & CPTO',
-    departmentHtml: 'PRODUCT STRATEGY &<br/>LEADERSHIP',
-    location: '📍 CRETO4 Design Studio · Gujarat',
     description:
-      'Visionary engineering lead steering multidisciplinary hardware and software products from concept to market. Drives innovation across all technical verticals with a hands-on approach to systems architecture.',
-    achievements: [
-      'Led 3 successful hardware product launches from prototype to mass production',
-      'Built and scaled technical team from 2 to 15 engineers in under 2 years',
-    ],
-    stats: [
-      { value: '8+ Yrs', label: 'EXP' },
-      { value: '50+', label: 'PROJECTS' },
-      { value: '12', label: 'PATENTS' },
-    ],
+      'Visionary engineering lead steering multidisciplinary hardware and software products from concept to market. Drives innovation across all technical verticals with a hands-on approach to systems architecture and product strategy.',
     floatingBadges: [
-      { emoji: '🚀', posClass: '-top-[2px] -right-[2px]' },
-      { emoji: '💡', posClass: '-bottom-[2px] -left-[2px]' },
-      { emoji: '▶️', posClass: '-bottom-[2px] -right-[2px]' },
+      { emoji: '🚀', posClass: 'top-0 -right-[2px]' },
+      { emoji: '💡', posClass: 'top-[44px] -right-[12px]' },
+      { emoji: '⚡', posClass: 'bottom-0 -left-[2px]' },
     ],
-    skills: ['Product Strategy', 'Systems Architecture', 'Hardware R&D', 'Team Leadership'],
-    socials: [
-      { emoji: '💼', label: 'LinkedIn', link: '#' },
-      { emoji: '🐦', label: 'Twitter', link: '#' },
-      { emoji: '💻', label: 'GitHub', link: '#' },
-      { emoji: '✉️', label: 'Email', link: 'mailto:prince@creto4.com' },
-    ],
+    skills: ['Product Strategy', 'Systems Architecture', 'Hardware R&D'],
   },
   {
     id: 'nisarg-patel',
@@ -63,31 +41,14 @@ const TEAM_SLIDES: TeamMemberSlide[] = [
     dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=NisargEngineer&backgroundColor=d1e8d1&radius=50&size=256&top=shortHairTheCaesar&facialHair=beardLight&clothing=hoodie',
     role: 'Head of Electronics, Embedded Systems & Manufacturing',
-    departmentHtml: 'ELECTRONICS &<br/>MANUFACTURING',
-    location: '📍 CRETO4 Design Studio · Gujarat',
     description:
-      'Expert in high-reliability circuit design, power management, micro-controller firmware, and PCB manufacturing processes. Leads the electronics division with precision engineering.',
-    achievements: [
-      'Designed power management systems for IoT devices with 99.9% uptime',
-      'Optimized PCB manufacturing workflow reducing production costs by 30%',
-    ],
-    stats: [
-      { value: '6+ Yrs', label: 'EXP' },
-      { value: '35+', label: 'PCBS' },
-      { value: '8', label: 'PRODUCTS' },
-    ],
+      'Expert in high-reliability circuit design, power management, micro-controller firmware, and PCB manufacturing processes. Leads the electronics division with precision engineering and DFM excellence.',
     floatingBadges: [
-      { emoji: '🔧', posClass: '-top-[2px] -right-[2px]' },
-      { emoji: '⚡', posClass: '-bottom-[2px] -left-[2px]' },
-      { emoji: '▶️', posClass: '-bottom-[2px] -right-[2px]' },
+      { emoji: '🔧', posClass: 'top-0 -right-[2px]' },
+      { emoji: '⚡', posClass: 'top-[44px] -right-[12px]' },
+      { emoji: '📟', posClass: 'bottom-0 -left-[2px]' },
     ],
-    skills: ['Hardware Engineering', 'Embedded C++', 'DFM', 'Power Systems'],
-    socials: [
-      { emoji: '💼', label: 'LinkedIn', link: '#' },
-      { emoji: '🐦', label: 'Twitter', link: '#' },
-      { emoji: '💻', label: 'GitHub', link: '#' },
-      { emoji: '✉️', label: 'Email', link: 'mailto:nisarg@creto4.com' },
-    ],
+    skills: ['Hardware Engineering', 'Embedded C++', 'DFM Excellence'],
   },
   {
     id: 'khushi-belani',
@@ -98,31 +59,14 @@ const TEAM_SLIDES: TeamMemberSlide[] = [
     dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=KhushiDesigner&backgroundColor=ffe8d1&radius=50&size=256&top=longHairStraight&accessories=glasses&clothing=shirtVNeck',
     role: 'Head of PCB Design, Education & Brand Communications',
-    departmentHtml: 'PCB DESIGN & BRAND<br/>COMMUNICATIONS',
-    location: '📍 CRETO4 Design Studio · Gujarat',
     description:
-      'Directs multi-layer PCB layout, component selection, and signal integrity analysis. Oversees educational project publishing and brand outreach with creative vision and technical depth.',
-    achievements: [
-      'Published technical research in Electronics For You magazine',
-      'Routed multi-layer HDI high-density PCB layouts & EMC compliance',
-    ],
-    stats: [
-      { value: '5+ Yrs', label: 'EXP' },
-      { value: '40+', label: 'PCB DESIGNS' },
-      { value: '15', label: 'WORKSHOPS' },
-    ],
+      'Directs multi-layer PCB layout, component selection, and signal integrity analysis. Oversees educational project publishing and brand outreach initiatives with creative vision and technical depth.',
     floatingBadges: [
-      { emoji: '🎨', posClass: '-top-[2px] -right-[2px]' },
-      { emoji: '✨', posClass: '-bottom-[2px] -left-[2px]' },
-      { emoji: '▶️', posClass: '-bottom-[2px] -right-[2px]' },
+      { emoji: '📐', posClass: 'top-0 -right-[2px]' },
+      { emoji: '🎨', posClass: 'top-[44px] -right-[12px]' },
+      { emoji: '✨', posClass: 'bottom-0 -left-[2px]' },
     ],
-    skills: ['PCB Design', 'Signal Integrity', 'Quality Assurance', 'Technical Brand'],
-    socials: [
-      { emoji: '💼', label: 'LinkedIn', link: '#' },
-      { emoji: '🐦', label: 'Twitter', link: '#' },
-      { emoji: '🎨', label: 'Dribbble', link: '#' },
-      { emoji: '✉️', label: 'Email', link: 'mailto:khushi@creto4.com' },
-    ],
+    skills: ['PCB Design', 'Signal Integrity', 'Quality Assurance'],
   },
   {
     id: 'rudra-chauhan',
@@ -133,31 +77,14 @@ const TEAM_SLIDES: TeamMemberSlide[] = [
     dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=RudraDeveloper&backgroundColor=d1d8e8&radius=50&size=256&top=shortHairShortWaved&facialHair=beardLight&clothing=graphicShirt',
     role: 'Head of Software Engineering & Digital Design',
-    departmentHtml: 'SOFTWARE ENGINEERING &<br/>DIGITAL DESIGN',
-    location: '📍 CRETO4 Design Studio · Gujarat',
     description:
       'Architects modern cloud applications, real-time IoT web portals, and interactive 3D WebGL experiences. Bridges the gap between hardware and software with cutting-edge digital solutions.',
-    achievements: [
-      'Built real-time IoT dashboard processing 10K+ device data points/sec',
-      'Developed interactive 3D product configurators for client showcases',
-    ],
-    stats: [
-      { value: '7+ Yrs', label: 'EXP' },
-      { value: '60+', label: 'PROJECTS' },
-      { value: '20', label: 'WEB APPS' },
-    ],
     floatingBadges: [
-      { emoji: '💻', posClass: '-top-[2px] -right-[2px]' },
-      { emoji: '🌐', posClass: '-bottom-[2px] -left-[2px]' },
-      { emoji: '▶️', posClass: '-bottom-[2px] -right-[2px]' },
+      { emoji: '💻', posClass: 'top-0 -right-[2px]' },
+      { emoji: '🌐', posClass: 'top-[44px] -right-[12px]' },
+      { emoji: '🎮', posClass: 'bottom-0 -left-[2px]' },
     ],
-    skills: ['Full-Stack Web', 'Cloud Infrastructure', '3D WebGL', 'IoT Systems'],
-    socials: [
-      { emoji: '💼', label: 'LinkedIn', link: '#' },
-      { emoji: '🐦', label: 'Twitter', link: '#' },
-      { emoji: '💻', label: 'GitHub', link: '#' },
-      { emoji: '✉️', label: 'Email', link: 'mailto:rudra@creto4.com' },
-    ],
+    skills: ['Full-Stack Web', 'Cloud Infrastructure', '3D WebGL'],
   },
 ];
 
@@ -246,29 +173,18 @@ export const TeamSection: React.FC = () => {
                 key={member.id}
                 className="w-full h-screen shrink-0 flex flex-col items-center justify-center relative p-4 sm:p-5"
               >
-                {/* 460px Spec Glass Card */}
-                <div className="w-full max-w-[460px] mx-auto my-auto">
+                {/* Clean Minimal Card Container matching screenshot */}
+                <div className="w-full max-w-[440px] mx-auto my-auto">
                   <div
-                    className={`w-full max-h-[90vh] overflow-y-auto no-scrollbar bg-white/90 backdrop-blur-[30px] border border-white/95 rounded-[40px] p-[32px_40px_36px] shadow-[0_8px_40px_rgba(26,58,46,0.06)] flex flex-col items-center text-center relative transition-all duration-500 ${
+                    className={`w-full bg-white rounded-[44px] p-[40px_36px_36px] shadow-[0_20px_60px_rgba(26,58,46,0.07)] flex flex-col items-center text-center relative transition-all duration-500 ${
                       isActive
                         ? 'opacity-100 translate-y-0'
                         : 'opacity-0 translate-y-[30px]'
                     }`}
                   >
-                    {/* 1. Top Badge Row */}
-                    <div className="w-full flex items-center justify-center gap-[12px] mb-4">
-                      <div
-                        className="bg-[rgba(26,58,46,0.06)] border border-[rgba(26,58,46,0.08)] text-[#1a3a2e] px-[18px] py-[8px] rounded-[100px] text-[0.7rem] font-bold tracking-[1.5px] uppercase leading-[1.4] text-center"
-                        dangerouslySetInnerHTML={{ __html: member.departmentHtml }}
-                      />
-                      <div className="text-[0.75rem] font-medium color-[#7a8a7a] flex items-center gap-1 whitespace-nowrap">
-                        {member.location}
-                      </div>
-                    </div>
-
-                    {/* 2. Avatar Area (130px x 130px) */}
-                    <div className="relative w-[130px] h-[130px] mb-4 shrink-0">
-                      <div className="w-[130px] h-[130px] rounded-full p-1 bg-gradient-to-br from-[#1a3a2e] via-[#3d7a5a] to-[#1a3a2e] shadow-[0_8px_25px_rgba(26,58,46,0.18)]">
+                    {/* 1. Avatar Area (126px x 126px) */}
+                    <div className="relative w-[126px] h-[126px] mb-6 shrink-0">
+                      <div className="w-[126px] h-[126px] rounded-full p-1 bg-gradient-to-br from-[#1a3a2e] via-[#3d7a5a] to-[#1a3a2e] shadow-[0_8px_25px_rgba(26,58,46,0.15)]">
                         <div className="w-full h-full rounded-full border-[4px] border-white overflow-hidden bg-[#1a3a2e] flex items-center justify-center relative">
                           {imgState !== 'initials' && imgSrc ? (
                             <img
@@ -285,94 +201,44 @@ export const TeamSection: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* 3 Floating Badges (32px circles) */}
+                      {/* Floating Badges */}
                       {member.floatingBadges.map((badge, bIdx) => (
                         <div
                           key={bIdx}
-                          className={`absolute ${badge.posClass} w-8 h-8 rounded-full bg-white text-[15px] shadow-[0_4px_12px_rgba(26,58,46,0.15)] border-2 border-white/90 flex items-center justify-center z-10 animate-pulse`}
+                          className={`absolute ${badge.posClass} w-8 h-8 rounded-full bg-white text-[15px] shadow-[0_4px_12px_rgba(26,58,46,0.12)] border-2 border-white/95 flex items-center justify-center z-10 animate-pulse`}
                         >
                           <span>{badge.emoji}</span>
                         </div>
                       ))}
                     </div>
 
-                    {/* 3. Name */}
-                    <h3 className="text-[1.8rem] font-extrabold text-[#1a3a2e] text-center flex items-center justify-center gap-1.5 mb-1 leading-tight">
+                    {/* 2. Name + Emoji */}
+                    <h3 className="text-[1.85rem] font-extrabold text-[#1a3a2e] text-center flex items-center justify-center gap-1.5 mb-1.5 tracking-tight leading-tight">
                       <span>{member.name}</span>
                       <span className="text-[1.3rem]">{member.emoji}</span>
                     </h3>
 
-                    {/* 4. Role */}
-                    <div className="text-[0.9rem] font-semibold text-[#4a7a5a] text-center leading-[1.5] mb-3">
+                    {/* 3. Role */}
+                    <div className="text-[0.88rem] font-semibold text-[#4a7a5a] text-center leading-[1.45] mb-4 max-w-[340px]">
                       {member.role}
                     </div>
 
-                    {/* 5. Description */}
-                    <p className="text-[0.82rem] font-normal text-[#6a6a6a] leading-[1.7] text-left mb-3.5 w-full">
+                    {/* 4. Description Paragraph */}
+                    <p className="text-[0.84rem] font-normal text-[#7a7a7a] leading-[1.65] text-center mb-6 max-w-[380px]">
                       {member.description}
                     </p>
 
-                    {/* 6. Achievements Box */}
-                    <div className="bg-[rgba(26,58,46,0.03)] rounded-[16px] p-[14px_18px] w-full mb-3.5 text-left">
-                      {member.achievements.map((ach, aIdx) => (
-                        <div
-                          key={aIdx}
-                          className="flex items-start gap-2 text-[0.78rem] text-[#5a6a5a] leading-[1.6] mb-1.5 last:mb-0"
-                        >
-                          <span className="text-[#4a7a5a] font-bold shrink-0">✓</span>
-                          <span>{ach}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* 7. Stats Row */}
-                    <div className="grid grid-cols-3 gap-[28px] py-[14px] w-full border-t border-b border-black/[0.04] mb-3.5 text-center">
-                      {member.stats.map((st, sIdx) => (
-                        <div key={sIdx}>
-                          <span className="text-[1.3rem] font-extrabold text-[#1a3a2e] block leading-none">
-                            {st.value}
-                          </span>
-                          <span className="text-[0.6rem] font-bold text-[#9aaa9a] uppercase tracking-[1.5px] block mt-1">
-                            {st.label}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* 8. Social Links */}
-                    <div className="flex items-center justify-center gap-[10px] mb-3.5">
-                      {member.socials.map((soc, socIdx) => (
-                        <a
-                          key={socIdx}
-                          href={soc.link}
-                          title={soc.label}
-                          className="w-[38px] h-[38px] rounded-full bg-[rgba(245,245,245,0.9)] border border-black/[0.05] flex items-center justify-center text-[1.05rem] transition-all duration-200 hover:bg-[#1a3a2e] hover:text-white hover:-translate-y-0.5 hover:scale-110"
-                        >
-                          {soc.emoji}
-                        </a>
-                      ))}
-                    </div>
-
-                    {/* 9. Skills */}
-                    <div className="flex flex-wrap justify-center gap-[8px] w-full mb-[16px]">
+                    {/* 5. Skill Tag Pills */}
+                    <div className="flex flex-wrap justify-center gap-2 w-full">
                       {member.skills.map((skill, sIdx) => (
                         <span
                           key={sIdx}
-                          className="bg-[rgba(245,245,245,0.9)] border border-black/[0.05] text-[#3a5a4a] px-[18px] py-[8px] rounded-[100px] text-[0.78rem] font-semibold transition-all duration-200 hover:bg-[#1a3a2e] hover:text-white hover:-translate-y-0.5"
+                          className="bg-[#ece9e4] text-[#2a4a3e] px-[18px] py-[8px] rounded-[100px] text-[0.76rem] font-semibold transition-all duration-200 hover:bg-[#1a3a2e] hover:text-white hover:-translate-y-0.5"
                         >
                           {skill}
                         </span>
                       ))}
                     </div>
-
-                    {/* 10. Contact Button */}
-                    <a
-                      href={`mailto:${member.id}@creto4.com`}
-                      className="bg-[#1a3a2e] text-white px-[28px] py-[12px] rounded-[100px] text-[0.85rem] font-semibold inline-flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_25px_rgba(26,58,46,0.25)]"
-                    >
-                      <span>Get in Touch</span>
-                      <span>📧</span>
-                    </a>
                   </div>
                 </div>
               </div>
@@ -392,7 +258,7 @@ export const TeamSection: React.FC = () => {
                 aria-label={`Go to slide ${idx + 1}: ${m.name}`}
                 className={`w-[10px] h-[10px] rounded-full transition-all duration-300 ${
                   isActive
-                    ? 'bg-[#1a3a2e] scale-[1.4] shadow-[0_0_0_4px_rgba(26,58,46,0.2)]'
+                    ? 'bg-[#1a3a2e] scale-[1.4] shadow-[0_0_0_4px_rgba(26,58,46,0.15)]'
                     : 'bg-[#1a3a2e]/25 hover:bg-[#1a3a2e]/60'
                 }`}
               />
@@ -401,7 +267,7 @@ export const TeamSection: React.FC = () => {
         </div>
 
         {/* Fixed Bottom-Left Slide Counter */}
-        <div className="fixed bottom-6 left-6 px-[18px] py-[8px] rounded-[100px] bg-white/80 backdrop-blur-md border border-black/5 text-[#1a3a2e] font-extrabold text-[0.8rem] tracking-[0.15em] z-50">
+        <div className="fixed bottom-6 left-6 px-[14px] py-[6px] rounded-[100px] text-[#1a3a2e] font-extrabold text-[0.78rem] tracking-[0.15em] z-50">
           0{currentSlide + 1} / 04
         </div>
       </div>
