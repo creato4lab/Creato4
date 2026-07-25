@@ -27,6 +27,12 @@
   }
 }
 
+@media (pointer: fine) {
+  body, a, button, input, select, textarea, .cursor-pointer {
+    cursor: none !important;
+  }
+}
+
 .hero-headline {
   font-size: clamp(3.5rem, 8vw, 7rem);
   line-height: 1.05;

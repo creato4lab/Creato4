@@ -16,6 +16,7 @@ import { Footer } from './components/Footer';
 import { DiscussionModal } from './components/DiscussionModal';
 import { ProjectDetailModal } from './components/ProjectDetailModal';
 import { SearchAccountCartModals } from './components/SearchAccountCartModals';
+import { CustomCursor } from './components/CustomCursor';
 
 import { WorkProject, StudentProject, ServiceItem } from './types';
 
@@ -100,6 +101,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#1A3C2F] selection:bg-[#1A3C2F] selection:text-[#FAF8F5] font-sans relative">
+      <CustomCursor />
+      
       {/* 1. Preloader */}
       {!preloaderDone && <Preloader onComplete={() => setPreloaderDone(true)} />}
 

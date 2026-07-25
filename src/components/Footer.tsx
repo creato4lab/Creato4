@@ -230,8 +230,15 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
 
         </div>
 
+        {/* Giant Footer Typography */}
+        <div className="w-full mt-16 mb-8 flex justify-center items-center pointer-events-none select-none">
+          <h1 className="text-[clamp(4rem,14vw,18rem)] font-black tracking-[-0.04em] text-[#FAF8F5] opacity-[0.03] leading-[0.8] w-full text-center overflow-hidden">
+            CREATO4
+          </h1>
+        </div>
+
         {/* Bottom Row */}
-        <div className="border-t border-[#FAF8F5]/10 pt-8 flex flex-col sm:flex-row items-center justify-between text-[0.75rem] text-[#FAF8F5]/50 gap-4">
+        <div className="border-t border-[#FAF8F5]/10 pt-8 flex flex-col sm:flex-row items-center justify-between text-[0.75rem] text-[#FAF8F5]/50 gap-4 relative z-10">
           <p>© 2026 Creato4. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <a href="#" className="hover:text-[#FAF8F5]">Privacy Policy</a>
