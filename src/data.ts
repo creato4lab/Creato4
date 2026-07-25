@@ -86,7 +86,7 @@ export const WORK_PROJECTS: WorkProject[] = [
     subtitle: 'Prepaid Water Meter, Real-Time Flow & Quality Monitoring, and Mesh Network Telemetry',
     category: 'IoT Systems · Water Tech · Embedded Firmware · Smart Utilities',
     tags: ['IoT Systems', 'Water Tech', 'Embedded Firmware', 'Smart Utilities'],
-    badge: 'Smart Utility Project',
+    badge: 'National Level Runner Up Project',
     image: '/water-leakage-theft.jpg',
     description: 'A smart prepaid IoT water meter system featuring a 3-device ecosystem (User Meter, Society Node, and Government Unit) designed for the BGI Hackathon 2026. It monitors water quantity and quality (TDS, Turbidity, pH) in real-time while detecting leakages, pipe cuts, and meter tampering.',
     challenge: 'Detecting micro-leakages, illegal pipe cuts before the meter, and physical meter tampering in real-time while ensuring offline communication reliability in remote areas.',
