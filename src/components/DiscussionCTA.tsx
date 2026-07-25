@@ -29,8 +29,8 @@ export const DiscussionCTA: React.FC<DiscussionCTAProps> = ({ onOpenDiscuss }) =
           transition={{ duration: 0.6 }}
           className="heading-h1 font-extrabold text-[#1A3C2F] tracking-tight leading-tight mb-6"
         >
-          HAVE AN IDEA? <br />
-          LET’S FIND OUT IF IT CAN BE BUILT.
+          HAVE A PRODUCT CONCEPT? <br />
+          LET’S ARCHITECT & ENGINEER IT TOGETHER.
         </motion.h2>
 
         {/* Subtext */}
@@ -41,7 +41,7 @@ export const DiscussionCTA: React.FC<DiscussionCTAProps> = ({ onOpenDiscuss }) =
           transition={{ duration: 0.6, delay: 0.15 }}
           className="text-base sm:text-lg text-[#5C6B60] leading-relaxed mb-6"
         >
-          Tell us about your product, hardware system, software platform, website, or automation idea. We’ll discuss the project direction and possible next steps.
+          Whether you're developing physical hardware, embedded IoT devices, custom web platforms, or automation systems — schedule a technical strategy call with our engineering leads to evaluate feasibility and roadmap your project.
         </motion.p>
 
         {/* Meta */}
@@ -53,13 +53,13 @@ export const DiscussionCTA: React.FC<DiscussionCTAProps> = ({ onOpenDiscuss }) =
           className="flex items-center justify-center gap-3 text-xs font-semibold text-[#5C6B60] uppercase tracking-wider mb-10"
         >
           <span className="flex items-center gap-1">
-            <ShieldCheck className="w-4 h-4 text-[#C4A35A]" /> No commitment
+            <ShieldCheck className="w-4 h-4 text-[#C4A35A]" /> No Obligation
           </span>
           <span>·</span>
-          <span>Initial project discussion</span>
+          <span>Direct Tech Lead Consultation</span>
           <span>·</span>
           <span className="flex items-center gap-1">
-            <Clock className="w-4 h-4 text-[#1A3C2F]" /> 20 minutes
+            <Clock className="w-4 h-4 text-[#1A3C2F]" /> 20-Min Strategy Call
           </span>
         </motion.div>
 
@@ -72,7 +72,7 @@ export const DiscussionCTA: React.FC<DiscussionCTAProps> = ({ onOpenDiscuss }) =
           onClick={onOpenDiscuss}
           className="group inline-flex items-center gap-3 px-10 py-5 rounded-full bg-[#1A3C2F] text-[#FAF8F5] text-base font-semibold tracking-wide hover:bg-[#234B3C] transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1 cursor-pointer"
         >
-          <span>Discuss Your Idea — Free</span>
+          <span>Schedule Free Tech Call</span>
           <ArrowUpRight className="w-5 h-5 transition-transform duration-300 group-hover:rotate-45" />
         </motion.button>
 
