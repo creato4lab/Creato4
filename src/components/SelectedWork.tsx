@@ -14,7 +14,7 @@ export const SelectedWork: React.FC<SelectedWorkProps> = ({ onSelectProject }) =
       <div className="max-w-[1800px] mx-auto">
         
         {/* Section Header */}
-        <div className="mb-16">
+        <div className="mb-16 pt-4 sm:pt-6">
           <span className="text-[0.75rem] uppercase font-bold tracking-[0.2em] text-[#C4A35A] block mb-3">
             SELECTED ENGINEERING WORK
           </span>
