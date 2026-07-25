@@ -24,29 +24,32 @@ export default function App() {
 
   // Smooth scroll
   useEffect(() => {
-    // Dynamically import Lenis to avoid any SSR issues (if next.js, but here it's Vite so it's fine either way, just standard import is ok, but we use dynamic for safety in case of build issues or just standard require)
-    import('lenis').then(({ default: Lenis }) => {
-      const lenis = new Lenis({
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
-        orientation: 'vertical', 
-        gestureOrientation: 'vertical',
-        smoothWheel: true,
-        wheelMultiplier: 1,
-        touchMultiplier: 2,
+    import('lenis')
+      .then(({ default: Lenis }) => {
+        const lenis = new Lenis({
+          duration: 1.2,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+          orientation: 'vertical', 
+          gestureOrientation: 'vertical',
+          smoothWheel: true,
+          wheelMultiplier: 1,
+          touchMultiplier: 2,
+        });
+
+        function raf(time: number) {
+          lenis.raf(time);
+          requestAnimationFrame(raf);
+        }
+
+        requestAnimationFrame(raf);
+
+        return () => {
+          lenis.destroy();
+        };
       })
-
-      function raf(time: number) {
-        lenis.raf(time)
-        requestAnimationFrame(raf)
-      }
-
-      requestAnimationFrame(raf)
-
-      return () => {
-        lenis.destroy()
-      }
-    })
+      .catch((err) => {
+        console.warn('Lenis smooth scroll failed to load:', err);
+      });
   }, []);
 
   // Modals state
