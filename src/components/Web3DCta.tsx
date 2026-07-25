@@ -142,7 +142,7 @@ export const Web3DCta: React.FC<Web3DCtaProps> = ({ onOpenDiscuss }) => {
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FAF8F5]/10 border border-[#FAF8F5]/20 text-[0.75rem] font-bold uppercase tracking-[0.2em] text-[#FAF8F5]/80 mb-8"
         >
           <Sparkles className="w-3.5 h-3.5 text-[#C4A35A]" />
-          <span>WEBGL · THREE.JS · INTERACTIVE</span>
+          <span>WEBGL · THREE.JS · NEXT-GEN WEB</span>
         </motion.div>
 
         {/* Headline */}
@@ -153,8 +153,8 @@ export const Web3DCta: React.FC<Web3DCtaProps> = ({ onOpenDiscuss }) => {
           transition={{ duration: 0.7, delay: 0.15 }}
           className="heading-h1 font-extrabold text-[#FAF8F5] leading-tight mb-6 tracking-tight"
         >
-          LIKE THIS WEBSITE? <br />
-          <span className="text-[#C4A35A]">WE BUILD EXPERIENCES</span> LIKE THIS
+          LOVE THIS DIGITAL EXPERIENCE? <br />
+          <span className="text-[#C4A35A]">WE CRAFT NEXT-GEN SITES</span> JUST LIKE IT
         </motion.h2>
 
         {/* Subtext */}
@@ -165,8 +165,7 @@ export const Web3DCta: React.FC<Web3DCtaProps> = ({ onOpenDiscuss }) => {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="text-base sm:text-lg text-[#FAF8F5]/80 max-w-xl mx-auto leading-relaxed mb-10"
         >
-          From premium company websites to interactive 3D product experiences, Creato4 designs and develops
-          digital experiences built to stand out.
+          From interactive 3D product showcases and WebGL graphics to high-converting web applications — Creato4 engineers digital platforms built to captivate and scale.
         </motion.p>
 
         {/* CTA Group */}
@@ -182,7 +181,7 @@ export const Web3DCta: React.FC<Web3DCtaProps> = ({ onOpenDiscuss }) => {
             onClick={onOpenDiscuss}
             className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-[#FAF8F5] text-[#1A3C2F] text-sm font-bold tracking-wide hover:bg-[#FAF8F5]/90 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-102 cursor-pointer"
           >
-            <span>Build My Website</span>
+            <span>Launch Your Project</span>
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
           </button>
 
@@ -198,7 +197,7 @@ export const Web3DCta: React.FC<Web3DCtaProps> = ({ onOpenDiscuss }) => {
 
         {/* Meta */}
         <p className="text-[0.75rem] text-[#FAF8F5]/50 mt-8 font-medium">
-          Like this experience? We build websites like this too.
+          Zero template bloat · 100% custom 3D WebGL &amp; high-speed React performance.
         </p>
 
       </div>
