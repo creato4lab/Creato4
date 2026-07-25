@@ -14,6 +14,7 @@ export const WORK_PROJECTS: WorkProject[] = [
     technologies: ['SolidWorks 3D CAD', 'ESP32 / STM32', 'Custom PCB', 'React / Node.js', 'Medical Sensors'],
     outcomes: ['Deployed in 12 civic diagnostic centers', 'Tested with over 15,000 patient vitals scans', 'Sub-second sensor telemetry latency'],
     featured: true,
+    documentUrl: '/Kiosk_PoC_SPU_SSIP.pdf',
   },
   {
     id: 'agri-titan-x6',
