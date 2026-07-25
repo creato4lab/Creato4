@@ -1,5 +1,5 @@
 import React from 'react';
-import { Linkedin, Instagram, Twitter, Github, Mail, Phone, MapPin, ArrowUpRight } from 'lucide-react';
+import { Linkedin, Instagram, Mail, Phone, MapPin, ArrowUpRight } from 'lucide-react';
 import { Creato4LabLogoMark } from './LogoMark';
 import { motion, useMotionValue, useMotionTemplate } from 'motion/react';
 
@@ -216,24 +216,6 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
                   className="p-2 rounded-full bg-[#FAF8F5]/10 hover:bg-[#C4A35A] hover:text-[#1A3C2F] transition-colors"
                 >
                   <Instagram className="w-4 h-4" />
-                </a>
-                <a
-                  href="https://twitter.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="Twitter/X"
-                  className="p-2 rounded-full bg-[#FAF8F5]/10 hover:bg-[#C4A35A] hover:text-[#1A3C2F] transition-colors"
-                >
-                  <Twitter className="w-4 h-4" />
-                </a>
-                <a
-                  href="https://github.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="GitHub"
-                  className="p-2 rounded-full bg-[#FAF8F5]/10 hover:bg-[#C4A35A] hover:text-[#1A3C2F] transition-colors"
-                >
-                  <Github className="w-4 h-4" />
                 </a>
               </div>
             </div>
