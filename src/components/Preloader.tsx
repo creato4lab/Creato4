@@ -190,10 +190,30 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
         }
 
         /* PHASE 2 KEYFRAMES */
-        @keyframes cubeEntrance {
+        @keyframes radialBurstEntrance {
           0% {
             opacity: 0;
-            transform: translateY(20px) scale(0.8);
+            transform: scale(0.5);
+          }
+          100% {
+            opacity: 0.6;
+            transform: scale(1.2);
+          }
+        }
+
+        @keyframes radialBurstPulse {
+          0%, 100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.1);
+          }
+        }
+
+        @keyframes crystalEntrance {
+          0% {
+            opacity: 0;
+            transform: translateY(40px) scale(0.5);
           }
           100% {
             opacity: 1;
@@ -201,30 +221,59 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           }
         }
 
-        @keyframes cubeSpin {
+        @keyframes crystalFloat {
           0% {
-            transform: rotateX(-15deg) rotateY(25deg);
+            transform: translateY(-8px);
           }
           100% {
-            transform: rotateX(-15deg) rotateY(385deg);
+            transform: translateY(8px);
           }
         }
 
-        @keyframes glowBreathe {
-          0%, 100% {
-            box-shadow: 0 0 0 0px rgba(201, 169, 110, 0), inset 0 0 0px 0px rgba(201, 169, 110, 0);
+        @keyframes crystalSpin {
+          0% {
+            transform: rotateX(-20deg) rotateY(30deg);
           }
-          50% {
-            box-shadow: 0 0 50px 8px rgba(201, 169, 110, 0.1), inset 0 0 30px 3px rgba(201, 169, 110, 0.03);
+          100% {
+            transform: rotateX(-20deg) rotateY(390deg);
           }
         }
 
-        @keyframes orbitRingSpin {
+        @keyframes gyroEntrance {
           0% {
-            transform: rotateX(70deg) rotateZ(0deg);
+            opacity: 0;
+            transform: scale(0.8);
           }
           100% {
-            transform: rotateX(70deg) rotateZ(360deg);
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes gyroRing1Spin {
+          0% {
+            transform: rotateX(75deg) rotateZ(0deg);
+          }
+          100% {
+            transform: rotateX(75deg) rotateZ(360deg);
+          }
+        }
+
+        @keyframes gyroRing2Spin {
+          0% {
+            transform: rotateY(75deg) rotateZ(0deg);
+          }
+          100% {
+            transform: rotateY(75deg) rotateZ(-360deg);
+          }
+        }
+
+        @keyframes gyroRing3Spin {
+          0% {
+            transform: rotateX(60deg) rotateY(20deg) rotateZ(0deg);
+          }
+          100% {
+            transform: rotateX(60deg) rotateY(20deg) rotateZ(360deg);
           }
         }
 
@@ -255,11 +304,22 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           }
         }
 
+        @keyframes trailFade {
+          0% {
+            opacity: 0.3;
+            transform: scale(0.8);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(0.4);
+          }
+        }
+
         @keyframes letterReveal {
           0% {
             opacity: 0;
-            filter: blur(8px);
-            transform: translateY(20px);
+            filter: blur(12px);
+            transform: translateY(30px);
           }
           100% {
             opacity: 1;
@@ -268,12 +328,23 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           }
         }
 
+        @keyframes goldShimmer {
+          0% {
+            background-position: 0% 50%;
+          }
+          100% {
+            background-position: 200% 50%;
+          }
+        }
+
         @keyframes taglineFadeIn {
           0% {
             opacity: 0;
+            transform: translateY(10px);
           }
           100% {
             opacity: 1;
+            transform: translateY(0);
           }
         }
 
@@ -487,187 +558,264 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
 
       {/* ── PHASE 2: Logo Reveal (3.8s — 6.0s) ── */}
       <div className="absolute flex flex-col items-center justify-center pointer-events-none">
-        {/* 3D Cube Container */}
+        {/* Radial Burst Glow */}
         <div
-          className="relative w-[120px] h-[120px] flex items-center justify-center opacity-0"
+          className="absolute w-[200px] h-[200px] rounded-full pointer-events-none opacity-0"
           style={{
-            perspective: '800px',
-            animation: 'cubeEntrance 0.8s cubic-bezier(.23,1,.32,1) 3.8s forwards',
+            background: 'radial-gradient(circle, rgba(201,169,110,.15) 0%, transparent 70%)',
+            animation:
+              'radialBurstEntrance 1s ease-out 3.9s forwards, radialBurstPulse 3s ease-in-out 4.9s infinite alternate',
+          }}
+        />
+
+        {/* 3D Crystal Cube Floating & Entrance Container */}
+        <div
+          className="relative w-[140px] h-[140px] flex items-center justify-center opacity-0"
+          style={{
+            perspective: '1000px',
+            animation: 'crystalEntrance 0.9s cubic-bezier(.23,1,.32,1) 3.8s forwards',
           }}
         >
-          {/* Glow Ring Around Cube */}
+          {/* Continuous Float Wrapper */}
           <div
-            className="absolute -inset-[25px] rounded-full"
+            className="w-full h-full flex items-center justify-center relative"
             style={{
-              border: '1px solid rgba(201,169,110,.2)',
-              animation: 'glowBreathe 2.5s ease-in-out 3.8s infinite',
-            }}
-          />
-
-          {/* 3D Orbit Ring & Orbiting Dots */}
-          <div
-            className="absolute -inset-[45px] rounded-full"
-            style={{
-              border: '1px dashed rgba(201,169,110,.08)',
-              transformStyle: 'preserve-3d',
-              animation: 'orbitRingSpin 8s linear 3.8s infinite',
+              animation: 'crystalFloat 3s ease-in-out 4.7s infinite alternate',
             }}
           >
-            {/* Dot 1 (0°) */}
+            {/* Triple Gyroscope Rings */}
             <div
-              className="absolute top-1/2 left-1/2 w-[6px] h-[6px] -mt-[3px] -ml-[3px] rounded-full"
+              className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0"
               style={{
-                backgroundColor: '#c9a96e',
-                boxShadow: '0 0 10px 2px rgba(201,169,110,.4)',
-                animation: 'orbitDot0 4s linear 3.8s infinite',
+                animation: 'gyroEntrance 0.8s ease-out 4.0s forwards',
               }}
-            />
-            {/* Dot 2 (120°) */}
-            <div
-              className="absolute top-1/2 left-1/2 w-[6px] h-[6px] -mt-[3px] -ml-[3px] rounded-full"
-              style={{
-                backgroundColor: '#c9a96e',
-                boxShadow: '0 0 10px 2px rgba(201,169,110,.4)',
-                animation: 'orbitDot120 4s linear 3.8s infinite',
-              }}
-            />
-            {/* Dot 3 (240°) */}
-            <div
-              className="absolute top-1/2 left-1/2 w-[6px] h-[6px] -mt-[3px] -ml-[3px] rounded-full"
-              style={{
-                backgroundColor: '#c9a96e',
-                boxShadow: '0 0 10px 2px rgba(201,169,110,.4)',
-                animation: 'orbitDot240 4s linear 3.8s infinite',
-              }}
-            />
-          </div>
+            >
+              {/* Ring 1 */}
+              <div
+                className="absolute -inset-[30px] rounded-full"
+                style={{
+                  border: '1.5px solid rgba(201,169,110,.25)',
+                  transformStyle: 'preserve-3d',
+                  animation: 'gyroRing1Spin 6s linear 4.0s infinite',
+                }}
+              />
+              {/* Ring 2 */}
+              <div
+                className="absolute -inset-[50px] rounded-full"
+                style={{
+                  border: '1px solid rgba(201,169,110,.15)',
+                  transformStyle: 'preserve-3d',
+                  animation: 'gyroRing2Spin 10s linear 4.0s infinite',
+                }}
+              />
+              {/* Ring 3 */}
+              <div
+                className="absolute -inset-[70px] rounded-full"
+                style={{
+                  border: '1px dashed rgba(201,169,110,.1)',
+                  transformStyle: 'preserve-3d',
+                  animation: 'gyroRing3Spin 14s linear 4.0s infinite',
+                }}
+              >
+                {/* Orbiting Gold Dots & Fading Trails on Ring 3 Path */}
+                {/* Dot 1 (0°) */}
+                <div
+                  className="absolute top-1/2 left-1/2 w-[8px] h-[8px] -mt-[4px] -ml-[4px] rounded-full"
+                  style={{
+                    backgroundColor: '#c9a96e',
+                    boxShadow: '0 0 12px 3px rgba(201,169,110,.5)',
+                    animation: 'orbitDot0 4s linear 4.0s infinite',
+                  }}
+                >
+                  <div
+                    className="absolute inset-0 rounded-full bg-[#c9a96e]"
+                    style={{
+                      animation: 'trailFade 0.8s ease-out infinite',
+                    }}
+                  />
+                </div>
+                {/* Dot 2 (120°) */}
+                <div
+                  className="absolute top-1/2 left-1/2 w-[8px] h-[8px] -mt-[4px] -ml-[4px] rounded-full"
+                  style={{
+                    backgroundColor: '#c9a96e',
+                    boxShadow: '0 0 12px 3px rgba(201,169,110,.5)',
+                    animation: 'orbitDot120 4s linear 4.0s infinite',
+                  }}
+                >
+                  <div
+                    className="absolute inset-0 rounded-full bg-[#c9a96e]"
+                    style={{
+                      animation: 'trailFade 0.8s ease-out infinite',
+                    }}
+                  />
+                </div>
+                {/* Dot 3 (240°) */}
+                <div
+                  className="absolute top-1/2 left-1/2 w-[8px] h-[8px] -mt-[4px] -ml-[4px] rounded-full"
+                  style={{
+                    backgroundColor: '#c9a96e',
+                    boxShadow: '0 0 12px 3px rgba(201,169,110,.5)',
+                    animation: 'orbitDot240 4s linear 4.0s infinite',
+                  }}
+                >
+                  <div
+                    className="absolute inset-0 rounded-full bg-[#c9a96e]"
+                    style={{
+                      animation: 'trailFade 0.8s ease-out infinite',
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
 
-          {/* 3D Cube */}
-          <div
-            className="w-[60px] h-[60px] relative"
-            style={{
-              transformStyle: 'preserve-3d',
-              animation: 'cubeSpin 6s linear 3.8s infinite',
-            }}
-          >
-            {/* Face 1: Front */}
+            {/* 3D Crystal Cube (70px x 70px, translateZ(35px)) */}
             <div
-              className="absolute inset-0 rounded-sm"
+              className="w-[70px] h-[70px] relative"
               style={{
-                border: '1.5px solid rgba(201,169,110,.5)',
-                backgroundColor: 'rgba(201,169,110,.03)',
-                backdropFilter: 'blur(2px)',
-                transform: 'translateZ(30px)',
+                transformStyle: 'preserve-3d',
+                animation: 'crystalSpin 7s linear 3.8s infinite',
               }}
-            />
-            {/* Face 2: Back */}
-            <div
-              className="absolute inset-0 rounded-sm"
-              style={{
-                border: '1.5px solid rgba(201,169,110,.5)',
-                backgroundColor: 'rgba(201,169,110,.03)',
-                backdropFilter: 'blur(2px)',
-                transform: 'rotateY(180deg) translateZ(30px)',
-              }}
-            />
-            {/* Face 3: Right */}
-            <div
-              className="absolute inset-0 rounded-sm"
-              style={{
-                border: '1.5px solid rgba(201,169,110,.5)',
-                backgroundColor: 'rgba(201,169,110,.03)',
-                backdropFilter: 'blur(2px)',
-                transform: 'rotateY(90deg) translateZ(30px)',
-              }}
-            />
-            {/* Face 4: Left */}
-            <div
-              className="absolute inset-0 rounded-sm"
-              style={{
-                border: '1.5px solid rgba(201,169,110,.5)',
-                backgroundColor: 'rgba(201,169,110,.03)',
-                backdropFilter: 'blur(2px)',
-                transform: 'rotateY(-90deg) translateZ(30px)',
-              }}
-            />
-            {/* Face 5: Top */}
-            <div
-              className="absolute inset-0 rounded-sm"
-              style={{
-                border: '1.5px solid rgba(201,169,110,.5)',
-                backgroundColor: 'rgba(201,169,110,.03)',
-                backdropFilter: 'blur(2px)',
-                transform: 'rotateX(90deg) translateZ(30px)',
-              }}
-            />
-            {/* Face 6: Bottom */}
-            <div
-              className="absolute inset-0 rounded-sm"
-              style={{
-                border: '1.5px solid rgba(201,169,110,.5)',
-                backgroundColor: 'rgba(201,169,110,.03)',
-                backdropFilter: 'blur(2px)',
-                transform: 'rotateX(-90deg) translateZ(30px)',
-              }}
-            />
+            >
+              {/* Face 1: Front */}
+              <div
+                className="absolute inset-0 rounded-sm"
+                style={{
+                  border: '1px solid rgba(201,169,110,.4)',
+                  background:
+                    'linear-gradient(135deg, rgba(201,169,110,.08), rgba(232,213,163,.03))',
+                  backdropFilter: 'blur(2px)',
+                  boxShadow: 'inset 0 0 15px rgba(201,169,110,.1)',
+                  transform: 'translateZ(35px)',
+                }}
+              />
+              {/* Face 2: Back */}
+              <div
+                className="absolute inset-0 rounded-sm"
+                style={{
+                  border: '1px solid rgba(201,169,110,.4)',
+                  background:
+                    'linear-gradient(135deg, rgba(201,169,110,.08), rgba(232,213,163,.03))',
+                  backdropFilter: 'blur(2px)',
+                  boxShadow: 'inset 0 0 15px rgba(201,169,110,.1)',
+                  transform: 'rotateY(180deg) translateZ(35px)',
+                }}
+              />
+              {/* Face 3: Right */}
+              <div
+                className="absolute inset-0 rounded-sm"
+                style={{
+                  border: '1px solid rgba(201,169,110,.4)',
+                  background:
+                    'linear-gradient(135deg, rgba(201,169,110,.08), rgba(232,213,163,.03))',
+                  backdropFilter: 'blur(2px)',
+                  boxShadow: 'inset 0 0 15px rgba(201,169,110,.1)',
+                  transform: 'rotateY(90deg) translateZ(35px)',
+                }}
+              />
+              {/* Face 4: Left */}
+              <div
+                className="absolute inset-0 rounded-sm"
+                style={{
+                  border: '1px solid rgba(201,169,110,.4)',
+                  background:
+                    'linear-gradient(135deg, rgba(201,169,110,.08), rgba(232,213,163,.03))',
+                  backdropFilter: 'blur(2px)',
+                  boxShadow: 'inset 0 0 15px rgba(201,169,110,.1)',
+                  transform: 'rotateY(-90deg) translateZ(35px)',
+                }}
+              />
+              {/* Face 5: Top */}
+              <div
+                className="absolute inset-0 rounded-sm"
+                style={{
+                  border: '1px solid rgba(201,169,110,.4)',
+                  background:
+                    'linear-gradient(135deg, rgba(201,169,110,.08), rgba(232,213,163,.03))',
+                  backdropFilter: 'blur(2px)',
+                  boxShadow: 'inset 0 0 15px rgba(201,169,110,.1)',
+                  transform: 'rotateX(90deg) translateZ(35px)',
+                }}
+              />
+              {/* Face 6: Bottom */}
+              <div
+                className="absolute inset-0 rounded-sm"
+                style={{
+                  border: '1px solid rgba(201,169,110,.4)',
+                  background:
+                    'linear-gradient(135deg, rgba(201,169,110,.08), rgba(232,213,163,.03))',
+                  backdropFilter: 'blur(2px)',
+                  boxShadow: 'inset 0 0 15px rgba(201,169,110,.1)',
+                  transform: 'rotateX(-90deg) translateZ(35px)',
+                }}
+              />
+            </div>
           </div>
         </div>
 
         {/* Brand Name "CRETO4" */}
-        <div className="flex gap-[1px] mt-6 select-none">
+        <div
+          className="flex gap-[2px] mt-10 select-none"
+          style={{
+            textShadow: '0 0 40px rgba(201,169,110,.15)',
+          }}
+        >
           {/* C */}
           <span
-            className="text-[clamp(2.5rem,6vw,4rem)] font-black text-white tracking-[-3px] opacity-0"
+            className="text-[clamp(2.8rem,7vw,4.5rem)] font-black text-white tracking-[-4px] opacity-0"
             style={{
-              animation: 'letterReveal 0.6s cubic-bezier(.23,1,.32,1) 4.2s forwards',
+              animation: 'letterReveal 0.7s cubic-bezier(.23,1,.32,1) 4.3s forwards',
             }}
           >
             C
           </span>
           {/* R */}
           <span
-            className="text-[clamp(2.5rem,6vw,4rem)] font-black text-white tracking-[-3px] opacity-0"
+            className="text-[clamp(2.8rem,7vw,4.5rem)] font-black text-white tracking-[-4px] opacity-0"
             style={{
-              animation: 'letterReveal 0.6s cubic-bezier(.23,1,.32,1) 4.28s forwards',
+              animation: 'letterReveal 0.7s cubic-bezier(.23,1,.32,1) 4.38s forwards',
             }}
           >
             R
           </span>
           {/* E */}
           <span
-            className="text-[clamp(2.5rem,6vw,4rem)] font-black text-white tracking-[-3px] opacity-0"
+            className="text-[clamp(2.8rem,7vw,4.5rem)] font-black text-white tracking-[-4px] opacity-0"
             style={{
-              animation: 'letterReveal 0.6s cubic-bezier(.23,1,.32,1) 4.36s forwards',
+              animation: 'letterReveal 0.7s cubic-bezier(.23,1,.32,1) 4.46s forwards',
             }}
           >
             E
           </span>
           {/* T */}
           <span
-            className="text-[clamp(2.5rem,6vw,4rem)] font-black text-white tracking-[-3px] opacity-0"
+            className="text-[clamp(2.8rem,7vw,4.5rem)] font-black text-white tracking-[-4px] opacity-0"
             style={{
-              animation: 'letterReveal 0.6s cubic-bezier(.23,1,.32,1) 4.44s forwards',
+              animation: 'letterReveal 0.7s cubic-bezier(.23,1,.32,1) 4.54s forwards',
             }}
           >
             T
           </span>
           {/* O */}
           <span
-            className="text-[clamp(2.5rem,6vw,4rem)] font-black text-white tracking-[-3px] opacity-0"
+            className="text-[clamp(2.8rem,7vw,4.5rem)] font-black text-white tracking-[-4px] opacity-0"
             style={{
-              animation: 'letterReveal 0.6s cubic-bezier(.23,1,.32,1) 4.52s forwards',
+              animation: 'letterReveal 0.7s cubic-bezier(.23,1,.32,1) 4.62s forwards',
             }}
           >
             O
           </span>
-          {/* 4 (Gold Gradient) */}
+          {/* 4 (Gold Gradient + Shimmer) */}
           <span
-            className="text-[clamp(2.5rem,6vw,4rem)] font-black tracking-[-3px] opacity-0"
+            className="text-[clamp(2.8rem,7vw,4.5rem)] font-black tracking-[-4px] opacity-0"
             style={{
-              backgroundImage: 'linear-gradient(135deg, #c9a96e, #e8d5a3, #c9a96e)',
+              backgroundImage:
+                'linear-gradient(135deg, #c9a96e, #e8d5a3, #f5f0eb, #c9a96e)',
+              backgroundSize: '200% auto',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              animation: 'letterReveal 0.6s cubic-bezier(.23,1,.32,1) 4.6s forwards',
+              animation:
+                'letterReveal 0.7s cubic-bezier(.23,1,.32,1) 4.7s forwards, goldShimmer 3s linear 4.7s infinite',
             }}
           >
             4
@@ -676,9 +824,9 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
 
         {/* Tagline */}
         <p
-          className="text-[0.8rem] font-medium text-[rgba(255,255,255,.3)] tracking-[4px] uppercase mt-2 opacity-0"
+          className="text-[0.75rem] font-medium text-[rgba(255,255,255,.35)] tracking-[5px] uppercase mt-2 opacity-0"
           style={{
-            animation: 'taglineFadeIn 0.6s ease 5.0s forwards',
+            animation: 'taglineFadeIn 0.6s ease 5.2s forwards',
           }}
         >
           MULTIDISCIPLINARY PRODUCT DESIGN STUDIO
@@ -686,13 +834,13 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       </div>
 
       {/* Progress Bar */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[160px] h-[2px] rounded-[2px] bg-[rgba(255,255,255,.06)] overflow-hidden">
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[180px] h-[2px] rounded-[2px] bg-[rgba(255,255,255,.06)] overflow-hidden">
         <div
           className="h-full rounded-[2px] w-0"
           style={{
             background: 'linear-gradient(90deg, #c9a96e, #e8d5a3, #c9a96e)',
-            boxShadow: '0 0 8px rgba(201,169,110,.2)',
-            animation: 'progressFill 5s cubic-bezier(.23,1,.32,1) 0.3s forwards',
+            boxShadow: '0 0 10px rgba(201,169,110,.3)',
+            animation: 'progressFill 5.5s cubic-bezier(.23,1,.32,1) 0.3s forwards',
           }}
         />
       </div>
