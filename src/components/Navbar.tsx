@@ -44,6 +44,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         { label: 'Agri-Titan X6 Drone', href: '#work' },
         { label: 'SmartPrint Station', href: '#work' },
         { label: 'Smart Safety Helmet', href: '#work' },
+        { label: 'Autonomous Disinfection Robot', href: '#work' },
+        { label: 'Smart Industrial Power Monitor', href: '#work' },
       ],
     },
     {
