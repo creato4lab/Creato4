@@ -129,29 +129,16 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 <span className="text-xs text-[#5C6B60]">
                   Need a similar custom solution for your enterprise or product line?
                 </span>
-                <div className="flex flex-wrap items-center gap-3">
-                  {(project as WorkProject).documentUrl && (
-                    <a
-                      href={(project as WorkProject).documentUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[#1A3C2F] text-[#1A3C2F] text-xs font-bold uppercase tracking-wider hover:bg-[#F5F0EA] transition-all"
-                    >
-                      <span>View PDF Report</span>
-                      <FileText className="w-4 h-4" />
-                    </a>
-                  )}
-                  <button
-                    onClick={() => {
-                      onClose();
-                      onOpenDiscuss();
-                    }}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#1A3C2F] text-[#FAF8F5] text-xs font-bold uppercase tracking-wider hover:bg-[#234B3C]"
-                  >
-                    <span>Discuss Similar Project</span>
-                    <ArrowUpRight className="w-4 h-4" />
-                  </button>
-                </div>
+                <button
+                  onClick={() => {
+                    onClose();
+                    onOpenDiscuss();
+                  }}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#1A3C2F] text-[#FAF8F5] text-xs font-bold uppercase tracking-wider hover:bg-[#234B3C]"
+                >
+                  <span>Discuss Similar Project</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
           ) : (

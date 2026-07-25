@@ -14,7 +14,6 @@ export interface WorkProject {
   technologies: string[];
   outcomes: string[];
   featured?: boolean;
-  documentUrl?: string;
 }
 
 export interface StudentProject {
