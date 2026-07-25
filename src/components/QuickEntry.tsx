@@ -65,28 +65,9 @@ export const QuickEntry: React.FC<QuickEntryProps> = ({ onSelectOption }) => {
                 {/* Subtle technical grid background */}
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(196,163,90,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(196,163,90,0.04)_1px,transparent_1px)] bg-[size:16px_16px]" />
                 
-                <motion.div
-                  animate={
-                    hoveredCard === 'idea'
-                      ? {
-                          y: [0, -6, 0],
-                          boxShadow: [
-                            '0 0 20px rgba(196,163,90,0.15)',
-                            '0 0 35px rgba(196,163,90,0.35)',
-                            '0 0 20px rgba(196,163,90,0.15)',
-                          ],
-                        }
-                      : {}
-                  }
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }}
-                  className="relative z-10 w-20 h-20 rounded-2xl bg-white/[0.04] backdrop-blur-xs border border-[#C4A35A]/50 flex items-center justify-center mb-2"
-                >
+                <div className="relative z-10 w-20 h-20 rounded-2xl bg-white/[0.04] backdrop-blur-xs border border-[#C4A35A]/50 flex items-center justify-center mb-2 shadow-[0_0_25px_rgba(196,163,90,0.25)]">
                   <Cpu className="w-10 h-10 text-[#C4A35A] drop-shadow-[0_0_8px_rgba(196,163,90,0.5)]" />
-                </motion.div>
+                </div>
                 <span className="relative z-10 text-[10px] uppercase font-mono tracking-widest text-[#C4A35A] font-semibold drop-shadow-[0_0_4px_rgba(196,163,90,0.3)]">
                   PROTOTYPE_RENDER.3D
                 </span>
