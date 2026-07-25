@@ -37,6 +37,8 @@ export default function App() {
           touchMultiplier: 2,
         });
 
+        (window as any).lenis = lenis;
+
         function raf(time: number) {
           lenis.raf(time);
           requestAnimationFrame(raf);
@@ -45,6 +47,7 @@ export default function App() {
         requestAnimationFrame(raf);
 
         return () => {
+          delete (window as any).lenis;
           lenis.destroy();
         };
       })
@@ -62,6 +65,20 @@ export default function App() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+
+  // Lock background scroll when any modal is open
+  const isAnyModalOpen = Boolean(selectedProject || discussOpen || searchOpen || accountOpen || cartOpen);
+
+  useEffect(() => {
+    const lenisInstance = (window as any).lenis;
+    if (isAnyModalOpen) {
+      if (lenisInstance) lenisInstance.stop();
+      document.body.style.overflow = 'hidden';
+    } else {
+      if (lenisInstance) lenisInstance.start();
+      document.body.style.overflow = '';
+    }
+  }, [isAnyModalOpen]);
 
   // Saved student project blueprints
   const [cartItems, setCartItems] = useState<string[]>(['iot-weather-station', 'robotic-arm-6dof']);
