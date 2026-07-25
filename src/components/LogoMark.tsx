@@ -11,7 +11,7 @@ export const Creato4LabLogoMark: React.FC<LogoMarkProps> = ({
 }) => {
   return (
     <img
-      src="/creato4logo.png"
+      src="/creato4-logo.png"
       alt="Creato4 Lab Logo"
       width={size}
       height={size}
