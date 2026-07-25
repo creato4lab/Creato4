@@ -46,7 +46,7 @@ export const WORK_PROJECTS: WorkProject[] = [
     subtitle: '24/7 Self-Service Document & Stationery Vending Kiosk',
     category: 'Embedded Systems · Automation · Web Platform',
     tags: ['Embedded Systems', 'Automation', 'Web Platform'],
-    image: '/smart-print-station.jpg',
+    image: '/smart-print-station.png',
     description: 'A 24/7 self-service document kiosk designed to provide round-the-clock access to black & white or color printing, photocopying, scanning, passport photo printing, and integrated stationery vending with secure UPI payments.',
     challenge: 'Integrating robust mechanical vending for office supplies alongside high-speed laser printing, dual-page scanning, and automated post-processing like document stapling and lamination.',
     solution: 'Engineered a custom unattended kiosk enclosure housing a passport photo printer, stationery vending spiral tracks, a touch control panel for QR document upload, and automatic file deletion for user privacy.',
