@@ -22,9 +22,8 @@ const TEAM_MEMBERS: TeamMember[] = [
     name: 'Prince Tagadiya',
     emoji: '👑',
     initials: 'PT',
-    avatarUrl: '/prince_memoji.png',
-    dicebearUrl:
-      'https://api.dicebear.com/9.x/avataaars/png?seed=PrinceCEO&backgroundColor=e8f0e8&radius=50&size=256&top=shortHairShortFlat&facialHair=beardMedium&clothing=blazerAndShirt',
+    avatarUrl: '/prince_photo.png',
+    dicebearUrl: '/prince_photo.png',
     role: 'Founder, CEO & CPTO',
     description:
       'Founder / Product & Technology Leader — sets overall product vision and technology direction. CEO / Business Leader — drives business strategy, fundraising and external representation. Chief Product Development Officer — owns end-to-end product design, development & delivery. Head of Sales, Business Development & Partnerships; Head of Media Production & Content Strategy.',
