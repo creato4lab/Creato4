@@ -21,23 +21,23 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
   };
 
   return (
-    <footer onMouseMove={handleMouseMove} className="relative bg-[#1A3C2F] text-[#FAF8F5] pt-20 pb-12 border-t border-[#234B3C] px-6 sm:px-10 lg:px-16 xl:px-20 overflow-hidden">
-      <div className="max-w-[1800px] mx-auto relative z-10">
+    <footer onMouseMove={handleMouseMove} className="relative bg-[#1A3C2F] text-[#FAF8F5] pt-20 pb-12 border-t border-[#234B3C] px-6 sm:px-10 lg:px-16 overflow-hidden">
+      <div className="max-w-7xl mx-auto relative z-10">
         
         {/* Top Row Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 pb-16 border-b border-[#FAF8F5]/10">
           
           {/* Column 1: Brand & Bio (4 cols) */}
-          <div className="lg:col-span-4 flex flex-col justify-between">
+          <div className="lg:col-span-4 flex flex-col justify-between space-y-6">
             <div>
-              <a href="#" className="inline-flex items-center gap-3 text-2xl font-extrabold tracking-tight text-[#FAF8F5] mb-2">
+              <a href="#" className="inline-flex items-center gap-3 text-2xl font-extrabold tracking-tight text-[#FAF8F5] mb-2 group">
                 <Creato4LabLogoMark size={36} />
-                <span>CREATO4</span>
+                <span className="group-hover:text-[#C4A35A] transition-colors">CREATO4</span>
               </a>
-              <div className="text-xs uppercase font-mono tracking-[0.2em] text-[#C4A35A] mb-6">
+              <div className="text-xs uppercase font-mono tracking-[0.2em] text-[#C4A35A] mb-4">
                 Design · Engineer · Build
               </div>
-              <p className="text-xs text-[#FAF8F5]/70 max-w-sm leading-relaxed mb-8">
+              <p className="text-xs text-[#FAF8F5]/70 max-w-sm leading-relaxed mb-6">
                 A multidisciplinary product & technology lab transforming ideas into working physical hardware,
                 embedded systems, custom software, and 3D digital experiences.
               </p>
@@ -45,7 +45,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
 
             <button
               onClick={onOpenDiscuss}
-              className="group inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#FAF8F5] text-[#1A3C2F] text-xs font-bold uppercase tracking-wider hover:bg-[#FAF8F5]/90 transition-all w-fit"
+              className="group inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#FAF8F5] text-[#1A3C2F] text-xs font-bold uppercase tracking-wider hover:bg-[#C4A35A] hover:text-[#1A3C2F] transition-all w-fit shadow-md"
             >
               <span>Schedule Tech Consultation</span>
               <div className="relative overflow-hidden w-4 h-4">
@@ -55,27 +55,27 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
             </button>
           </div>
 
-          {/* Column 2: 4 Navigation Columns (6 cols) */}
+          {/* Column 2: 4 Navigation Columns (5 cols) */}
           <div className="lg:col-span-5 grid grid-cols-2 sm:grid-cols-4 gap-6">
             
             {/* WORK */}
             <div>
-              <h4 className="text-[0.75rem] uppercase font-bold tracking-[0.2em] text-[#FAF8F5]/50 mb-4">
+              <h4 className="text-[0.7rem] uppercase font-bold tracking-[0.2em] text-[#C4A35A] mb-4">
                 WORK
               </h4>
               <ul className="space-y-2.5 text-xs">
                 <li>
-                  <a href="#work" className="text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
+                  <a href="#work" className="text-[#FAF8F5]/75 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
                     Featured Work
                   </a>
                 </li>
                 <li>
-                  <a href="#work" className="text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
+                  <a href="#work" className="text-[#FAF8F5]/75 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
                     All Projects
                   </a>
                 </li>
                 <li>
-                  <a href="#work" className="text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
+                  <a href="#work" className="text-[#FAF8F5]/75 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
                     Case Studies
                   </a>
                 </li>
@@ -84,32 +84,32 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
 
             {/* SERVICES */}
             <div>
-              <h4 className="text-[0.75rem] uppercase font-bold tracking-[0.2em] text-[#FAF8F5]/50 mb-4">
+              <h4 className="text-[0.7rem] uppercase font-bold tracking-[0.2em] text-[#C4A35A] mb-4">
                 SERVICES
               </h4>
               <ul className="space-y-2.5 text-xs">
                 <li>
-                  <a href="#services" className="text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
+                  <a href="#services" className="text-[#FAF8F5]/75 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
                     Product Eng.
                   </a>
                 </li>
                 <li>
-                  <a href="#services" className="text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
+                  <a href="#services" className="text-[#FAF8F5]/75 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
                     3D CAD & DFM
                   </a>
                 </li>
                 <li>
-                  <a href="#services" className="text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
+                  <a href="#services" className="text-[#FAF8F5]/75 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
                     Electronics & PCB
                   </a>
                 </li>
                 <li>
-                  <a href="#services" className="text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
+                  <a href="#services" className="text-[#FAF8F5]/75 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
                     Embedded IoT
                   </a>
                 </li>
                 <li>
-                  <a href="#services" className="text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
+                  <a href="#services" className="text-[#FAF8F5]/75 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
                     Software & AI
                   </a>
                 </li>
@@ -118,27 +118,27 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
 
             {/* COMPANY */}
             <div>
-              <h4 className="text-[0.75rem] uppercase font-bold tracking-[0.2em] text-[#FAF8F5]/50 mb-4">
+              <h4 className="text-[0.7rem] uppercase font-bold tracking-[0.2em] text-[#C4A35A] mb-4">
                 COMPANY
               </h4>
               <ul className="space-y-2.5 text-xs">
                 <li>
-                  <a href="#process" className="text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
+                  <a href="#process" className="text-[#FAF8F5]/75 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
                     Our Process
                   </a>
                 </li>
                 <li>
-                  <a href="#team" className="text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
+                  <a href="#team" className="text-[#FAF8F5]/75 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
                     About Lab
                   </a>
                 </li>
                 <li>
-                  <a href="#team" className="text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
+                  <a href="#team" className="text-[#FAF8F5]/75 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
                     Engineering Team
                   </a>
                 </li>
                 <li>
-                  <a href="#trust" className="text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
+                  <a href="#trust" className="text-[#FAF8F5]/75 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
                     Milestones
                   </a>
                 </li>
@@ -147,22 +147,22 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
 
             {/* STUDENTS */}
             <div>
-              <h4 className="text-[0.75rem] uppercase font-bold tracking-[0.2em] text-[#FAF8F5]/50 mb-4">
+              <h4 className="text-[0.7rem] uppercase font-bold tracking-[0.2em] text-[#C4A35A] mb-4">
                 STUDENTS
               </h4>
               <ul className="space-y-2.5 text-xs">
                 <li>
-                  <a href="#student-projects" className="text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
+                  <a href="#student-projects" className="text-[#FAF8F5]/75 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
                     Browse Kits
                   </a>
                 </li>
                 <li>
-                  <a href="#student-projects" className="text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
+                  <a href="#student-projects" className="text-[#FAF8F5]/75 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
                     Arduino & ESP32
                   </a>
                 </li>
                 <li>
-                  <a href="#student-projects" className="text-[#FAF8F5]/80 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
+                  <a href="#student-projects" className="text-[#FAF8F5]/75 hover:text-[#FAF8F5] hover:translate-x-1 inline-block transition-all">
                     Robotics Blueprints
                   </a>
                 </li>
@@ -171,31 +171,43 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
 
           </div>
 
-          {/* Column 3: Contact Info & Socials (3 cols) */}
-          <div className="lg:col-span-3 flex flex-col justify-between space-y-6">
+          {/* Column 3: Glassmorphic Contact & Socials Box (3 cols) */}
+          <div className="lg:col-span-3 bg-[#FAF8F5]/[0.04] p-6 rounded-2xl border border-[#FAF8F5]/10 flex flex-col justify-between space-y-6">
             <div>
-              <h4 className="text-[0.75rem] uppercase font-bold tracking-[0.2em] text-[#FAF8F5]/50 mb-4">
+              <h4 className="text-[0.7rem] uppercase font-bold tracking-[0.2em] text-[#C4A35A] mb-4">
                 LAB CONTACT
               </h4>
               <div className="space-y-3 text-xs text-[#FAF8F5]/80">
-                <div className="flex items-center gap-2.5">
-                  <Mail className="w-4 h-4 text-[#C4A35A]" />
-                  <a href="mailto:creato4lab@gmail.com" className="hover:text-[#FAF8F5]">
+                <div className="flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-full bg-[#FAF8F5]/10 flex items-center justify-center shrink-0">
+                    <Mail className="w-3.5 h-3.5 text-[#C4A35A]" />
+                  </div>
+                  <a href="mailto:creato4lab@gmail.com" className="hover:text-[#C4A35A] transition-colors truncate">
                     creato4lab@gmail.com
                   </a>
                 </div>
-                <div className="flex items-center gap-2.5">
-                  <Phone className="w-4 h-4 text-[#C4A35A]" />
-                  <a href="tel:+919909089344" className="hover:text-[#FAF8F5]">
+                <div className="flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-full bg-[#FAF8F5]/10 flex items-center justify-center shrink-0">
+                    <Phone className="w-3.5 h-3.5 text-[#C4A35A]" />
+                  </div>
+                  <a href="tel:+919909089344" className="hover:text-[#C4A35A] transition-colors">
                     +91 99090 89344
                   </a>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-full bg-[#FAF8F5]/10 flex items-center justify-center shrink-0">
+                    <MapPin className="w-3.5 h-3.5 text-[#C4A35A]" />
+                  </div>
+                  <span className="text-[#FAF8F5]/70">
+                    Gujarat, India
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Social Icons */}
+            {/* Social Connect Buttons */}
             <div>
-              <h4 className="text-[0.75rem] uppercase font-bold tracking-[0.2em] text-[#FAF8F5]/50 mb-3">
+              <h4 className="text-[0.7rem] uppercase font-bold tracking-[0.2em] text-[#C4A35A] mb-3">
                 CONNECT
               </h4>
               <div className="flex items-center gap-3">
@@ -204,18 +216,20 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
                   target="_blank"
                   rel="noreferrer"
                   aria-label="LinkedIn"
-                  className="p-2 rounded-full bg-[#FAF8F5]/10 hover:bg-[#C4A35A] hover:text-[#1A3C2F] transition-colors"
+                  className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#FAF8F5]/10 hover:bg-[#C4A35A] hover:text-[#1A3C2F] text-xs font-semibold transition-all"
                 >
-                  <Linkedin className="w-4 h-4" />
+                  <Linkedin className="w-3.5 h-3.5" />
+                  <span>LinkedIn</span>
                 </a>
                 <a
                   href="https://www.instagram.com/creato4.lab?igsh=MWh4bGZybXBxZ3Rj&utm_source=qr"
                   target="_blank"
                   rel="noreferrer"
                   aria-label="Instagram"
-                  className="p-2 rounded-full bg-[#FAF8F5]/10 hover:bg-[#C4A35A] hover:text-[#1A3C2F] transition-colors"
+                  className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#FAF8F5]/10 hover:bg-[#C4A35A] hover:text-[#1A3C2F] text-xs font-semibold transition-all"
                 >
-                  <Instagram className="w-4 h-4" />
+                  <Instagram className="w-3.5 h-3.5" />
+                  <span>Instagram</span>
                 </a>
               </div>
             </div>
@@ -225,16 +239,16 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
         </div>
 
         {/* Giant Footer Typography with Mouse Spotlight Glow */}
-        <div ref={textRef} className="w-full mt-16 mb-8 flex justify-center items-center pointer-events-none select-none relative">
+        <div ref={textRef} className="w-full mt-12 mb-6 flex justify-center items-center pointer-events-none select-none relative">
           
           {/* Base faint text */}
-          <h1 className="text-[clamp(4rem,14vw,18rem)] font-black tracking-[-0.04em] text-[#FAF8F5] opacity-[0.03] leading-[0.8] w-full text-center overflow-hidden">
+          <h1 className="text-[clamp(4rem,14vw,16rem)] font-black tracking-[-0.04em] text-[#FAF8F5] opacity-[0.03] leading-[0.8] w-full text-center overflow-hidden">
             CREATO4
           </h1>
           
           {/* Spotlight glow text */}
           <motion.h1 
-            className="absolute inset-0 text-[clamp(4rem,14vw,18rem)] font-black tracking-[-0.04em] text-[#C4A35A] leading-[0.8] w-full text-center overflow-hidden"
+            className="absolute inset-0 text-[clamp(4rem,14vw,16rem)] font-black tracking-[-0.04em] text-[#C4A35A] leading-[0.8] w-full text-center overflow-hidden"
             style={{
               WebkitMaskImage: useMotionTemplate`radial-gradient(350px circle at ${mouseX}px ${mouseY}px, black 0%, transparent 100%)`,
               maskImage: useMotionTemplate`radial-gradient(350px circle at ${mouseX}px ${mouseY}px, black 0%, transparent 100%)`
@@ -246,12 +260,12 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
         </div>
 
         {/* Bottom Row */}
-        <div className="border-t border-[#FAF8F5]/10 pt-8 flex flex-col sm:flex-row items-center justify-between text-[0.75rem] text-[#FAF8F5]/50 gap-4 relative z-10">
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between text-[0.75rem] text-[#FAF8F5]/50 gap-4 relative z-10">
           <p>© 2026 Creato4. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-[#FAF8F5]">Privacy Policy</a>
-            <a href="#" className="hover:text-[#FAF8F5]">Terms of Service</a>
-            <a href="#" className="hover:text-[#FAF8F5]">Security Policy</a>
+            <a href="#" className="hover:text-[#FAF8F5] transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-[#FAF8F5] transition-colors">Terms of Service</a>
+            <a href="#" className="hover:text-[#FAF8F5] transition-colors">Security Policy</a>
           </div>
         </div>
 
