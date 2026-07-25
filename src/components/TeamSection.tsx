@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'motion/react';
-import { Linkedin, RefreshCw } from 'lucide-react';
+import { Linkedin } from 'lucide-react';
 
 interface TeamMember {
   id: string;
@@ -108,7 +108,6 @@ const TeamTiltCard: React.FC<TeamTiltCardProps> = ({ member, imgState, imgSrc, o
   const [rotateY, setRotateY] = useState(0);
   const [glowPos, setGlowPos] = useState({ x: 50, y: 50, opacity: 0 });
   const [isHovered, setIsHovered] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
@@ -141,30 +140,6 @@ const TeamTiltCard: React.FC<TeamTiltCardProps> = ({ member, imgState, imgSrc, o
     setGlowPos((prev) => ({ ...prev, opacity: 0 }));
   };
 
-  const handleSyncProfile = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!member.linkedinUrl || isSyncing) return;
-    
-    setIsSyncing(true);
-    try {
-      const response = await fetch('/api/sync-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ linkedinUrl: member.linkedinUrl, memberId: member.id })
-      });
-      const data = await response.json();
-      if (data.success) {
-        // Reload to show the new image
-        window.location.reload();
-      } else {
-        alert('Failed to sync: ' + data.error);
-      }
-    } catch (err) {
-      alert('Network error while syncing profile');
-    }
-    setIsSyncing(false);
-  };
-
   return (
     <div style={{ perspective: '1000px' }} className="w-full">
       <motion.div
@@ -193,18 +168,6 @@ const TeamTiltCard: React.FC<TeamTiltCardProps> = ({ member, imgState, imgSrc, o
             background: `radial-gradient(circle at ${glowPos.x}% ${glowPos.y}%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 65%)`,
           }}
         />
-
-        {/* Sync Profile Button (Hidden Admin Feature) */}
-        {member.linkedinUrl && (
-          <button 
-            onClick={handleSyncProfile}
-            disabled={isSyncing}
-            className="absolute top-4 right-4 z-30 p-2 rounded-full bg-black/5 hover:bg-black/10 text-black/40 hover:text-black/80 transition-all"
-            title="Sync LinkedIn Profile Image"
-          >
-            <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-          </button>
-        )}
 
         {/* 1. Avatar Area (TranslateZ 35px for 3D depth) */}
         <div
