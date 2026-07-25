@@ -44,9 +44,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   const sidePad       = useTransform(spring, [0, 1], [0, 24]);
   const innerPadY     = useTransform(spring, [0, 1], [14, 9]);
   const innerPadX     = useTransform(spring, [0, 1], [32, 16]);
-  const bgAlpha       = useTransform(spring, [0, 0.3, 1], [0, 0, 0.86]);
-  const blurVal       = useTransform(spring, [0, 1], [0, 24]);
-  const shadowAlpha   = useTransform(spring, [0, 0.5, 1], [0, 0, 0.13]);
+  const bgAlpha       = useTransform(spring, [0, 0.3, 1], [0, 0, 0.6]);
+  const blurVal       = useTransform(spring, [0, 1], [0, 48]);
+  const shadowAlpha   = useTransform(spring, [0, 0.5, 1], [0, 0, 0.08]);
   const maxWidthVal   = useTransform(spring, [0, 1], [1800, 940]);
   const logoSize      = useTransform(spring, [0, 1], [40, 34]);
   const brandSize     = useTransform(spring, [0, 1], [22, 16]);
@@ -113,14 +113,14 @@ export const Navbar: React.FC<NavbarProps> = ({
           style={{
             maxWidth: maxWidthVal,
             borderRadius,
-            // Glass background
+            // Apple-style liquid glass
             backgroundColor: useTransform(bgAlpha, (a) => `rgba(250,248,245,${a})`),
-            backdropFilter: useTransform(blurVal, (b) => `blur(${b}px)`),
-            WebkitBackdropFilter: useTransform(blurVal, (b) => `blur(${b}px)`),
+            backdropFilter: useTransform(blurVal, (b) => `blur(${b}px) saturate(180%)`),
+            WebkitBackdropFilter: useTransform(blurVal, (b) => `blur(${b}px) saturate(180%)`),
             // Outline border for glass look
             boxShadow: useTransform(shadowAlpha, (a) =>
               a > 0.01
-                ? `0 8px 40px rgba(26,60,47,${a}), 0 1px 0 rgba(255,255,255,0.55) inset, 0 0 0 1px rgba(232,226,217,${a * 1.5})`
+                ? `0 12px 40px rgba(0,0,0,${a}), inset 0 0 0 1px rgba(255,255,255,0.7), inset 0 1px 0 rgba(255,255,255,1)`
                 : 'none'
             ),
           }}
