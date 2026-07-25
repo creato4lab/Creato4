@@ -77,12 +77,9 @@ const TEAM_MEMBERS: TeamMember[] = [
   {
     id: 'rudra-chauhan',
     name: 'Rudra Chauhan',
-    emoji: '💻',
-    initials: 'RC',
-    avatarUrl: '/rudra_memoji.png',
-    dicebearUrl:
-      'https://api.dicebear.com/9.x/avataaars/png?seed=RudraDeveloper&backgroundColor=d1d8e8&radius=50&size=256&top=shortHairShortWaved&facialHair=beardLight&clothing=graphicShirt',
-    role: 'HEAD OF SOFTWARE ENGINEERING & DIGITAL DESIGN',
+    avatarUrl: '/rudra_photo.png',
+    dicebearUrl: '/rudra_photo.png',
+    role: 'Head of Software Engineering & Digital Design',
     description:
       'Head of Software Engineering — leads web, mobile, backend & cloud development. System Architecture — designs scalable software architecture across platforms. Graphic Design, Thumbnail & Branding Lead — supports visual design and branding assets. App & Web Experience; DevOps & Cloud Infrastructure.',
     floatingBadges: [
