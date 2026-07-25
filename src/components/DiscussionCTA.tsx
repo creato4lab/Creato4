@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { ArrowUpRight, Clock, ShieldCheck, MessageSquareCode, Send, CheckCircle2 } from 'lucide-react';
+import { Clock, ShieldCheck, MessageSquareCode, Send, CheckCircle2, UserCheck } from 'lucide-react';
 
 interface DiscussionCTAProps {
   onOpenDiscuss?: () => void;
@@ -31,74 +31,82 @@ export const DiscussionCTA: React.FC<DiscussionCTAProps> = ({ onOpenDiscuss }) =
   };
 
   return (
-    <section className="py-24 lg:py-32 bg-[#FAF8F5] border-t border-[#E8E2D9] px-6 sm:px-10 lg:px-16 xl:px-20 text-center">
-      <div className="max-w-[800px] mx-auto">
+    <section className="py-24 lg:py-32 bg-[#FAF8F5] border-t border-[#E8E2D9] px-6 sm:px-10 lg:px-16 xl:px-20">
+      <div className="max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
         
-        {/* Label Icon */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          className="w-16 h-16 rounded-2xl bg-[#1A3C2F]/10 border border-[#1A3C2F]/20 flex items-center justify-center mx-auto mb-8 shadow-xs"
-        >
-          <MessageSquareCode className="w-8 h-8 text-[#1A3C2F]" />
-        </motion.div>
+        {/* LEFT COLUMN: TEXT CONTENT (5 cols desktop) */}
+        <div className="lg:col-span-5 flex flex-col justify-center text-left">
+          
+          {/* Label Icon */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="w-16 h-16 rounded-2xl bg-[#1A3C2F]/10 border border-[#1A3C2F]/20 flex items-center justify-center mb-8 shadow-xs"
+          >
+            <MessageSquareCode className="w-8 h-8 text-[#1A3C2F]" />
+          </motion.div>
 
-        {/* Headline */}
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="heading-h1 font-extrabold text-[#1A3C2F] tracking-tight leading-tight mb-6"
-        >
-          HAVE A PRODUCT CONCEPT? <br />
-          LET’S ARCHITECT &amp; ENGINEER IT TOGETHER.
-        </motion.h2>
+          {/* Headline */}
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="heading-h1 font-extrabold text-[#1A3C2F] tracking-tight leading-tight mb-6"
+          >
+            HAVE A PRODUCT CONCEPT? <br />
+            LET’S ARCHITECT &amp; ENGINEER IT TOGETHER.
+          </motion.h2>
 
-        {/* Subtext */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.15 }}
-          className="text-base sm:text-lg text-[#5C6B60] leading-relaxed mb-6"
-        >
-          Whether you're developing physical hardware, embedded IoT devices, custom web platforms, or automation systems — submit your project inquiry below to connect with our engineering team.
-        </motion.p>
+          {/* Subtext */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="text-base sm:text-lg text-[#5C6B60] leading-relaxed mb-8"
+          >
+            Whether you're developing physical hardware, embedded IoT devices, custom web platforms, or automation systems — submit your project inquiry to connect with our lead engineers.
+          </motion.p>
 
-        {/* Value Badges */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 0.8 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.3 }}
-          className="flex flex-wrap items-center justify-center gap-3 text-xs font-semibold text-[#5C6B60] uppercase tracking-wider mb-10"
-        >
-          <span className="flex items-center gap-1">
-            <ShieldCheck className="w-4 h-4 text-[#C4A35A]" /> No Obligation
-          </span>
-          <span>·</span>
-          <span>Direct Tech Lead Consultation</span>
-          <span>·</span>
-          <span className="flex items-center gap-1">
-            <Clock className="w-4 h-4 text-[#1A3C2F]" /> 24-Hour Response
-          </span>
-        </motion.div>
+          {/* Value Badges Stack */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 0.9 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+            className="space-y-3.5 pt-4 border-t border-[#E8E2D9]"
+          >
+            <div className="flex items-center gap-3 text-xs font-semibold text-[#1A3C2F] uppercase tracking-wider">
+              <ShieldCheck className="w-4 h-4 text-[#C4A35A] shrink-0" />
+              <span>No Obligation &amp; 100% Confidential NDA</span>
+            </div>
+            <div className="flex items-center gap-3 text-xs font-semibold text-[#1A3C2F] uppercase tracking-wider">
+              <UserCheck className="w-4 h-4 text-[#1A3C2F] shrink-0" />
+              <span>Direct Tech Lead Consultation</span>
+            </div>
+            <div className="flex items-center gap-3 text-xs font-semibold text-[#1A3C2F] uppercase tracking-wider">
+              <Clock className="w-4 h-4 text-[#1A3C2F] shrink-0" />
+              <span>Fast 24-Hour Engineering Response</span>
+            </div>
+          </motion.div>
 
-        {/* INLINE CONTACT FORM CARD */}
+        </div>
+
+        {/* RIGHT COLUMN: CONTACT FORM CARD (7 cols desktop) */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="bg-[#F5F0EA] border border-[#E8E2D9] rounded-3xl p-6 sm:p-10 shadow-sm text-left relative overflow-hidden"
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="lg:col-span-7 bg-[#F5F0EA] border border-[#E8E2D9] rounded-3xl p-6 sm:p-10 shadow-sm text-left relative overflow-hidden"
         >
           {!submitted ? (
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="border-b border-[#E8E2D9] pb-4 mb-2">
-                <h3 className="text-xl font-bold text-[#1A3C2F]">Contact Engineering Team</h3>
-                <p className="text-xs text-[#5C6B60] mt-0.5">Fill out your project details to request a technical consultation.</p>
+                <h3 className="text-2xl font-extrabold text-[#1A3C2F]">Contact Engineering Team</h3>
+                <p className="text-xs text-[#5C6B60] mt-1">Fill out your project details to request a technical consultation.</p>
               </div>
 
               {/* Name & Email Row */}
@@ -197,7 +205,7 @@ export const DiscussionCTA: React.FC<DiscussionCTAProps> = ({ onOpenDiscuss }) =
             </form>
           ) : (
             /* SUBMITTED SUCCESS CARD */
-            <div className="text-center py-8 space-y-4">
+            <div className="text-center py-10 space-y-4">
               <div className="w-16 h-16 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 flex items-center justify-center mx-auto shadow-sm">
                 <CheckCircle2 className="w-9 h-9" />
               </div>
