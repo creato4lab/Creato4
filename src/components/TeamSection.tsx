@@ -22,7 +22,7 @@ const TEAM_MEMBERS: TeamMember[] = [
     name: 'Prince Tagadiya',
     emoji: '👑',
     initials: 'PT',
-    avatarUrl: '/prince_memoji.png',
+    avatarUrl: 'https://github.com/princetagadiya.png',
     dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=PrinceCEO&backgroundColor=e8f0e8&radius=50&size=256&top=shortHairShortFlat&facialHair=beardMedium&clothing=blazerAndShirt',
     role: 'Founder, CEO & CPTO',
@@ -79,7 +79,7 @@ const TEAM_MEMBERS: TeamMember[] = [
     name: 'Rudra Chauhan',
     emoji: '💻',
     initials: 'RC',
-    avatarUrl: '/rudra_memoji.png',
+    avatarUrl: 'https://github.com/CHAUHANRUDRA24.png',
     dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=RudraDeveloper&backgroundColor=d1d8e8&radius=50&size=256&top=shortHairShortWaved&facialHair=beardLight&clothing=graphicShirt',
     role: 'Head of Software Engineering & Digital Design',
