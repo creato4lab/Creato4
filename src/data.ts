@@ -326,37 +326,85 @@ export const TEAM_MEMBERS: TeamMember[] = [
     initials: 'PT',
     name: 'Prince Tagadiya',
     role: 'Founder, CEO & CPTO',
-    department: 'Product · Technology · Business',
+    department: 'Product · Technology · Business Strategy',
     tags: ['Product Strategy', 'Systems Architecture', 'Hardware R&D', 'Business Lead'],
     bio: 'Visionary engineering lead steering multidisciplinary hardware and software product creation from initial napkin sketch to scaled deployment.',
+    expandedBio: 'Prince leads CRETO4\'s overall product roadmap, hardware-software architecture integration, and strategic client ventures. With deep expertise across cross-disciplinary engineering and industrial prototyping, he bridges conceptual client vision into robust physical products.',
+    keyContributions: [
+      'Architected the Smart Privacy Health Kiosk hardware & cloud pipeline',
+      'Spearheaded SSIP Government Innovation Grant acquisition',
+      'Directs multidisciplinary R&D across embedded, CAD, and software teams'
+    ],
+    specialties: ['Cross-disciplinary Systems Architecture', 'Industrial DFM & Rapid Prototyping', 'Venture Strategy & Client Delivery'],
+    stats: [
+      { label: 'Projects Led', value: '25+' },
+      { label: 'R&D Experience', value: '4+ Yrs' },
+      { label: 'Grants Secured', value: 'SSIP' }
+    ]
   },
   {
     id: 'nisarg-patel',
     initials: 'NP',
     name: 'Nisarg Patel',
     role: 'Head of Electronics, Embedded Systems & Manufacturing',
-    department: 'Hardware · Embedded · Manufacturing',
+    department: 'Hardware · Embedded · Electronics Manufacturing',
     tags: ['Hardware Engineering', 'Embedded C++', 'DFM', 'Sensors'],
     bio: 'Expert in high-reliability circuit design, power management, micro-controller firmware, and precision electronics manufacturing pipelines.',
+    expandedBio: 'Nisarg leads the physical electronics engineering at CRETO4. From high-current power distribution boards for heavy-payload hexacopters to sub-second sensor telemetry hubs, he ensures ultra-reliable hardware performance under demanding operational environments.',
+    keyContributions: [
+      'Designed custom PDB and RTK-GPS telemetry for Agri-Titan X6 drone',
+      'Developed sub-100mW power management for Smart Safety Helmet',
+      'Established in-house SMT assembly & hardware verification protocols'
+    ],
+    specialties: ['STM32 & ESP32 Embedded C/C++', 'Power Electronics & Battery Systems', 'Sensor Telemetry & RF Communication'],
+    stats: [
+      { label: 'Custom PCBs', value: '40+' },
+      { label: 'Sensor Modules', value: '100+' },
+      { label: 'Uptime Rate', value: '99.9%' }
+    ]
   },
   {
     id: 'khushi-belani',
     initials: 'KB',
     name: 'Khushi Belani',
     role: 'Head of PCB Design, Education & Brand Communications',
-    department: 'PCB · Research · QA · Education · Brand',
-    tags: ['PCB Design', 'Signal Integrity', 'Quality Assurance', 'Brand Communication'],
+    department: 'PCB Design · Research · QA · Education · Brand',
+    tags: ['PCB Layout', 'Signal Integrity', 'Quality Assurance', 'Brand Communication'],
     bio: 'Directs multi-layer PCB layout, component selection, educational project publishing, and technical brand positioning.',
+    expandedBio: 'Khushi oversees high-density PCB design standards, electromagnetic compatibility (EMC) compliance, and technical publishing. She also leads CRETO4\'s educational STEM initiative, translating complex hardware designs into accessible learning kits for student engineers.',
+    keyContributions: [
+      'Published technical research articles in Electronics For You magazine',
+      'Engineered multi-layer HDI PCB layouts for IoT diagnostic kiosks',
+      'Curated DIY engineering kit documentation and Gerber manufacturing specs'
+    ],
+    specialties: ['Altium Designer Multi-Layer HDI Routing', 'Signal & Power Integrity Analysis', 'Technical Publishing & Brand Strategy'],
+    stats: [
+      { label: 'Publications', value: 'Featured' },
+      { label: 'PCB Layers', value: '4-6 Layers' },
+      { label: 'Kits Created', value: '15+' }
+    ]
   },
   {
     id: 'rudra-chauhan',
     initials: 'RC',
     name: 'Rudra Chauhan',
     role: 'Head of Software Engineering & Digital Design',
-    department: 'Software · Cloud · Digital Experiences',
+    department: 'Software · Cloud Infrastructure · Digital Experiences',
     tags: ['Full-Stack Web', 'Cloud Infrastructure', '3D WebGL', 'AI Systems'],
     bio: 'Architects modern cloud applications, real-time IoT web portals, interactive 3D WebGL graphics, and scalable software backends.',
-  },
+    expandedBio: 'Rudra directs the digital experience engineering at CRETO4. Combining full-stack React/Node web platforms with real-time hardware WebSockets, 3D WebGL visualizations, and modern AI/LLM API integrations, he delivers seamless software control for physical hardware devices.',
+    keyContributions: [
+      'Built full-stack real-time telemetry dashboard for Smart Health Kiosk',
+      'Designed high-performance 3D WebGL interactive product visualizers',
+      'Engineered zero-latency MQTT cloud queues for IoT print terminals'
+    ],
+    specialties: ['React / TypeScript / Vite / WebGL', 'Node.js, WebSockets & MQTT Telemetry', 'Cloud Infrastructure & API Design'],
+    stats: [
+      { label: 'Web Applications', value: '30+' },
+      { label: 'Daily Telemetry', value: '50k+ Events' },
+      { label: '3D Assets', value: 'Interactive' }
+    ]
+  }
 ];
 
 export const TRUST_ACHIEVEMENTS = [

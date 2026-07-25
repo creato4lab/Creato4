@@ -61,3 +61,289 @@
   scrollbar-width: none;
 }
 
+/* 3D Transform Utilities for Card Tilt */
+.perspective-container {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.layer-depth-1 {
+  transform: translateZ(12px);
+}
+
+.layer-depth-2 {
+  transform: translateZ(24px);
+}
+
+.layer-depth-3 {
+  transform: translateZ(36px);
+}
+
+.layer-depth-4 {
+  transform: translateZ(48px);
+}
+
+/* Staggered Animations for Team Cards */
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  70% {
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounceSlow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}
+
+.animate-pop-in {
+  animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-bounce-slow {
+  animation: bounceSlow 2s ease-in-out infinite;
+}
+
+/* Apple-style Frosted Glass Card */
+.apple-glass-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  border-radius: 48px;
+  box-shadow: 
+    0 30px 60px -15px rgba(26, 58, 46, 0.08),
+    0 10px 20px -10px rgba(0, 0, 0, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+/* Skill Tag Pill Hover */
+.skill-tag-pill {
+  background-color: #ece9e4;
+  color: #1a3a2e;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.skill-tag-pill:hover {
+  background-color: #1a3a2e;
+  color: #ffffff;
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 16px -4px rgba(26, 58, 46, 0.25);
+}
+
+/* Avatar Shine Gradient */
+.avatar-shine-overlay {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 60%);
+}
+
+/* Floating Working Emojis Animations */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(5deg);
+  }
+}
+
+@keyframes floatReverse {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(6px) rotate(-5deg);
+  }
+}
+
+.animate-float-1 {
+  animation: floatSlow 3.2s ease-in-out infinite;
+}
+
+.animate-float-2 {
+  animation: floatReverse 3.8s ease-in-out infinite 0.5s;
+}
+
+.animate-float-3 {
+  animation: floatSlow 4.2s ease-in-out infinite 1s;
+}
+
+/* Working Emoji Floating Badge */
+.working-emoji-badge {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(26, 58, 46, 0.12);
+  box-shadow: 0 6px 16px -3px rgba(26, 58, 46, 0.15);
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.group:hover .working-emoji-badge {
+  transform: scale(1.15) rotate(8deg);
+}
+
+/* Stats Row Styling */
+.stats-row-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  padding: 14px 0;
+  width: 100%;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  margin: 14px 0;
+}
+
+/* Social Buttons */
+.social-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(245, 245, 245, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+  user-select: none;
+}
+
+.social-icon-btn:hover {
+  background-color: #1a3a2e;
+  color: #ffffff;
+  transform: translateY(-3px) scale(1.1);
+  box-shadow: 0 8px 16px -4px rgba(26, 58, 46, 0.3);
+}
+
+/* Updated Skill Pill Tags */
+.skill-tag-pill-v2 {
+  background: rgba(245, 245, 245, 0.9);
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  color: #3a5a4a;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: default;
+  user-select: none;
+}
+
+.skill-tag-pill-v2:hover {
+  background-color: #1a3a2e;
+  color: #ffffff;
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 16px -4px rgba(26, 58, 46, 0.25);
+}
+
+/* Get in Touch CTA Button */
+.get-in-touch-btn {
+  background-color: #1a3a2e;
+  color: #ffffff;
+  padding: 10px 24px;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 6px 20px -4px rgba(26, 58, 46, 0.3);
+  cursor: pointer;
+  border: none;
+}
+
+/* Department Tag & Location Badge */
+.department-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #4a7a5a;
+  background: rgba(26, 58, 46, 0.06);
+  padding: 4px 12px;
+  border-radius: 100px;
+  border: 1px solid rgba(26, 58, 46, 0.1);
+}
+
+.location-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #7a8a7a;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Key Contributions List */
+.contributions-container {
+  width: 100%;
+  background: rgba(245, 245, 245, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-radius: 16px;
+  padding: 10px 14px;
+  margin: 6px 0;
+  text-align: left;
+}
+
+.contribution-item {
+  font-size: 0.78rem;
+  color: #3a5a4a;
+  font-weight: 600;
+  line-height: 1.45;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.contribution-item:last-child {
+  margin-bottom: 0;
+}
+
+.checkmark-icon {
+  color: #1a3a2e;
+  font-weight: 800;
+  shrink: 0;
+}
+
+
+

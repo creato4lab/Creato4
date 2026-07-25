@@ -55,6 +55,10 @@ export interface TeamMember {
   department: string;
   tags: string[];
   bio: string;
+  expandedBio?: string;
+  keyContributions?: string[];
+  specialties?: string[];
+  stats?: { label: string; value: string }[];
 }
 
 export interface DiscussionFormData {
