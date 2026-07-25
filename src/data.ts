@@ -46,7 +46,7 @@ export const WORK_PROJECTS: WorkProject[] = [
     subtitle: 'IoT-Connected Cloud Kiosk for On-Demand Document Printing',
     category: 'Embedded Systems · Automation · Web Platform',
     tags: ['Embedded Systems', 'Automation', 'Web Platform'],
-    image: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=800&q=80',
+    image: '/smart-print-station.png',
     description: 'Self-service unattended printing terminal allowing users to upload documents via WhatsApp or web link and pay via QR code for instant secure print releases.',
     challenge: 'Preventing paper jams, handling offline printer state machine errors, and encrypting document streams end-to-end.',
     solution: 'Built a ruggedized kiosk housing, custom micro-controller relay boards for power cycling, and cloud queue management with automatic document deletion after print.',
