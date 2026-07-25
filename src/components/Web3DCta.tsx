@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { motion } from 'motion/react';
+import { motion, useScroll, useTransform } from 'motion/react';
 import { ArrowRight, Sparkles, Code, Monitor } from 'lucide-react';
 
 interface Web3DCtaProps {
@@ -9,6 +9,14 @@ interface Web3DCtaProps {
 
 export const Web3DCta: React.FC<Web3DCtaProps> = ({ onOpenDiscuss }) => {
   const mountRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"]
+  });
+
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ["-30%", "30%"]);
 
   useEffect(() => {
     const currentMount = mountRef.current;
@@ -125,10 +133,15 @@ export const Web3DCta: React.FC<Web3DCtaProps> = ({ onOpenDiscuss }) => {
   }, []);
 
   return (
-    <section className="relative py-24 lg:py-36 bg-[#1A3C2F] text-[#FAF8F5] overflow-hidden">
+    <section ref={sectionRef} className="relative py-24 lg:py-36 bg-[#1A3C2F] text-[#FAF8F5] overflow-hidden">
       
-      {/* Background 3D WebGL Canvas */}
-      <div ref={mountRef} className="absolute inset-0 w-full h-full pointer-events-none z-0" />
+      {/* Background 3D WebGL Canvas - Parallax Panorama */}
+      <motion.div 
+        style={{ y: backgroundY }}
+        className="absolute w-full h-[160%] -top-[30%] left-0 pointer-events-none z-0"
+      >
+        <div ref={mountRef} className="w-full h-full" />
+      </motion.div>
 
       {/* Content Container */}
       <div className="relative z-10 max-w-[800px] mx-auto px-6 text-center">
