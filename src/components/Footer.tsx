@@ -180,19 +180,15 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
               <div className="space-y-3 text-xs text-[#FAF8F5]/80">
                 <div className="flex items-center gap-2.5">
                   <Mail className="w-4 h-4 text-[#C4A35A]" />
-                  <a href="mailto:contact@creato4.com" className="hover:text-[#FAF8F5]">
-                    contact@creato4.com
+                  <a href="mailto:creato4lab@gmail.com" className="hover:text-[#FAF8F5]">
+                    creato4lab@gmail.com
                   </a>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <Phone className="w-4 h-4 text-[#C4A35A]" />
-                  <a href="tel:+18005550199" className="hover:text-[#FAF8F5]">
-                    +1 (800) 555-0199
+                  <a href="tel:+919909089344" className="hover:text-[#FAF8F5]">
+                    +91 99090 89344
                   </a>
-                </div>
-                <div className="flex items-start gap-2.5">
-                  <MapPin className="w-4 h-4 text-[#C4A35A] shrink-0 mt-0.5" />
-                  <span>Creato4 Product Lab, Innovation Corridor</span>
                 </div>
               </div>
             </div>
@@ -204,7 +200,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
               </h4>
               <div className="flex items-center gap-3">
                 <a
-                  href="https://linkedin.com"
+                  href="https://www.linkedin.com/company/creato4-lab/"
                   target="_blank"
                   rel="noreferrer"
                   aria-label="LinkedIn"
@@ -213,7 +209,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
                   <Linkedin className="w-4 h-4" />
                 </a>
                 <a
-                  href="https://instagram.com"
+                  href="https://www.instagram.com/creato4.lab?igsh=MWh4bGZybXBxZ3Rj&utm_source=qr"
                   target="_blank"
                   rel="noreferrer"
                   aria-label="Instagram"
