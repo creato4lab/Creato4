@@ -299,7 +299,7 @@ export const TeamSection: React.FC = () => {
               <TeamTiltCard
                 key={member.id}
                 member={member}
-                imgState={imgState}
+                imgState="none"
                 imgSrc={imgSrc}
                 onImgError={handleImgError}
               />
