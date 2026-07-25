@@ -10,8 +10,8 @@ export const QuickEntry: React.FC<QuickEntryProps> = ({ onSelectOption }) => {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
   return (
-    <section className="py-20 lg:py-32 bg-[#F5F0EA] border-b border-[#E8E2D9] px-6 lg:px-12">
-      <div className="max-w-[1400px] mx-auto">
+    <section className="py-20 lg:py-32 bg-[#F5F0EA] border-b border-[#E8E2D9] px-6 sm:px-10 lg:px-16 xl:px-20">
+      <div className="max-w-[1800px] mx-auto">
         
         {/* Section Header */}
         <div className="text-center mb-16">

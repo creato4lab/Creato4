@@ -14,7 +14,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss }) => {
 
   return (
     <section className="relative min-h-screen pt-24 lg:pt-28 pb-12 w-full flex items-center bg-[#FAF8F5] overflow-hidden border-b border-[#E8E2D9]">
-      <div className="max-w-[1400px] w-full mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center min-h-[calc(100vh-120px)]">
+      <div className="max-w-[1800px] w-full mx-auto px-6 sm:px-10 lg:px-16 xl:px-20 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center min-h-[calc(100vh-120px)]">
         
         {/* LEFT COLUMN (55% desktop = 7 cols) */}
         <div className="lg:col-span-7 flex flex-col justify-center z-20">

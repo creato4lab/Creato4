@@ -10,8 +10,8 @@ interface SelectedWorkProps {
 
 export const SelectedWork: React.FC<SelectedWorkProps> = ({ onSelectProject }) => {
   return (
-    <section id="work" className="py-20 lg:py-32 bg-[#FAF8F5] border-b border-[#E8E2D9] px-6 lg:px-12">
-      <div className="max-w-[1400px] mx-auto">
+    <section id="work" className="py-20 lg:py-32 bg-[#1A3C2F] text-[#FAF8F5] px-6 sm:px-10 lg:px-16 xl:px-20">
+      <div className="max-w-[1800px] mx-auto">
         
         {/* Section Header */}
         <div className="mb-16">

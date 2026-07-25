@@ -95,7 +95,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           : 'bg-transparent border-b border-transparent'
       }`}
     >
-      <div className="max-w-[1400px] h-full mx-auto px-6 lg:px-12 flex items-center justify-between">
+      <div className="max-w-[1800px] w-full h-full mx-auto px-6 sm:px-10 lg:px-16 xl:px-20 flex items-center justify-between">
         {/* Left: Brand Logo */}
         <a
           href="#"

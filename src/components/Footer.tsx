@@ -8,8 +8,8 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
   return (
-    <footer className="bg-[#1A3C2F] text-[#FAF8F5] pt-20 pb-10 px-6 lg:px-12 border-t border-[#FAF8F5]/10">
-      <div className="max-w-[1400px] mx-auto">
+    <footer className="bg-[#1A3C2F] text-[#FAF8F5] pt-20 pb-12 border-t border-[#234B3C] px-6 sm:px-10 lg:px-16 xl:px-20">
+      <div className="max-w-[1800px] mx-auto">
         
         {/* Top Row Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16">

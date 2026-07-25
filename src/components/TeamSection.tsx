@@ -103,8 +103,8 @@ export const TeamSection: React.FC = () => {
   };
 
   return (
-    <section id="team" className="w-full bg-[#f5f0eb] py-20 px-6 font-sans">
-      <div className="max-w-[1320px] mx-auto">
+    <section id="team" className="w-full bg-[#f5f0eb] py-20 px-6 sm:px-10 lg:px-16 xl:px-20 font-sans">
+      <div className="max-w-[1800px] mx-auto">
         {/* Section Header */}
         <div className="text-center mb-14">
           <span className="text-xs font-extrabold uppercase tracking-[0.25em] text-[#4a7a5a] block mb-2">

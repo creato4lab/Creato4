@@ -34,7 +34,7 @@ export const HowWeDeliver: React.FC = () => {
     <section id="process" className="py-20 lg:py-32 bg-[#F5F0EA] border-b border-[#E8E2D9] overflow-hidden">
       
       {/* Header */}
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 text-center mb-16">
+      <div className="max-w-[1800px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-20 text-center mb-16">
         <span className="text-[0.75rem] uppercase font-bold tracking-[0.2em] text-[#5C6B60] block mb-3">
           YOUR IDEA. OUR ENGINEERING.
         </span>

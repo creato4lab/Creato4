@@ -23,8 +23,8 @@ export const TrustCredibility: React.FC = () => {
   };
 
   return (
-    <section id="trust" className="py-20 bg-[#FAF8F5] border-y border-[#E8E2D9] px-6 lg:px-12">
-      <div className="max-w-[1400px] mx-auto text-center">
+    <section id="trust" className="py-20 bg-[#FAF8F5] border-y border-[#E8E2D9] px-6 sm:px-10 lg:px-16 xl:px-20">
+      <div className="max-w-[1800px] mx-auto text-center">
         
         {/* Header Tag */}
         <span className="text-[0.75rem] uppercase font-bold tracking-[0.2em] text-[#5C6B60] block mb-3">
