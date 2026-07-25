@@ -42,7 +42,7 @@
       overflow-x: hidden;
     }
 
-    /* Section 1: Hero Section (100vh, green gradient, title "CRETO4") */
+    /* Section 1: Hero Section */
     .hero-section {
       width: 100vw;
       height: 100vh;
@@ -111,7 +111,7 @@
       60% { transform: translateY(4px); }
     }
 
-    /* Section 2: Pinned Team Container (400vh tall = 4 slides) */
+    /* Section 2: Pinned Team Container */
     .pinned-team-container {
       position: relative;
       height: 400vh;
@@ -153,7 +153,7 @@
       padding: 16px;
     }
 
-    /* Card Container Specifications */
+    /* Card Container */
     .card-wrapper {
       perspective: 1000px;
       width: 100%;
@@ -236,6 +236,7 @@
       width: 130px;
       height: 130px;
       margin-bottom: 16px;
+      flex-shrink: 0;
     }
 
     .avatar-ring {
@@ -257,12 +258,27 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
 
     .avatar-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
+    }
+
+    .avatar-fallback {
+      display: none;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+      background-color: #1a3a2e;
+      color: #ffffff;
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
     }
 
     /* Floating Badges */
@@ -470,7 +486,6 @@
     }
 
     /* Navigation UI */
-    /* Right-side dots */
     .right-dots-nav {
       position: fixed;
       right: 24px;
@@ -498,7 +513,6 @@
       box-shadow: 0 0 0 4px rgba(26, 58, 46, 0.2);
     }
 
-    /* Slide counter */
     .slide-counter {
       position: fixed;
       bottom: 24px;
@@ -516,7 +530,7 @@
       z-index: 100;
     }
 
-    /* Section 3: Next Section (100vh, green gradient, "Let's Work Together") */
+    /* Section 3: Next Section */
     .cta-section {
       width: 100vw;
       height: 100vh;
@@ -564,7 +578,7 @@
       box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
     }
 
-    /* Responsive Mobile Rules (max-width 500px) */
+    /* Responsive Mobile Rules */
     @media (max-width: 500px) {
       .card {
         padding: 20px 20px 24px;
@@ -654,7 +668,7 @@
 </head>
 <body>
 
-  <!-- Section 1: Hero Section (100vh, green gradient, title "CRETO4") -->
+  <!-- Section 1: Hero Section -->
   <header class="hero-section" id="hero">
     <div class="hero-sub">MULTIDISCIPLINARY ENGINEERING LAB</div>
     <h1 class="hero-title">CRETO4</h1>
@@ -667,7 +681,7 @@
     </div>
   </header>
 
-  <!-- Section 2: Team Section (400vh, sticky, scroll-snap through 4 members) -->
+  <!-- Section 2: Team Section -->
   <div class="pinned-team-container" id="team-container">
     <div class="sticky-viewport">
       <div class="slider-track" id="slider-track">
@@ -683,11 +697,15 @@
                 <div class="location-badge">📍 CRETO4 Design Studio · Gujarat</div>
               </div>
 
-              <!-- 2. Avatar with 3 Floating Emoji Badges -->
+              <!-- 2. Avatar with 3 Floating Emoji Badges & Robust Multi-tier Fallback -->
               <div class="avatar-area">
                 <div class="avatar-ring">
                   <div class="avatar-inner">
-                    <img src="https://api.dicebear.com/9.x/avataaars/png?seed=PrinceCEO&backgroundColor=e8f0e8&radius=50&size=256&top=shortHairShortFlat&facialHair=beardMedium&clothing=blazerAndShirt" alt="Prince Tagadiya" class="avatar-img">
+                    <img src="prince_memoji.png" 
+                         onerror="handleAvatarError(this, 'https://api.dicebear.com/9.x/avataaars/png?seed=PrinceCEO&backgroundColor=e8f0e8&radius=50&size=256&top=shortHairShortFlat&facialHair=beardMedium&clothing=blazerAndShirt')" 
+                         alt="Prince Tagadiya" 
+                         class="avatar-img">
+                    <div class="avatar-fallback">PT</div>
                   </div>
                 </div>
                 <div class="floating-badge pos-top-right">🚀</div>
@@ -774,11 +792,15 @@
                 <div class="location-badge">📍 CRETO4 Design Studio · Gujarat</div>
               </div>
 
-              <!-- 2. Avatar with 3 Floating Emoji Badges -->
+              <!-- 2. Avatar with 3 Floating Emoji Badges & Robust Multi-tier Fallback -->
               <div class="avatar-area">
                 <div class="avatar-ring">
                   <div class="avatar-inner">
-                    <img src="https://api.dicebear.com/9.x/avataaars/png?seed=NisargEngineer&backgroundColor=d1e8d1&radius=50&size=256&top=shortHairTheCaesar&facialHair=beardLight&clothing=hoodie" alt="Nisarg Patel" class="avatar-img">
+                    <img src="nisarg_memoji.png" 
+                         onerror="handleAvatarError(this, 'https://api.dicebear.com/9.x/avataaars/png?seed=NisargEngineer&backgroundColor=d1e8d1&radius=50&size=256&top=shortHairTheCaesar&facialHair=beardLight&clothing=hoodie')" 
+                         alt="Nisarg Patel" 
+                         class="avatar-img">
+                    <div class="avatar-fallback">NP</div>
                   </div>
                 </div>
                 <div class="floating-badge pos-top-right">🔧</div>
@@ -865,11 +887,15 @@
                 <div class="location-badge">📍 CRETO4 Design Studio · Gujarat</div>
               </div>
 
-              <!-- 2. Avatar with 3 Floating Emoji Badges -->
+              <!-- 2. Avatar with 3 Floating Emoji Badges & Robust Multi-tier Fallback -->
               <div class="avatar-area">
                 <div class="avatar-ring">
                   <div class="avatar-inner">
-                    <img src="https://api.dicebear.com/9.x/avataaars/png?seed=KhushiDesigner&backgroundColor=ffe8d1&radius=50&size=256&top=longHairStraight&accessories=glasses&clothing=shirtVNeck" alt="Khushi Belani" class="avatar-img">
+                    <img src="khushi_memoji.png" 
+                         onerror="handleAvatarError(this, 'https://api.dicebear.com/9.x/avataaars/png?seed=KhushiDesigner&backgroundColor=ffe8d1&radius=50&size=256&top=longHairStraight&accessories=glasses&clothing=shirtVNeck')" 
+                         alt="Khushi Belani" 
+                         class="avatar-img">
+                    <div class="avatar-fallback">KB</div>
                   </div>
                 </div>
                 <div class="floating-badge pos-top-right">🎨</div>
@@ -956,11 +982,15 @@
                 <div class="location-badge">📍 CRETO4 Design Studio · Gujarat</div>
               </div>
 
-              <!-- 2. Avatar with 3 Floating Emoji Badges -->
+              <!-- 2. Avatar with 3 Floating Emoji Badges & Robust Multi-tier Fallback -->
               <div class="avatar-area">
                 <div class="avatar-ring">
                   <div class="avatar-inner">
-                    <img src="https://api.dicebear.com/9.x/avataaars/png?seed=RudraDeveloper&backgroundColor=d1d8e8&radius=50&size=256&top=shortHairShortWaved&facialHair=beardLight&clothing=graphicShirt" alt="Rudra Chauhan" class="avatar-img">
+                    <img src="rudra_memoji.png" 
+                         onerror="handleAvatarError(this, 'https://api.dicebear.com/9.x/avataaars/png?seed=RudraDeveloper&backgroundColor=d1d8e8&radius=50&size=256&top=shortHairShortWaved&facialHair=beardLight&clothing=graphicShirt')" 
+                         alt="Rudra Chauhan" 
+                         class="avatar-img">
+                    <div class="avatar-fallback">RC</div>
                   </div>
                 </div>
                 <div class="floating-badge pos-top-right">💻</div>
@@ -1051,7 +1081,7 @@
     <div class="slide-counter" id="slide-counter">01 / 04</div>
   </div>
 
-  <!-- Section 3: Next Section (100vh, green gradient, "Let's Work Together") -->
+  <!-- Section 3: Next Section -->
   <footer class="cta-section" id="cta-section">
     <h2 class="cta-title">Let's Work Together</h2>
     <p class="cta-desc">Have an innovative hardware or software project in mind? Connect with our team to bring your vision to life.</p>
@@ -1059,6 +1089,18 @@
   </footer>
 
   <script>
+    // Multi-tier Avatar Error Handling
+    function handleAvatarError(imgElem, dicebearUrl) {
+      if (!imgElem.getAttribute('data-tried-dicebear')) {
+        imgElem.setAttribute('data-tried-dicebear', 'true');
+        imgElem.src = dicebearUrl;
+      } else {
+        imgElem.style.display = 'none';
+        const fallback = imgElem.nextElementSibling;
+        if (fallback) fallback.style.display = 'flex';
+      }
+    }
+
     // Scroll Logic & Snap Controller
     const teamContainer = document.getElementById('team-container');
     const sliderTrack = document.getElementById('slider-track');
@@ -1072,10 +1114,8 @@
       if (index === currentSlideIndex) return;
       currentSlideIndex = index;
 
-      // Update translateY on track
       sliderTrack.style.transform = `translateY(-${index * 100}vh)`;
 
-      // Update slide active classes
       slides.forEach((slide, idx) => {
         if (idx === index) {
           slide.classList.add('active');
@@ -1084,7 +1124,6 @@
         }
       });
 
-      // Update dot buttons
       dotButtons.forEach((dot, idx) => {
         if (idx === index) {
           dot.classList.add('active');
@@ -1093,7 +1132,6 @@
         }
       });
 
-      // Update slide counter
       slideCounter.textContent = `0${index + 1} / 04`;
     }
 
@@ -1107,7 +1145,6 @@
       const scrolled = -rect.top;
       const progress = Math.max(0, Math.min(1, scrolled / totalScrollable));
 
-      // Calculate slide index: floor((scrollY - sectionTop) / (sectionHeight - viewportHeight) * totalSlides)
       const calculatedSlide = Math.min(3, Math.floor(progress * 4));
       updateSlideUI(calculatedSlide);
     }
@@ -1127,7 +1164,6 @@
       });
     }
 
-    // Keyboard Arrow Navigation support
     window.addEventListener('keydown', (e) => {
       const rect = teamContainer.getBoundingClientRect();
       if (rect.top <= 0 && rect.bottom >= window.innerHeight) {

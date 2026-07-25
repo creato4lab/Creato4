@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronDown } from 'lucide-react';
 
 interface TeamMemberSlide {
   id: string;
   name: string;
   emoji: string;
+  initials: string;
   avatarUrl: string;
+  dicebearUrl: string;
   role: string;
   departmentHtml: string;
   location: string;
@@ -22,7 +23,9 @@ const TEAM_SLIDES: TeamMemberSlide[] = [
     id: 'prince-tagadiya',
     name: 'Prince Tagadiya',
     emoji: '👑',
-    avatarUrl:
+    initials: 'PT',
+    avatarUrl: '/prince_memoji.png',
+    dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=PrinceCEO&backgroundColor=e8f0e8&radius=50&size=256&top=shortHairShortFlat&facialHair=beardMedium&clothing=blazerAndShirt',
     role: 'Founder, CEO & CPTO',
     departmentHtml: 'PRODUCT STRATEGY &<br/>LEADERSHIP',
@@ -55,7 +58,9 @@ const TEAM_SLIDES: TeamMemberSlide[] = [
     id: 'nisarg-patel',
     name: 'Nisarg Patel',
     emoji: '🔧',
-    avatarUrl:
+    initials: 'NP',
+    avatarUrl: '/nisarg_memoji.png',
+    dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=NisargEngineer&backgroundColor=d1e8d1&radius=50&size=256&top=shortHairTheCaesar&facialHair=beardLight&clothing=hoodie',
     role: 'Head of Electronics, Embedded Systems & Manufacturing',
     departmentHtml: 'ELECTRONICS &<br/>MANUFACTURING',
@@ -88,7 +93,9 @@ const TEAM_SLIDES: TeamMemberSlide[] = [
     id: 'khushi-belani',
     name: 'Khushi Belani',
     emoji: '🎨',
-    avatarUrl:
+    initials: 'KB',
+    avatarUrl: '/khushi_memoji.png',
+    dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=KhushiDesigner&backgroundColor=ffe8d1&radius=50&size=256&top=longHairStraight&accessories=glasses&clothing=shirtVNeck',
     role: 'Head of PCB Design, Education & Brand Communications',
     departmentHtml: 'PCB DESIGN & BRAND<br/>COMMUNICATIONS',
@@ -121,7 +128,9 @@ const TEAM_SLIDES: TeamMemberSlide[] = [
     id: 'rudra-chauhan',
     name: 'Rudra Chauhan',
     emoji: '💻',
-    avatarUrl:
+    initials: 'RC',
+    avatarUrl: '/rudra_memoji.png',
+    dicebearUrl:
       'https://api.dicebear.com/9.x/avataaars/png?seed=RudraDeveloper&backgroundColor=d1d8e8&radius=50&size=256&top=shortHairShortWaved&facialHair=beardLight&clothing=graphicShirt',
     role: 'Head of Software Engineering & Digital Design',
     departmentHtml: 'SOFTWARE ENGINEERING &<br/>DIGITAL DESIGN',
@@ -155,8 +164,8 @@ const TEAM_SLIDES: TeamMemberSlide[] = [
 export const TeamSection: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [failedImgs, setFailedImgs] = useState<{ [id: string]: 'none' | 'dicebear' | 'initials' }>({});
 
-  // Track window scroll progress through the 400vh pinned team section
   useEffect(() => {
     const handleScroll = () => {
       if (!containerRef.current) return;
@@ -168,8 +177,6 @@ export const TeamSection: React.FC = () => {
 
       const scrolled = -rect.top;
       const progress = Math.max(0, Math.min(1, scrolled / totalScrollable));
-
-      // Calculate slide index from 0 to 3: floor(progress * 4)
       const newSlide = Math.min(3, Math.floor(progress * 4));
 
       setCurrentSlide((prev) => (prev !== newSlide ? newSlide : prev));
@@ -181,7 +188,6 @@ export const TeamSection: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Programmatic scroll to a specific slide when dot is clicked
   const scrollToSlide = (index: number) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
@@ -195,6 +201,17 @@ export const TeamSection: React.FC = () => {
     window.scrollTo({
       top: targetScrollY,
       behavior: 'smooth',
+    });
+  };
+
+  const handleImgError = (member: TeamMemberSlide) => {
+    setFailedImgs((prev) => {
+      const current = prev[member.id] || 'none';
+      if (current === 'none') {
+        return { ...prev, [member.id]: 'dicebear' };
+      } else {
+        return { ...prev, [member.id]: 'initials' };
+      }
     });
   };
 
@@ -216,13 +233,20 @@ export const TeamSection: React.FC = () => {
         >
           {TEAM_SLIDES.map((member, idx) => {
             const isActive = idx === currentSlide;
+            const imgState = failedImgs[member.id] || 'none';
+            const imgSrc =
+              imgState === 'none'
+                ? member.avatarUrl
+                : imgState === 'dicebear'
+                ? member.dicebearUrl
+                : '';
 
             return (
               <div
                 key={member.id}
                 className="w-full h-screen shrink-0 flex flex-col items-center justify-center relative p-4 sm:p-5"
               >
-                {/* 460px Exact Spec Glass Card */}
+                {/* 460px Spec Glass Card */}
                 <div className="w-full max-w-[460px] mx-auto my-auto">
                   <div
                     className={`w-full max-h-[90vh] overflow-y-auto no-scrollbar bg-white/90 backdrop-blur-[30px] border border-white/95 rounded-[40px] p-[32px_40px_36px] shadow-[0_8px_40px_rgba(26,58,46,0.06)] flex flex-col items-center text-center relative transition-all duration-500 ${
@@ -242,15 +266,22 @@ export const TeamSection: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* 2. Avatar (130px x 130px) with 3 Floating Emoji Badges */}
+                    {/* 2. Avatar Area (130px x 130px) */}
                     <div className="relative w-[130px] h-[130px] mb-4 shrink-0">
                       <div className="w-[130px] h-[130px] rounded-full p-1 bg-gradient-to-br from-[#1a3a2e] via-[#3d7a5a] to-[#1a3a2e] shadow-[0_8px_25px_rgba(26,58,46,0.18)]">
-                        <div className="w-full h-full rounded-full border-[4px] border-white overflow-hidden bg-[#1a3a2e] flex items-center justify-center">
-                          <img
-                            src={member.avatarUrl}
-                            alt={member.name}
-                            className="w-full h-full object-cover select-none"
-                          />
+                        <div className="w-full h-full rounded-full border-[4px] border-white overflow-hidden bg-[#1a3a2e] flex items-center justify-center relative">
+                          {imgState !== 'initials' && imgSrc ? (
+                            <img
+                              src={imgSrc}
+                              alt={member.name}
+                              onError={() => handleImgError(member)}
+                              className="w-full h-full object-cover select-none block"
+                            />
+                          ) : (
+                            <span className="text-white text-2xl font-extrabold select-none">
+                              {member.initials}
+                            </span>
+                          )}
                         </div>
                       </div>
 
@@ -294,7 +325,7 @@ export const TeamSection: React.FC = () => {
                       ))}
                     </div>
 
-                    {/* 7. Stats Row (3 Columns) */}
+                    {/* 7. Stats Row */}
                     <div className="grid grid-cols-3 gap-[28px] py-[14px] w-full border-t border-b border-black/[0.04] mb-3.5 text-center">
                       {member.stats.map((st, sIdx) => (
                         <div key={sIdx}>
@@ -308,7 +339,7 @@ export const TeamSection: React.FC = () => {
                       ))}
                     </div>
 
-                    {/* 8. Social Links (4 Circular Buttons 38px) */}
+                    {/* 8. Social Links */}
                     <div className="flex items-center justify-center gap-[10px] mb-3.5">
                       {member.socials.map((soc, socIdx) => (
                         <a
@@ -322,7 +353,7 @@ export const TeamSection: React.FC = () => {
                       ))}
                     </div>
 
-                    {/* 9. Skills (Pill Tags) */}
+                    {/* 9. Skills */}
                     <div className="flex flex-wrap justify-center gap-[8px] w-full mb-[16px]">
                       {member.skills.map((skill, sIdx) => (
                         <span
