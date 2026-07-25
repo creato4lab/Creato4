@@ -47,7 +47,7 @@ export const Web3DCta: React.FC<Web3DCtaProps> = ({ onOpenDiscuss }) => {
       color: 0xc4a35a, // Gold wireframe
       wireframe: true,
       transparent: true,
-      opacity: 0.12,
+      opacity: 0.22,
     });
     
     const terrain = new THREE.Mesh(planeGeo, planeMat);
@@ -75,7 +75,7 @@ export const Web3DCta: React.FC<Web3DCtaProps> = ({ onOpenDiscuss }) => {
       color: 0xfaf8f5,
       size: 0.06,
       transparent: true,
-      opacity: 0.3,
+      opacity: 0.45,
     });
     const particles = new THREE.Points(particleGeo, particleMat);
     scene.add(particles);
@@ -157,23 +157,26 @@ export const Web3DCta: React.FC<Web3DCtaProps> = ({ onOpenDiscuss }) => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative py-28 lg:py-40 bg-[#1A3C2F] text-[#FAF8F5] overflow-hidden">
+    <section ref={sectionRef} className="relative h-[200vh] bg-[#1A3C2F] text-[#FAF8F5]">
       
-      {/* Background 3D WebGL Canvas - Parallax Panorama */}
-      <motion.div 
-        style={{ y: backgroundY }}
-        className="absolute w-full h-[130%] -top-[15%] left-0 pointer-events-none z-0"
-      >
-        <div ref={mountRef} className="w-full h-full" />
-      </motion.div>
+      {/* Sticky Panorama Window */}
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col items-center justify-center">
 
-      {/* Radial Gradient Overlay to ensure text legibility against the complex panorama */}
-      <div className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_center,rgba(26,60,47,0.3)_0%,rgba(26,60,47,0.85)_100%)]" />
+        {/* Background 3D WebGL Canvas - Parallax Panorama */}
+        <motion.div 
+          style={{ y: backgroundY }}
+          className="absolute w-full h-[120%] -top-[10%] left-0 pointer-events-none z-0"
+        >
+          <div ref={mountRef} className="w-full h-full" />
+        </motion.div>
 
-      {/* Content Container */}
-      <div className="relative z-10 max-w-[800px] mx-auto px-6 text-center">
-        
-        {/* Label */}
+        {/* Radial Gradient Overlay - Softer center for better visibility of 3D scene */}
+        <div className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_center,rgba(26,60,47,0.1)_0%,rgba(26,60,47,0.75)_100%)]" />
+
+        {/* Content Container */}
+        <div className="relative z-10 w-full max-w-[800px] mx-auto px-6 text-center">
+          
+          {/* Label */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -240,6 +243,7 @@ export const Web3DCta: React.FC<Web3DCtaProps> = ({ onOpenDiscuss }) => {
           Zero template bloat · 100% custom 3D WebGL &amp; high-speed React performance.
         </p>
 
+      </div>
       </div>
     </section>
   );
