@@ -87,7 +87,7 @@ export const WORK_PROJECTS: WorkProject[] = [
     category: 'IoT Systems · Water Tech · Embedded Firmware · Smart Utilities',
     tags: ['IoT Systems', 'Water Tech', 'Embedded Firmware', 'Smart Utilities'],
     badge: 'Smart Utility Project',
-    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80',
+    image: '/water-leakage-theft.jpg',
     description: 'An intelligent IoT water utility monitoring system featuring pulse flow meters, differential pressure sensors, automated valve cutoffs, and cloud telemetry to prevent municipal water loss and unauthorized pipeline tapping.',
     challenge: 'Detecting micro-leakages and illegal pipe bypass tapping in real time across underground water distribution networks without false positive alerts.',
     solution: 'Engineered differential flow analysis algorithms using ESP32 microcontrollers, high-precision hall-effect flow sensors, cellular/LoRa telemetry, and automated motorized ball valves for instant remote isolation.',
