@@ -9,13 +9,11 @@ interface StudentProjectsProps {
 }
 
 export const StudentProjects: React.FC<StudentProjectsProps> = ({ onSelectProject }) => {
-  const [activeTab, setActiveTab] = useState<'Featured' | 'Popular' | 'New' | 'Advanced'>('Featured');
+  const [activeTab, setActiveTab] = useState<'Hardware' | 'Software'>('Hardware');
 
-  const tabs: Array<'Featured' | 'Popular' | 'New' | 'Advanced'> = [
-    'Featured',
-    'Popular',
-    'New',
-    'Advanced',
+  const tabs: Array<'Hardware' | 'Software'> = [
+    'Hardware',
+    'Software',
   ];
 
   const filteredProjects = STUDENT_PROJECTS.filter((p) => p.category === activeTab);
@@ -127,7 +125,7 @@ export const StudentProjects: React.FC<StudentProjectsProps> = ({ onSelectProjec
         {/* Link Below */}
         <div className="text-center mt-12">
           <button
-            onClick={() => setActiveTab('Featured')}
+            onClick={() => setActiveTab('Hardware')}
             className="inline-flex items-center gap-2 text-[0.75rem] font-extrabold uppercase tracking-[0.2em] text-[#1A3C2F] hover:underline cursor-pointer"
           >
             <span>Explore All Student Projects</span>

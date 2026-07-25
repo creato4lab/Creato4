@@ -19,7 +19,7 @@ export interface WorkProject {
 export interface StudentProject {
   id: string;
   title: string;
-  category: 'Featured' | 'Popular' | 'New' | 'Advanced';
+  category: 'Hardware' | 'Software';
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
   price: string;
   image: string;
