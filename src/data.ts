@@ -7,7 +7,7 @@ export const WORK_PROJECTS: WorkProject[] = [
     subtitle: 'Autonomous Tele-Health & Diagnostic Hardware Solution',
     category: 'Product Engineering · Mechanical · Embedded · Software',
     tags: ['Product Engineering', 'Mechanical', 'Embedded', 'Software'],
-    image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80',
+    image: '/smart-health-kiosk.jpg',
     description: 'A fully integrated smart kiosk providing privacy-first diagnostic vitals check, direct cloud tele-consultation, and automated biometric reporting in public facilities.',
     challenge: 'Designing a compact, acoustic-isolated hardware enclosure while integrating medical-grade sensors, embedded microcontrollers, and real-time HIPAA-compliant cloud sync.',
     solution: 'Engineered a modular sheet-metal structural frame with sound-dampening composites, custom PCB sensor hubs, and a multi-threaded web application for touch interaction.',
