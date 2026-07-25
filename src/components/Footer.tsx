@@ -10,12 +10,14 @@ interface FooterProps {
 export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const textRef = React.useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    const { currentTarget, clientX, clientY } = e;
-    const { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
+    if (textRef.current) {
+      const rect = textRef.current.getBoundingClientRect();
+      mouseX.set(e.clientX - rect.left);
+      mouseY.set(e.clientY - rect.top);
+    }
   };
 
   return (
@@ -245,7 +247,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
         </div>
 
         {/* Giant Footer Typography with Mouse Spotlight Glow */}
-        <div className="w-full mt-16 mb-8 flex justify-center items-center pointer-events-none select-none relative">
+        <div ref={textRef} className="w-full mt-16 mb-8 flex justify-center items-center pointer-events-none select-none relative">
           
           {/* Base faint text */}
           <h1 className="text-[clamp(4rem,14vw,18rem)] font-black tracking-[-0.04em] text-[#FAF8F5] opacity-[0.03] leading-[0.8] w-full text-center overflow-hidden">
