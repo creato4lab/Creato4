@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meet The Team | CRETO4</title>
-  
+  <title>CRETO4 — Meet The Team & 3D Interactive Showcase</title>
+
   <!-- Inter Font Family -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    /* CSS Resets & Core System */
+    /* CSS Resets & Root Variables */
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
@@ -19,173 +19,375 @@
     }
 
     :root {
-      --bg-cream: #f5f0eb;
+      --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       --color-dark-green: #1a3a2e;
-      --color-role: #4a7a5a;
-      --color-desc: #6a6a6a;
+      --color-bg-dark: #0f2a1e;
+      --color-gold: #c9a96e;
+      --color-cream: #f5f0eb;
       --color-white: #ffffff;
-      --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     html {
       scroll-behavior: smooth;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
 
     body {
-      width: 100%;
-      min-height: 100vh;
       font-family: var(--font-inter);
-      background-color: var(--bg-cream);
-      color: var(--color-dark-green);
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+      background-color: var(--color-bg-dark);
+      color: var(--color-white);
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Section 1: Hero Header Section */
+    /* Hide scrollbars globally */
+    ::-webkit-scrollbar {
+      display: none !important;
+      width: 0px !important;
+    }
+
+    /* =========================================================
+       1. HERO SECTION (100vh)
+       ========================================================= */
     .hero-section {
       width: 100%;
-      background: linear-gradient(135deg, #1a3a2e 0%, #2d5a45 100%);
-      color: var(--color-white);
+      height: 100vh;
+      position: relative;
+      background: linear-gradient(135deg, #1a3a2e 0%, #0f2a1e 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 90px 20px 80px;
+      padding: 0 20px;
+      overflow: hidden;
+    }
+
+    /* Particle Network Canvas */
+    #particle-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Mouse Follow Glow */
+    .mouse-glow {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,169,110,0.08) 0%, rgba(201,169,110,0) 70%);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Floating 3D SVG Wireframe Shapes */
+    .wireframe-shape {
+      position: absolute;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0.6;
+    }
+
+    .shape-torus {
+      width: 280px;
+      height: 280px;
+      bottom: -40px;
+      left: -40px;
+      animation: floatTorus 12s ease-in-out infinite;
+    }
+
+    .shape-sphere {
+      width: 220px;
+      height: 220px;
+      bottom: 20px;
+      right: -20px;
+      animation: floatSphere 10s ease-in-out infinite;
+    }
+
+    .shape-cube {
+      width: 180px;
+      height: 180px;
+      top: 40px;
+      left: 20px;
+      animation: floatCube 14s ease-in-out infinite;
+    }
+
+    .shape-pyramid {
+      width: 160px;
+      height: 160px;
+      top: 60px;
+      right: 40px;
+      animation: floatPyramid 11s ease-in-out infinite;
+    }
+
+    @keyframes floatTorus {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(15deg); }
+    }
+
+    @keyframes floatSphere {
+      0%, 100% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-25px) scale(1.05); }
+    }
+
+    @keyframes floatCube {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-18px) rotate(-12deg); }
+    }
+
+    @keyframes floatPyramid {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-22px) rotate(18deg); }
+    }
+
+    /* Hero Content Box */
+    .hero-content {
       position: relative;
+      z-index: 10;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    .hero-sub {
-      font-size: 0.82rem;
-      font-weight: 800;
-      letter-spacing: 0.3em;
+    /* Tech Badge */
+    .tech-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 8px 20px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      opacity: 0.85;
-      margin-bottom: 12px;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 24px;
     }
 
-    .hero-title {
-      font-size: clamp(2.5rem, 5.5vw, 4.5rem);
-      font-weight: 800;
-      letter-spacing: -0.03em;
+    .sparkle-icon {
+      animation: sparklePulse 2s ease-in-out infinite;
+      display: inline-block;
+    }
+
+    @keyframes sparklePulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.25); opacity: 1; }
+    }
+
+    /* Headline */
+    .hero-headline {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900;
+      letter-spacing: -2px;
       line-height: 1.08;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
+      color: #ffffff;
     }
 
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #c9a96e 0%, #e8d5a3 50%, #c9a96e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+
+    /* Description */
     .hero-desc {
-      font-size: 1.1rem;
-      opacity: 0.85;
-      max-width: 640px;
-      line-height: 1.65;
-      font-weight: 400;
+      font-size: 1.05rem;
+      color: rgba(255, 255, 255, 0.65);
+      line-height: 1.7;
+      max-width: 620px;
+      margin-bottom: 32px;
     }
 
-    /* Section 2: Team Grid Section (All 4 Members side by side) */
-    .team-section {
-      width: 100%;
-      max-width: 1800px;
-      margin: 0 auto;
-      padding: 80px 40px 100px;
+    /* Centered Button Group */
+    .hero-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 32px;
     }
 
-    .section-header {
-      text-align: center;
-      margin-bottom: 56px;
-    }
-
-    .section-badge {
-      font-size: 0.78rem;
-      font-weight: 800;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--color-role);
-      margin-bottom: 8px;
-      display: block;
-    }
-
-    .section-title {
-      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
-      font-weight: 800;
-      color: var(--color-dark-green);
-      letter-spacing: -0.02em;
-    }
-
-    /* 4-Column Responsive Grid */
-    .team-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 28px;
-      width: 100%;
-    }
-
-    @media (max-width: 1100px) {
-      .team-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 32px;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .team-grid {
-        grid-template-columns: 1fr;
-        gap: 28px;
-      }
-    }
-
-    /* 3D Perspective Wrapper */
-    .team-card-wrapper {
-      perspective: 1000px;
-      width: 100%;
-    }
-
-    /* Member Card Design - 3D Tilt Sheen Container */
-    .team-card {
+    .btn-primary {
       background: #ffffff;
+      color: #1a3a2e;
+      padding: 14px 32px;
+      border-radius: 100px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 14px 32px;
+      border-radius: 100px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* Hero Footer Text */
+    .hero-footer-text {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.4);
+      font-weight: 500;
+    }
+
+    /* Scroll Indicator */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      z-index: 10;
+      animation: scrollBounce 2s ease-in-out infinite;
+      cursor: pointer;
+    }
+
+    .scroll-text {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .scroll-line {
+      width: 1.5px;
+      height: 24px;
+      background: linear-gradient(to bottom, rgba(201,169,110,0.8), rgba(255,255,255,0.1));
+      border-radius: 2px;
+    }
+
+    @keyframes scrollBounce {
+      0%, 100% { transform: translate(-50%, 0); }
+      50% { transform: translate(-50%, 8px); }
+    }
+
+    /* =========================================================
+       2. TEAM SECTION (400vh Sticky Scroll-Snap Container)
+       ========================================================= */
+    .team-scroll-container {
+      width: 100%;
+      height: 400vh;
+      position: relative;
+      background-color: var(--color-cream);
+      color: var(--color-dark-green);
+    }
+
+    .team-sticky-viewport {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Member Card Container */
+    .team-card {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.95);
       border-radius: 40px;
-      padding: 36px 28px 32px;
-      box-shadow: 0 12px 40px rgba(26, 58, 46, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.9);
+      padding: 28px 36px 32px;
+      max-width: 440px;
+      width: 90%;
+      max-height: 88vh;
+      box-shadow: 0 8px 40px rgba(26, 58, 46, 0.06);
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
       position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      user-select: none;
-      transform-style: preserve-3d;
-      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease;
-    }
-
-    .team-card-wrapper:hover .team-card {
-      box-shadow: 0 25px 50px rgba(26, 58, 46, 0.18);
-    }
-
-    /* Dynamic Sheen / Light Reflection Overlay */
-    .card-glare {
-      position: absolute;
-      inset: 0;
-      border-radius: 40px;
-      pointer-events: none;
+      overflow-y: auto;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
       opacity: 0;
-      transition: opacity 0.5s ease;
-      z-index: 20;
+      transform: translateY(30px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
     }
 
-    /* 1. Avatar Area */
-    .avatar-area {
+    .team-card.active-slide {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* 1. Top Badge Row */
+    .top-badge-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      width: 100%;
+    }
+
+    .dept-badge {
+      background: rgba(26, 58, 46, 0.06);
+      border: 1px solid rgba(26, 58, 46, 0.08);
+      color: #1a3a2e;
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    .location-badge {
+      font-size: 0.7rem;
+      color: #7a8a7a;
+      font-weight: 500;
+    }
+
+    /* 2. Avatar Ring */
+    .avatar-wrapper {
       position: relative;
       width: 120px;
       height: 120px;
-      margin-bottom: 22px;
+      margin-bottom: 14px;
       flex-shrink: 0;
-      transform: translateZ(35px);
-      transform-style: preserve-3d;
-      transition: transform 0.3s ease;
     }
 
-    .avatar-ring {
+    .avatar-gradient-ring {
       width: 120px;
       height: 120px;
       border-radius: 50%;
@@ -194,7 +396,7 @@
       box-shadow: 0 8px 25px rgba(26, 58, 46, 0.18);
     }
 
-    .avatar-inner {
+    .avatar-inner-box {
       width: 100%;
       height: 100%;
       border-radius: 50%;
@@ -204,31 +406,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
     }
 
-    .avatar-img {
+    .avatar-img-el {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
     }
 
-    .avatar-fallback {
-      display: none;
-      width: 100%;
-      height: 100%;
-      align-items: center;
-      justify-content: center;
-      background-color: #1a3a2e;
-      color: #ffffff;
-      font-size: 2rem;
-      font-weight: 800;
-      letter-spacing: 0.05em;
-    }
-
-    /* Floating Badges around Avatar Ring */
-    .floating-badge {
+    /* 3. Floating Emoji Badges */
+    .float-emoji-badge {
       position: absolute;
       width: 30px;
       height: 30px;
@@ -241,368 +429,867 @@
       align-items: center;
       justify-content: center;
       z-index: 10;
-      user-select: none;
-      transform: translateZ(45px);
-      animation: floatBadge 3s ease-in-out infinite;
+      animation: floatBadgeAnim 3s ease-in-out infinite;
     }
 
-    .pos-top-right { top: -2px; right: -2px; animation-delay: 0s; }
-    .pos-mid-right { top: 40px; right: -10px; animation-delay: 0.8s; }
-    .pos-bottom-left { bottom: -2px; left: -2px; animation-delay: 1.6s; }
+    .badge-pos-1 { top: -2px; right: -2px; animation-delay: 0s; }
+    .badge-pos-2 { top: 40px; right: -10px; animation-delay: 0.8s; }
+    .badge-pos-3 { bottom: -2px; left: -2px; animation-delay: 1.6s; }
 
-    @keyframes floatBadge {
-      0%, 100% { transform: translateY(0px) translateZ(45px); }
-      50% { transform: translateY(-5px) translateZ(45px); }
+    @keyframes floatBadgeAnim {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
     }
 
-    /* 2. Name + Emoji */
-    .member-name {
+    /* 4. Name */
+    .member-name-title {
       font-size: 1.6rem;
       font-weight: 800;
       color: #1a3a2e;
-      text-align: center;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      margin-bottom: 6px;
-      letter-spacing: -0.02em;
-      transform: translateZ(25px);
-      transition: transform 0.3s ease;
+      margin-bottom: 4px;
     }
 
-    .name-emoji {
-      font-size: 1.25rem;
-    }
-
-    /* 3. Role */
-    .member-role {
+    /* 5. Role */
+    .member-role-title {
       font-size: 0.85rem;
       font-weight: 600;
       color: #4a7a5a;
-      text-align: center;
-      line-height: 1.45;
-      margin-bottom: 16px;
-      min-height: 40px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    /* 6. Description */
+    .member-desc-text {
+      font-size: 0.8rem;
+      color: #6a6a6a;
+      line-height: 1.7;
+      text-align: left;
+      margin-bottom: 14px;
+    }
+
+    /* 7. Achievements Box */
+    .achievements-box {
+      background: rgba(26, 58, 46, 0.03);
+      border-radius: 14px;
+      padding: 12px 16px;
+      width: 100%;
+      text-align: left;
+      margin-bottom: 14px;
+    }
+
+    .achievement-item {
+      font-size: 0.75rem;
+      color: #5a6a5a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .achievement-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .check-mark {
+      color: #4a7a5a;
+      font-weight: 800;
+    }
+
+    /* 8. Stats Row */
+    .stats-three-col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      width: 100%;
+      padding: 12px 0;
+      border-top: 1px solid rgba(0, 0, 0, 0.04);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+      margin-bottom: 14px;
+    }
+
+    .stat-col-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-number {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #1a3a2e;
+    }
+
+    .stat-label {
+      font-size: 0.58rem;
+      font-weight: 700;
+      color: #9aaa9a;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-top: 2px;
+    }
+
+    /* 9. Social Links */
+    .social-links-row {
       display: flex;
       align-items: center;
       justify-content: center;
-      transform: translateZ(18px);
-      transition: transform 0.3s ease;
+      gap: 8px;
+      margin-bottom: 14px;
     }
 
-    /* 4. Description Paragraph */
-    .member-desc {
-      font-size: 0.82rem;
-      font-weight: 400;
-      color: #7a7a7a;
-      line-height: 1.65;
-      text-align: center;
-      margin-bottom: 22px;
-      flex-grow: 1;
-      transform: translateZ(12px);
-      transition: transform 0.3s ease;
+    .social-circle-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(245, 245, 245, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      cursor: pointer;
     }
 
-    /* 5. Skill Tag Pills */
-    .skills-row {
+    .social-circle-btn:hover {
+      background: #1a3a2e;
+      transform: scale(1.1);
+      box-shadow: 0 6px 16px rgba(26, 58, 46, 0.2);
+    }
+
+    /* 10. Skills Pill Tags */
+    .skills-flex-wrap {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 8px;
-      width: 100%;
-      margin-top: auto;
-      transform: translateZ(20px);
-      transition: transform 0.3s ease;
+      gap: 6px;
+      margin-bottom: 16px;
     }
 
-    .skill-tag {
-      background: #ece9e4;
-      color: #2a4a3e;
-      padding: 7px 15px;
+    .skill-pill-tag {
+      background: rgba(245, 245, 245, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      color: #3a5a4a;
+      padding: 7px 16px;
       border-radius: 100px;
-      font-size: 0.74rem;
+      font-size: 0.75rem;
       font-weight: 600;
       transition: all 0.25s ease;
       cursor: default;
     }
 
-    .skill-tag:hover {
-      background-color: #1a3a2e;
+    .skill-pill-tag:hover {
+      background: #1a3a2e;
       color: #ffffff;
-      transform: translateY(-2px);
     }
 
-    /* Section 3: Footer CTA Section */
-    .cta-section {
+    /* 11. Contact Button */
+    .btn-contact-member {
+      background: #1a3a2e;
+      color: #ffffff;
+      padding: 11px 26px;
+      border-radius: 100px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-contact-member:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(26, 58, 46, 0.25);
+    }
+
+    /* Fixed Navigation Controls */
+    .team-nav-dots {
+      position: fixed;
+      right: 32px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 100;
+    }
+
+    .nav-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(26, 58, 46, 0.3);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+    }
+
+    .nav-dot.active {
+      background: #1a3a2e;
+      transform: scale(1.4);
+      box-shadow: 0 0 0 3px rgba(26, 58, 46, 0.2);
+    }
+
+    .slide-counter-pill {
+      position: fixed;
+      left: 32px;
+      bottom: 32px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #1a3a2e;
+      font-mono: monospace;
+      z-index: 100;
+    }
+
+    /* =========================================================
+       3. NEXT SECTION (100vh)
+       ========================================================= */
+    .next-section {
       width: 100%;
-      background: linear-gradient(135deg, #1a3a2e 0%, #2d5a45 100%);
-      color: var(--color-white);
+      height: 100vh;
+      background: linear-gradient(135deg, #0f2a1e 0%, #1a3a2e 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 90px 20px;
+      padding: 0 20px;
+      position: relative;
     }
 
-    .cta-title {
-      font-size: clamp(2rem, 4.5vw, 3.5rem);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      margin-bottom: 16px;
+    .next-glow-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(201,169,110,0.05) 0%, rgba(0,0,0,0) 70%);
+      pointer-events: none;
     }
 
-    .cta-desc {
+    .next-headline {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 900;
+      color: #ffffff;
+      margin-bottom: 12px;
+      letter-spacing: -1px;
+    }
+
+    .next-subtitle {
       font-size: 1.1rem;
-      opacity: 0.85;
-      max-width: 540px;
+      color: rgba(255, 255, 255, 0.6);
       margin-bottom: 32px;
-      line-height: 1.6;
     }
 
-    .cta-btn-main {
-      padding: 16px 40px;
-      border-radius: 100px;
-      background-color: var(--color-white);
-      color: #1a3a2e;
-      font-size: 0.95rem;
-      font-weight: 800;
-      text-decoration: none;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s ease;
-    }
-
-    .cta-btn-main:hover {
-      transform: translateY(-4px) scale(1.04);
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    /* Responsive Queries */
+    @media (max-width: 500px) {
+      .team-card {
+        padding: 20px 24px;
+        max-height: 92vh;
+      }
+      .team-nav-dots {
+        right: 12px;
+      }
+      .slide-counter-pill {
+        left: 16px;
+        bottom: 16px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Section 1: Hero Section -->
-  <header class="hero-section" id="hero">
-    <div class="hero-sub">MULTIDISCIPLINARY ENGINEERING LAB</div>
-    <h1 class="hero-title">CRETO4</h1>
-    <p class="hero-desc">Meet the engineers, designers, and visionaries building physical products, embedded hardware, and high-performance digital experiences.</p>
-  </header>
+  <!-- =========================================================
+       1. HERO SECTION (100vh)
+       ========================================================= -->
+  <section class="hero-section" id="hero">
+    <canvas id="particle-canvas"></canvas>
+    <div class="mouse-glow" id="mouse-glow"></div>
 
-  <!-- Section 2: Team Members Section (All in one view) -->
-  <main class="team-section" id="team">
-    <div class="section-header">
-      <span class="section-badge">THE PEOPLE BEHIND THE WORK</span>
-      <h2 class="section-title">MEET THE TEAM</h2>
+    <!-- 3D Floating SVG Wireframe Shapes -->
+    <!-- 1. Torus (280px) Bottom-Left -->
+    <svg class="wireframe-shape shape-torus" viewBox="0 0 200 200" fill="none">
+      <ellipse cx="100" cy="100" rx="80" ry="40" stroke="url(#gold-grad-1)" stroke-width="1.5" />
+      <ellipse cx="100" cy="100" rx="40" ry="80" stroke="url(#gold-grad-1)" stroke-width="1.5" />
+      <circle cx="100" cy="100" r="70" stroke="url(#gold-grad-1)" stroke-width="1" stroke-dasharray="4 4" />
+      <defs>
+        <linearGradient id="gold-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#c9a96e" stop-opacity="0.8"/>
+          <stop offset="100%" stop-color="#e8d5a3" stop-opacity="0.2"/>
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <!-- 2. Sphere (220px) Bottom-Right -->
+    <svg class="wireframe-shape shape-sphere" viewBox="0 0 200 200" fill="none">
+      <circle cx="100" cy="100" r="75" stroke="url(#gold-grad-2)" stroke-width="1.5" />
+      <ellipse cx="100" cy="100" rx="75" ry="30" stroke="url(#gold-grad-2)" stroke-width="1.2" />
+      <ellipse cx="100" cy="100" rx="30" ry="75" stroke="url(#gold-grad-2)" stroke-width="1.2" />
+      <defs>
+        <linearGradient id="gold-grad-2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#e8d5a3" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#c9a96e" stop-opacity="0.3"/>
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <!-- 3. Cube (180px) Top-Left -->
+    <svg class="wireframe-shape shape-cube" viewBox="0 0 200 200" fill="none">
+      <path d="M100 30 L160 65 L160 135 L100 170 L40 135 L40 65 Z" stroke="url(#gold-grad-3)" stroke-width="1.5" />
+      <path d="M100 30 L100 170 M160 65 L100 100 L40 65 M160 135 L100 100 L40 135" stroke="url(#gold-grad-3)" stroke-width="1.2" />
+      <defs>
+        <linearGradient id="gold-grad-3" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#c9a96e" stop-opacity="0.7"/>
+          <stop offset="100%" stop-color="#ffffff" stop-opacity="0.2"/>
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <!-- 4. Pyramid (160px) Top-Right -->
+    <svg class="wireframe-shape shape-pyramid" viewBox="0 0 200 200" fill="none">
+      <path d="M100 25 L165 155 L35 155 Z" stroke="url(#gold-grad-4)" stroke-width="1.5" />
+      <path d="M100 25 L100 155 M100 25 L120 155" stroke="url(#gold-grad-4)" stroke-width="1.2" stroke-dasharray="3 3" />
+      <defs>
+        <linearGradient id="gold-grad-4" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#c9a96e" stop-opacity="0.8"/>
+          <stop offset="100%" stop-color="#e8d5a3" stop-opacity="0.3"/>
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <!-- Hero Central Content -->
+    <div class="hero-content">
+      <div class="tech-badge">
+        <span class="sparkle-icon">✨</span>
+        <span>WEBGL · THREE.JS · NEXT-GEN WEB</span>
+      </div>
+
+      <h1 class="hero-headline">
+        LOVE THIS DIGITAL EXPERIENCE? <br />
+        <span class="gold-gradient-text">WE CRAFT NEXT-GEN SITES JUST LIKE IT</span>
+      </h1>
+
+      <p class="hero-desc">
+        From interactive 3D product showcases and WebGL graphics to high-converting web applications — Creato4 engineers digital platforms built to captivate and scale.
+      </p>
+
+      <div class="hero-btn-group">
+        <a href="#team-scroll" class="btn-primary">Launch Your Project →</a>
+        <a href="#team-scroll" class="btn-secondary">💻 Explore Web Services</a>
+      </div>
+
+      <p class="hero-footer-text">
+        Zero template bloat · 100% custom 3D WebGL &amp; high-speed React performance.
+      </p>
     </div>
 
-    <!-- 4-Card Responsive Grid -->
-    <div class="team-grid">
+    <!-- Scroll Bounce Indicator -->
+    <div class="scroll-indicator" onclick="document.getElementById('team-scroll').scrollIntoView({behavior: 'smooth'})">
+      <span class="scroll-text">SCROLL</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+
+  <!-- =========================================================
+       2. TEAM SECTION (400vh Sticky Scroll-Snap Container)
+       ========================================================= -->
+  <div class="team-scroll-container" id="team-scroll">
+    
+    <!-- Fixed Navigation Dots & Counter -->
+    <div class="team-nav-dots" id="nav-dots">
+      <button class="nav-dot active" onclick="scrollToSlide(0)" aria-label="Slide 1"></button>
+      <button class="nav-dot" onclick="scrollToSlide(1)" aria-label="Slide 2"></button>
+      <button class="nav-dot" onclick="scrollToSlide(2)" aria-label="Slide 3"></button>
+      <button class="nav-dot" onclick="scrollToSlide(3)" aria-label="Slide 4"></button>
+    </div>
+
+    <div class="slide-counter-pill" id="slide-counter">
+      01 / 04
+    </div>
+
+    <!-- Sticky 100vh Viewport -->
+    <div class="team-sticky-viewport">
       
-      <!-- Card 1: Prince Tagadiya -->
-      <div class="team-card-wrapper">
-        <article class="team-card">
-          <div class="card-glare"></div>
-          <div class="avatar-area">
-            <div class="avatar-ring">
-              <div class="avatar-inner">
-                <img src="prince_memoji.png" 
-                     onerror="handleAvatarError(this, 'https://api.dicebear.com/9.x/avataaars/png?seed=PrinceCEO&backgroundColor=e8f0e8&radius=50&size=256&top=shortHairShortFlat&facialHair=beardMedium&clothing=blazerAndShirt')" 
-                     alt="Prince Tagadiya" 
-                     class="avatar-img">
-                <div class="avatar-fallback">PT</div>
-              </div>
+      <!-- Slide 1: Prince Tagadiya -->
+      <article class="team-card active-slide" id="card-0">
+        <div class="top-badge-row">
+          <span class="dept-badge">PRODUCT &amp; TECHNOLOGY STRATEGY</span>
+          <span class="location-badge">📍 CRETO4 Design Studio · Gujarat</span>
+        </div>
+
+        <div class="avatar-wrapper">
+          <div class="avatar-gradient-ring">
+            <div class="avatar-inner-box">
+              <img src="https://api.dicebear.com/9.x/avataaars/png?seed=PrinceCEO&backgroundColor=e8f0e8&radius=50&size=256&top=shortHairShortFlat&facialHair=beardMedium&clothing=blazerAndShirt" alt="Prince Tagadiya" class="avatar-img-el">
             </div>
-            <div class="floating-badge pos-top-right">🚀</div>
-            <div class="floating-badge pos-mid-right">💡</div>
-            <div class="floating-badge pos-bottom-left">⚡</div>
           </div>
+          <div class="float-emoji-badge badge-pos-1">🚀</div>
+          <div class="float-emoji-badge badge-pos-2">💡</div>
+          <div class="float-emoji-badge badge-pos-3">▶️</div>
+        </div>
 
-          <h3 class="member-name">
-            <span>Prince Tagadiya</span>
-            <span class="name-emoji">👑</span>
-          </h3>
+        <h2 class="member-name-title">
+          <span>Prince Tagadiya</span>
+          <span>👑</span>
+        </h2>
 
-          <div class="member-role">Founder, CEO &amp; CPTO</div>
+        <div class="member-role-title">Founder, CEO &amp; CPTO</div>
 
-          <p class="member-desc">
-            Visionary engineering lead steering multidisciplinary hardware and software products from concept to market. Drives innovation across all technical verticals with a hands-on approach to systems architecture and product strategy.
-          </p>
+        <p class="member-desc-text">
+          Visionary engineering lead steering multidisciplinary hardware and software products from concept to market. Drives innovation across all technical verticals with a hands-on approach to systems architecture and product strategy.
+        </p>
 
-          <div class="skills-row">
-            <span class="skill-tag">Product Strategy</span>
-            <span class="skill-tag">Systems Architecture</span>
-            <span class="skill-tag">Hardware R&amp;D</span>
+        <div class="achievements-box">
+          <div class="achievement-item"><span class="check-mark">✓</span> SSIP Government Innovation Grant Recipient</div>
+          <div class="achievement-item"><span class="check-mark">✓</span> Architected Smart Privacy Diagnostic Kiosk</div>
+        </div>
+
+        <div class="stats-three-col">
+          <div class="stat-col-item">
+            <span class="stat-number">8+ Yrs</span>
+            <span class="stat-label">EXP</span>
           </div>
-        </article>
-      </div>
+          <div class="stat-col-item">
+            <span class="stat-number">50+</span>
+            <span class="stat-label">PROJECTS</span>
+          </div>
+          <div class="stat-col-item">
+            <span class="stat-number">12</span>
+            <span class="stat-label">PATENTS</span>
+          </div>
+        </div>
 
-      <!-- Card 2: Nisarg Patel -->
-      <div class="team-card-wrapper">
-        <article class="team-card">
-          <div class="card-glare"></div>
-          <div class="avatar-area">
-            <div class="avatar-ring">
-              <div class="avatar-inner">
-                <img src="nisarg_memoji.png" 
-                     onerror="handleAvatarError(this, 'https://api.dicebear.com/9.x/avataaars/png?seed=NisargEngineer&backgroundColor=d1e8d1&radius=50&size=256&top=shortHairTheCaesar&facialHair=beardLight&clothing=hoodie')" 
-                     alt="Nisarg Patel" 
-                     class="avatar-img">
-                <div class="avatar-fallback">NP</div>
-              </div>
+        <div class="social-links-row">
+          <a href="#" class="social-circle-btn" title="LinkedIn">💼</a>
+          <a href="#" class="social-circle-btn" title="Twitter">🐦</a>
+          <a href="#" class="social-circle-btn" title="GitHub">💻</a>
+          <a href="#" class="social-circle-btn" title="Email">✉️</a>
+        </div>
+
+        <div class="skills-flex-wrap">
+          <span class="skill-pill-tag">Product Strategy</span>
+          <span class="skill-pill-tag">Systems Architecture</span>
+          <span class="skill-pill-tag">Hardware R&amp;D</span>
+          <span class="skill-pill-tag">Team Leadership</span>
+        </div>
+
+        <a href="mailto:prince@creto4.com" class="btn-contact-member">Get in Touch 📧</a>
+      </article>
+
+      <!-- Slide 2: Nisarg Patel -->
+      <article class="team-card" id="card-1" style="display: none;">
+        <div class="top-badge-row">
+          <span class="dept-badge">ELECTRONICS &amp; MANUFACTURING</span>
+          <span class="location-badge">📍 CRETO4 Design Studio · Gujarat</span>
+        </div>
+
+        <div class="avatar-wrapper">
+          <div class="avatar-gradient-ring">
+            <div class="avatar-inner-box">
+              <img src="https://api.dicebear.com/9.x/avataaars/png?seed=NisargEngineer&backgroundColor=d1e8d1&radius=50&size=256&top=shortHairTheCaesar&facialHair=beardLight&clothing=hoodie" alt="Nisarg Patel" class="avatar-img-el">
             </div>
-            <div class="floating-badge pos-top-right">🔧</div>
-            <div class="floating-badge pos-mid-right">⚡</div>
-            <div class="floating-badge pos-bottom-left">📟</div>
           </div>
+          <div class="float-emoji-badge badge-pos-1">🔧</div>
+          <div class="float-emoji-badge badge-pos-2">⚡</div>
+          <div class="float-emoji-badge badge-pos-3">▶️</div>
+        </div>
 
-          <h3 class="member-name">
-            <span>Nisarg Patel</span>
-            <span class="name-emoji">🔧</span>
-          </h3>
+        <h2 class="member-name-title">
+          <span>Nisarg Patel</span>
+          <span>🔧</span>
+        </h2>
 
-          <div class="member-role">Head of Electronics, Embedded Systems &amp; Manufacturing</div>
+        <div class="member-role-title">Head of Electronics, Embedded Systems &amp; Manufacturing</div>
 
-          <p class="member-desc">
-            Expert in high-reliability circuit design, power management, micro-controller firmware, and PCB manufacturing processes. Leads the electronics division with precision engineering and DFM excellence.
-          </p>
+        <p class="member-desc-text">
+          Expert in high-reliability circuit design, power management, micro-controller firmware, and PCB manufacturing processes. Leads the electronics division with precision engineering and DFM excellence.
+        </p>
 
-          <div class="skills-row">
-            <span class="skill-tag">Hardware Engineering</span>
-            <span class="skill-tag">Embedded C++</span>
-            <span class="skill-tag">DFM Excellence</span>
+        <div class="achievements-box">
+          <div class="achievement-item"><span class="check-mark">✓</span> Designed Agri-Titan X6 High-Current PDB</div>
+          <div class="achievement-item"><span class="check-mark">✓</span> Sub-100mW Ultra Low-Power Wearable Firmware</div>
+        </div>
+
+        <div class="stats-three-col">
+          <div class="stat-col-item">
+            <span class="stat-number">6+ Yrs</span>
+            <span class="stat-label">EXP</span>
           </div>
-        </article>
-      </div>
+          <div class="stat-col-item">
+            <span class="stat-number">35+</span>
+            <span class="stat-label">PCBS</span>
+          </div>
+          <div class="stat-col-item">
+            <span class="stat-number">8</span>
+            <span class="stat-label">PRODUCTS</span>
+          </div>
+        </div>
 
-      <!-- Card 3: Khushi Belani -->
-      <div class="team-card-wrapper">
-        <article class="team-card">
-          <div class="card-glare"></div>
-          <div class="avatar-area">
-            <div class="avatar-ring">
-              <div class="avatar-inner">
-                <img src="khushi_memoji.png" 
-                     onerror="handleAvatarError(this, 'https://api.dicebear.com/9.x/avataaars/png?seed=KhushiDesigner&backgroundColor=ffe8d1&radius=50&size=256&top=longHairStraight&accessories=glasses&clothing=shirtVNeck')" 
-                     alt="Khushi Belani" 
-                     class="avatar-img">
-                <div class="avatar-fallback">KB</div>
-              </div>
+        <div class="social-links-row">
+          <a href="#" class="social-circle-btn" title="LinkedIn">💼</a>
+          <a href="#" class="social-circle-btn" title="Twitter">🐦</a>
+          <a href="#" class="social-circle-btn" title="Hardware">🔧</a>
+          <a href="#" class="social-circle-btn" title="Email">✉️</a>
+        </div>
+
+        <div class="skills-flex-wrap">
+          <span class="skill-pill-tag">Hardware Engineering</span>
+          <span class="skill-pill-tag">Embedded C++</span>
+          <span class="skill-pill-tag">DFM</span>
+          <span class="skill-pill-tag">Power Systems</span>
+        </div>
+
+        <a href="mailto:nisarg@creto4.com" class="btn-contact-member">Get in Touch 📧</a>
+      </article>
+
+      <!-- Slide 3: Khushi Belani -->
+      <article class="team-card" id="card-2" style="display: none;">
+        <div class="top-badge-row">
+          <span class="dept-badge">PCB DESIGN &amp; BRAND COMMUNICATIONS</span>
+          <span class="location-badge">📍 CRETO4 Design Studio · Gujarat</span>
+        </div>
+
+        <div class="avatar-wrapper">
+          <div class="avatar-gradient-ring">
+            <div class="avatar-inner-box">
+              <img src="https://api.dicebear.com/9.x/avataaars/png?seed=KhushiDesigner&backgroundColor=ffe8d1&radius=50&size=256&top=longHairStraight&accessories=glasses&clothing=shirtVNeck" alt="Khushi Belani" class="avatar-img-el">
             </div>
-            <div class="floating-badge pos-top-right">📐</div>
-            <div class="floating-badge pos-mid-right">🎨</div>
-            <div class="floating-badge pos-bottom-left">✨</div>
           </div>
+          <div class="float-emoji-badge badge-pos-1">📐</div>
+          <div class="float-emoji-badge badge-pos-2">🎨</div>
+          <div class="float-emoji-badge badge-pos-3">✨</div>
+        </div>
 
-          <h3 class="member-name">
-            <span>Khushi Belani</span>
-            <span class="name-emoji">🎨</span>
-          </h3>
+        <h2 class="member-name-title">
+          <span>Khushi Belani</span>
+          <span>🎨</span>
+        </h2>
 
-          <div class="member-role">Head of PCB Design, Education &amp; Brand Communications</div>
+        <div class="member-role-title">Head of PCB Design, Education &amp; Brand Communications</div>
 
-          <p class="member-desc">
-            Directs multi-layer PCB layout, component selection, and signal integrity analysis. Oversees educational project publishing and brand outreach initiatives with creative vision and technical depth.
-          </p>
+        <p class="member-desc-text">
+          Directs multi-layer PCB layout, component selection, and signal integrity analysis. Oversees educational project publishing and brand outreach initiatives with creative vision and technical depth.
+        </p>
 
-          <div class="skills-row">
-            <span class="skill-tag">PCB Design</span>
-            <span class="skill-tag">Signal Integrity</span>
-            <span class="skill-tag">Quality Assurance</span>
+        <div class="achievements-box">
+          <div class="achievement-item"><span class="check-mark">✓</span> Featured Researcher in Electronics For You Magazine</div>
+          <div class="achievement-item"><span class="check-mark">✓</span> Multi-Layer High-Density HDI Layout Design</div>
+        </div>
+
+        <div class="stats-three-col">
+          <div class="stat-col-item">
+            <span class="stat-number">5+ Yrs</span>
+            <span class="stat-label">EXP</span>
           </div>
-        </article>
-      </div>
+          <div class="stat-col-item">
+            <span class="stat-number">40+</span>
+            <span class="stat-label">PCB DESIGNS</span>
+          </div>
+          <div class="stat-col-item">
+            <span class="stat-number">15</span>
+            <span class="stat-label">WORKSHOPS</span>
+          </div>
+        </div>
 
-      <!-- Card 4: Rudra Chauhan -->
-      <div class="team-card-wrapper">
-        <article class="team-card">
-          <div class="card-glare"></div>
-          <div class="avatar-area">
-            <div class="avatar-ring">
-              <div class="avatar-inner">
-                <img src="rudra_memoji.png" 
-                     onerror="handleAvatarError(this, 'https://api.dicebear.com/9.x/avataaars/png?seed=RudraDeveloper&backgroundColor=d1d8e8&radius=50&size=256&top=shortHairShortWaved&facialHair=beardLight&clothing=graphicShirt')" 
-                     alt="Rudra Chauhan" 
-                     class="avatar-img">
-                <div class="avatar-fallback">RC</div>
-              </div>
+        <div class="social-links-row">
+          <a href="#" class="social-circle-btn" title="LinkedIn">💼</a>
+          <a href="#" class="social-circle-btn" title="Twitter">🐦</a>
+          <a href="#" class="social-circle-btn" title="Design">🎨</a>
+          <a href="#" class="social-circle-btn" title="Email">✉️</a>
+        </div>
+
+        <div class="skills-flex-wrap">
+          <span class="skill-pill-tag">PCB Design</span>
+          <span class="skill-pill-tag">Signal Integrity</span>
+          <span class="skill-pill-tag">Quality Assurance</span>
+          <span class="skill-pill-tag">Technical Brand</span>
+        </div>
+
+        <a href="mailto:khushi@creto4.com" class="btn-contact-member">Get in Touch 📧</a>
+      </article>
+
+      <!-- Slide 4: Rudra Chauhan -->
+      <article class="team-card" id="card-3" style="display: none;">
+        <div class="top-badge-row">
+          <span class="dept-badge">SOFTWARE ENGINEERING &amp; DIGITAL DESIGN</span>
+          <span class="location-badge">📍 CRETO4 Design Studio · Gujarat</span>
+        </div>
+
+        <div class="avatar-wrapper">
+          <div class="avatar-gradient-ring">
+            <div class="avatar-inner-box">
+              <img src="https://api.dicebear.com/9.x/avataaars/png?seed=RudraDeveloper&backgroundColor=d1d8e8&radius=50&size=256&top=shortHairShortWaved&facialHair=beardLight&clothing=graphicShirt" alt="Rudra Chauhan" class="avatar-img-el">
             </div>
-            <div class="floating-badge pos-top-right">💻</div>
-            <div class="floating-badge pos-mid-right">🌐</div>
-            <div class="floating-badge pos-bottom-left">🎮</div>
           </div>
+          <div class="float-emoji-badge badge-pos-1">💻</div>
+          <div class="float-emoji-badge badge-pos-2">🌐</div>
+          <div class="float-emoji-badge badge-pos-3">🎮</div>
+        </div>
 
-          <h3 class="member-name">
-            <span>Rudra Chauhan</span>
-            <span class="name-emoji">💻</span>
-          </h3>
+        <h2 class="member-name-title">
+          <span>Rudra Chauhan</span>
+          <span>💻</span>
+        </h2>
 
-          <div class="member-role">Head of Software Engineering &amp; Digital Design</div>
+        <div class="member-role-title">Head of Software Engineering &amp; Digital Design</div>
 
-          <p class="member-desc">
-            Architects modern cloud applications, real-time IoT web portals, and interactive 3D WebGL experiences. Bridges the gap between hardware and software with cutting-edge digital solutions.
-          </p>
+        <p class="member-desc-text">
+          Architects modern cloud applications, real-time IoT web portals, and interactive 3D WebGL experiences. Bridges the gap between hardware and software with cutting-edge digital solutions.
+        </p>
 
-          <div class="skills-row">
-            <span class="skill-tag">Full-Stack Web</span>
-            <span class="skill-tag">Cloud Infrastructure</span>
-            <span class="skill-tag">3D WebGL</span>
+        <div class="achievements-box">
+          <div class="achievement-item"><span class="check-mark">✓</span> Built Real-Time Hardware WebSockets &amp; Telemetry</div>
+          <div class="achievement-item"><span class="check-mark">✓</span> Engineered Interactive 3D WebGL Graphics Engine</div>
+        </div>
+
+        <div class="stats-three-col">
+          <div class="stat-col-item">
+            <span class="stat-number">7+ Yrs</span>
+            <span class="stat-label">EXP</span>
           </div>
-        </article>
-      </div>
+          <div class="stat-col-item">
+            <span class="stat-number">60+</span>
+            <span class="stat-label">PROJECTS</span>
+          </div>
+          <div class="stat-col-item">
+            <span class="stat-number">20</span>
+            <span class="stat-label">WEB APPS</span>
+          </div>
+        </div>
+
+        <div class="social-links-row">
+          <a href="#" class="social-circle-btn" title="LinkedIn">💼</a>
+          <a href="#" class="social-circle-btn" title="Twitter">🐦</a>
+          <a href="#" class="social-circle-btn" title="GitHub">💻</a>
+          <a href="#" class="social-circle-btn" title="Email">✉️</a>
+        </div>
+
+        <div class="skills-flex-wrap">
+          <span class="skill-pill-tag">Full-Stack Web</span>
+          <span class="skill-pill-tag">Cloud Infrastructure</span>
+          <span class="skill-pill-tag">3D WebGL</span>
+          <span class="skill-pill-tag">IoT Systems</span>
+        </div>
+
+        <a href="mailto:rudra@creto4.com" class="btn-contact-member">Get in Touch 📧</a>
+      </article>
 
     </div>
-  </main>
+  </div>
 
-  <!-- Section 3: Footer CTA -->
-  <footer class="cta-section" id="cta-section">
-    <h2 class="cta-title">Let's Work Together</h2>
-    <p class="cta-desc">Have an innovative hardware or software project in mind? Connect with our team to bring your vision to life.</p>
-    <a href="mailto:hello@creto4.com" class="cta-btn-main">Start a Conversation 🚀</a>
-  </footer>
 
+  <!-- =========================================================
+       3. NEXT SECTION (100vh)
+       ========================================================= -->
+  <section class="next-section" id="next">
+    <div class="next-glow-bg"></div>
+    <h2 class="next-headline">Let's Work Together</h2>
+    <p class="next-subtitle">Ready to bring your ideas to life?</p>
+    <a href="mailto:hello@creto4.com" class="btn-primary" style="padding: 16px 44px; font-size: 1rem;">Start a Project 🚀</a>
+  </section>
+
+
+  <!-- =========================================================
+       VANILLA JAVASCRIPT ENGINES
+       ========================================================= -->
   <script>
-    function handleAvatarError(imgElem, dicebearUrl) {
-      if (!imgElem.getAttribute('data-tried-dicebear')) {
-        imgElem.setAttribute('data-tried-dicebear', 'true');
-        imgElem.src = dicebearUrl;
-      } else {
-        imgElem.style.display = 'none';
-        const fallback = imgElem.nextElementSibling;
-        if (fallback) fallback.style.display = 'flex';
+    /* -------------------------------------------------------------
+       1. Particle Network Canvas Engine (80 Gold Particles)
+       ------------------------------------------------------------- */
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const particles = [];
+    const particleCount = 80;
+    const maxDistance = 120;
+    const mouse = { x: null, y: null, radius: 150 };
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+
+      // Mouse glow offset
+      const glow = document.getElementById('mouse-glow');
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
+    });
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.radius = Math.random() * 2 + 1; // 1-3px
+        this.vx = (Math.random() - 0.5) * 0.8;
+        this.vy = (Math.random() - 0.5) * 0.8;
+        this.opacity = Math.random() * 0.5 + 0.2; // 0.2-0.7
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < 0 || this.x > width) this.vx *= -1;
+        if (this.y < 0 || this.y > height) this.vy *= -1;
+
+        // Mouse repulsion
+        if (mouse.x !== null && mouse.y !== null) {
+          const dx = mouse.x - this.x;
+          const dy = mouse.y - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < mouse.radius) {
+            const force = (mouse.radius - dist) / mouse.radius;
+            this.x -= (dx / dist) * force * 3;
+            this.y -= (dy / dist) * force * 3;
+          }
+        }
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(201, 169, 110, ${this.opacity})`;
+        ctx.fill();
       }
     }
 
-    // 3D Perspective Cursor Tilt & Reflection Sheen Engine
-    document.querySelectorAll('.team-card-wrapper').forEach(wrapper => {
-      const card = wrapper.querySelector('.team-card');
-      const glare = wrapper.querySelector('.card-glare');
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
 
-      wrapper.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+    function animateParticles() {
+      ctx.clearRect(0, 0, width, height);
 
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
 
-        const rotateY = ((x - centerX) / centerX) * 12;
-        const rotateX = -((y - centerY) / centerY) * 12;
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
 
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`;
+          if (dist < maxDistance) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            const lineOpacity = (1 - dist / maxDistance) * 0.25;
+            ctx.strokeStyle = `rgba(201, 169, 110, ${lineOpacity})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
 
-        const glowX = (x / rect.width) * 100;
-        const glowY = (y / rect.height) * 100;
-        glare.style.opacity = '1';
-        glare.style.background = `radial-gradient(circle at ${glowX}% ${glowY}%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 65%)`;
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    /* -------------------------------------------------------------
+       2. Sticky 400vh Scroll-Snap Engine for Team Section
+       ------------------------------------------------------------- */
+    const container = document.getElementById('team-scroll');
+    const cards = [
+      document.getElementById('card-0'),
+      document.getElementById('card-1'),
+      document.getElementById('card-2'),
+      document.getElementById('card-3'),
+    ];
+    const dots = document.querySelectorAll('.nav-dot');
+    const counter = document.getElementById('slide-counter');
+
+    let currentSlide = 0;
+
+    function updateTeamSlides() {
+      const rect = container.getBoundingClientRect();
+      const totalScrollable = container.offsetHeight - window.innerHeight;
+      if (totalScrollable <= 0) return;
+
+      const scrolled = -rect.top;
+      let progress = Math.max(0, Math.min(1, scrolled / totalScrollable));
+      let slideIndex = Math.floor(progress * 4);
+      if (slideIndex >= 4) slideIndex = 3;
+
+      if (slideIndex !== currentSlide) {
+        currentSlide = slideIndex;
+        showSlide(currentSlide);
+      }
+    }
+
+    function showSlide(index) {
+      cards.forEach((card, idx) => {
+        if (idx === index) {
+          card.style.display = 'flex';
+          setTimeout(() => card.classList.add('active-slide'), 20);
+        } else {
+          card.classList.remove('active-slide');
+          card.style.display = 'none';
+        }
       });
 
-      wrapper.addEventListener('mouseleave', () => {
-        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-        glare.style.opacity = '0';
+      dots.forEach((dot, idx) => {
+        if (idx === index) dot.classList.add('active');
+        else dot.classList.remove('active');
       });
+
+      counter.textContent = `0${index + 1} / 04`;
+    }
+
+    window.addEventListener('scroll', updateTeamSlides);
+
+    function scrollToSlide(slideIdx) {
+      const totalScrollable = container.offsetHeight - window.innerHeight;
+      const targetScroll = container.offsetTop + (slideIdx / 3) * totalScrollable;
+      window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+    }
+
+    // Keyboard Arrow Controls
+    window.addEventListener('keydown', (e) => {
+      const rect = container.getBoundingClientRect();
+      if (rect.top <= 100 && rect.bottom >= window.innerHeight - 100) {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+          if (currentSlide < 3) scrollToSlide(currentSlide + 1);
+        } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+          if (currentSlide > 0) scrollToSlide(currentSlide - 1);
+        }
+      }
     });
+
+    // Touch Swipe Control
+    let touchStartY = 0;
+    container.addEventListener('touchstart', (e) => {
+      touchStartY = e.touches[0].clientY;
+    });
+
+    container.addEventListener('touchend', (e) => {
+      const touchEndY = e.changedTouches[0].clientY;
+      const diff = touchStartY - touchEndY;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0 && currentSlide < 3) {
+          scrollToSlide(currentSlide + 1);
+        } else if (diff < 0 && currentSlide > 0) {
+          scrollToSlide(currentSlide - 1);
+        }
+      }
+    });
+
+    showSlide(0);
   </script>
 </body>
 </html>
