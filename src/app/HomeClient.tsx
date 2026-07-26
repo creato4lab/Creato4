@@ -24,19 +24,6 @@ import { ServiceItem } from '@/types';
 export default function HomeClient() {
   const [preloaderDone, setPreloaderDone] = useState(false);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && sessionStorage.getItem('creato4_preloader_seen')) {
-      setPreloaderDone(true);
-    }
-  }, []);
-
-  const handlePreloaderComplete = () => {
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem('creato4_preloader_seen', 'true');
-    }
-    setPreloaderDone(true);
-  };
-
   // Smooth scroll
   useEffect(() => {
     import('lenis')
@@ -135,7 +122,7 @@ export default function HomeClient() {
       <CustomCursor />
       
       {/* 1. Preloader */}
-      {!preloaderDone && <Preloader onComplete={handlePreloaderComplete} />}
+      {!preloaderDone && <Preloader onComplete={() => setPreloaderDone(true)} />}
 
       {/* Main Content (fades in smoothly) */}
       <div className={preloaderDone ? 'opacity-100 transition-opacity duration-500' : 'opacity-0'}>

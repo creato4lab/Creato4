@@ -31,10 +31,10 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
           {/* Column 1: Brand & Bio Card (4 cols) */}
           <div className="lg:col-span-4 bg-[#FAF8F5]/[0.04] p-6 sm:p-7 rounded-2xl border border-[#FAF8F5]/10 flex flex-col justify-between space-y-6">
             <div>
-              <Link href="/" className="inline-flex items-center gap-3 text-2xl font-extrabold tracking-tight text-[#FAF8F5] mb-2 group">
+              <a href="#" className="inline-flex items-center gap-3 text-2xl font-extrabold tracking-tight text-[#FAF8F5] mb-2 group">
                 <Creato4LabLogoMark size={36} />
                 <span className="group-hover:text-[#C4A35A] transition-colors">CREATO4</span>
-              </Link>
+              </a>
               <div className="text-xs uppercase font-mono tracking-[0.2em] text-[#C4A35A] mb-4">
                 Design · Engineer · Build
               </div>
