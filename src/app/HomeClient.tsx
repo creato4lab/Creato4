@@ -26,22 +26,17 @@ export default function HomeClient() {
 
   useEffect(() => {
     try {
-      const navEntry = performance.getEntriesByType?.('navigation')?.[0] as PerformanceNavigationTiming | undefined;
-      const isReload = navEntry?.type === 'reload';
-      
-      if (isReload) {
-        sessionStorage.removeItem('creato4_preloader_seen');
-      } else if (sessionStorage.getItem('creato4_preloader_seen') === 'true') {
+      if (localStorage.getItem('creato4_preloader_seen') === 'true') {
         setPreloaderDone(true);
       }
     } catch {
-      // Fallback if sessionStorage is disabled/blocked
+      // Fallback if localStorage is disabled/blocked
     }
   }, []);
 
   const handlePreloaderComplete = () => {
     try {
-      sessionStorage.setItem('creato4_preloader_seen', 'true');
+      localStorage.setItem('creato4_preloader_seen', 'true');
     } catch {
       // ignore storage errors
     }
