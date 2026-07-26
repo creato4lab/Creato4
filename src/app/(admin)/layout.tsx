@@ -8,12 +8,12 @@ import { signOut } from '@/auth';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
-  if (!session || !session.user) {
+  if (!session || !session.user || !session.user.email) {
     redirect('/login');
   }
 
   const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: { email: session.user.email },
     select: { role: true }
   });
 

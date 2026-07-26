@@ -5,12 +5,12 @@ import { auth } from "@/auth";
 
 async function requireAdmin() {
   const session = await auth();
-  if (!session || !session.user) {
+  if (!session || !session.user || !session.user.email) {
     throw new Error("Unauthorized");
   }
   
   const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: { email: session.user.email },
     select: { role: true }
   });
 
