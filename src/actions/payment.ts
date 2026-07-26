@@ -4,6 +4,8 @@ import Razorpay from "razorpay";
 import crypto from "crypto";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
+import { sendEmail } from "@/lib/mailer";
+import { getOrderConfirmationEmail } from "@/lib/emailTemplates";
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID!,
@@ -111,6 +113,30 @@ export async function verifyPayment(
           : [],
       }
     });
+
+    // Send order confirmation email
+    const product = await prisma.product.findUnique({ where: { id: productId } });
+    if (product && session.user.email) {
+      const name = session.user.name || session.user.email.split("@")[0];
+      const date = new Date().toLocaleDateString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        dateStyle: "long",
+      });
+      await sendEmail({
+        to: session.user.email,
+        subject: `✅ Order Confirmed — ${product.title} | Creato4 Lab`,
+        html: getOrderConfirmationEmail({
+          name,
+          email: session.user.email,
+          orderId: order.id,
+          productName: product.title,
+          licenseType,
+          amount: amountPaid / 100,
+          licenseKey: license.licenseKey,
+          date,
+        }),
+      });
+    }
 
     return { success: true, orderId: order.id, licenseId: license.id };
   } catch (error) {
