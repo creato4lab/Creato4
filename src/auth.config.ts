@@ -17,11 +17,19 @@ export const authConfig = {
       const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
       
       if (isOnDashboard) {
-        if (isLoggedIn) return true;
+        if (isLoggedIn) {
+          if (auth.user?.email === "creato4lab@gmail.com") {
+            return Response.redirect(new URL("/admin", nextUrl));
+          }
+          return true;
+        }
         return false; // Redirect unauthenticated users to login page
       } else if (isLoggedIn) {
-        // If user is already logged in and tries to access login/register, redirect to dashboard
+        // If user is already logged in and tries to access login/register, redirect appropriately
         if (nextUrl.pathname.startsWith("/login") || nextUrl.pathname.startsWith("/register")) {
+          if (auth.user?.email === "creato4lab@gmail.com") {
+            return Response.redirect(new URL("/admin", nextUrl));
+          }
           return Response.redirect(new URL("/dashboard", nextUrl));
         }
       }

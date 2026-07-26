@@ -27,12 +27,14 @@ export function GlobalUIWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   
   // If we are on the homepage, the homepage manages its own UI rendering for Navbar/Footer to preserve animations.
-  // We only inject Navbar/Footer globally for non-homepage routes.
+  // We also don't show the global UI (Navbar/Footer) on the /admin pages.
   const isHomePage = pathname === '/';
+  const isAdminPage = pathname?.startsWith('/admin');
+  const showGlobalUI = !isHomePage && !isAdminPage;
 
   return (
     <>
-      {!isHomePage && (
+      {showGlobalUI && (
         <Navbar
           onOpenDiscuss={() => handleOpenDiscuss('General Consultation')}
           onOpenSearch={() => setSearchOpen(true)}
@@ -44,11 +46,11 @@ export function GlobalUIWrapper({ children }: { children: React.ReactNode }) {
 
       {children}
 
-      {!isHomePage && (
+      {showGlobalUI && (
         <Footer onOpenDiscuss={() => handleOpenDiscuss('Footer Inquiry')} />
       )}
 
-      {!isHomePage && (
+      {showGlobalUI && (
         <>
           <DiscussionModal
             isOpen={discussOpen}
