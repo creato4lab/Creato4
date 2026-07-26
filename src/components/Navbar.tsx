@@ -139,7 +139,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
 
             {/* ── BRAND LOGO ─────────────────────────────── */}
-            <a href="#" className="flex items-center gap-2.5 group shrink-0">
+            <Link href="/" className="flex items-center gap-2.5 group shrink-0">
               <motion.div style={{ width: logoSize, height: logoSize }}>
                 <MotionLogoMark size={logoSize} />
               </motion.div>
@@ -149,7 +149,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 CREATO4
               </motion.span>
-            </a>
+            </Link>
 
             {/* ── DESKTOP NAV LINKS ─────────────────────── */}
             <nav className="hidden lg:flex items-center">
