@@ -28,7 +28,13 @@
 }
 
 @media (pointer: fine) {
-  body, a, button, input, select, textarea, .cursor-pointer {
+  body.hide-default-cursor, 
+  body.hide-default-cursor a, 
+  body.hide-default-cursor button, 
+  body.hide-default-cursor input, 
+  body.hide-default-cursor select, 
+  body.hide-default-cursor textarea, 
+  body.hide-default-cursor .cursor-pointer {
     cursor: none !important;
   }
 }

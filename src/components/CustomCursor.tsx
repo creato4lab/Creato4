@@ -15,6 +15,8 @@ export const CustomCursor: React.FC = () => {
   const smoothY = useSpring(mouseY, springConfig);
 
   useEffect(() => {
+    document.body.classList.add('hide-default-cursor');
+
     const updateMousePosition = (e: MouseEvent) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
@@ -42,6 +44,7 @@ export const CustomCursor: React.FC = () => {
     window.addEventListener('mouseover', handleMouseOver);
 
     return () => {
+      document.body.classList.remove('hide-default-cursor');
       window.removeEventListener('mousemove', updateMousePosition);
       window.removeEventListener('mouseover', handleMouseOver);
     };
