@@ -5,11 +5,7 @@ import { ArrowRight, BookOpen, Layers, CheckCircle2 } from 'lucide-react';
 import { STUDENT_PROJECTS } from '../data';
 import { StudentProject } from '../types';
 
-interface StudentProjectsProps {
-  onSelectProject: (project: StudentProject) => void;
-}
-
-export const StudentProjects: React.FC<StudentProjectsProps> = ({ onSelectProject }) => {
+export const StudentProjects: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'Hardware' | 'Software'>('Hardware');
 
   const tabs: Array<'Hardware' | 'Software'> = [
@@ -74,9 +70,11 @@ export const StudentProjects: React.FC<StudentProjectsProps> = ({ onSelectProjec
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: idx * 0.1, ease: 'easeOut' }}
-                onClick={() => onSelectProject(project)}
-                className="group bg-[#F5F0EA] rounded-2xl overflow-hidden border border-[#E8E2D9] shadow-xs hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col justify-between"
               >
+                <Link
+                  href={`/shop/${project.id}`}
+                  className="group h-full bg-[#F5F0EA] rounded-2xl overflow-hidden border border-[#E8E2D9] shadow-xs hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
+                >
                 {/* Image & Difficulty Pill */}
                 <div className="relative aspect-[4/3] overflow-hidden bg-[#E8E2D9]">
                   <img
@@ -120,6 +118,7 @@ export const StudentProjects: React.FC<StudentProjectsProps> = ({ onSelectProjec
                     </div>
                   </div>
                 </div>
+                </Link>
               </motion.div>
             ))}
           </div>

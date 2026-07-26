@@ -16,11 +16,10 @@ import { DiscussionCTA } from '@/components/DiscussionCTA';
 import { Footer } from '@/components/Footer';
 
 import { DiscussionModal } from '@/components/DiscussionModal';
-import { ProjectDetailModal } from '@/components/ProjectDetailModal';
 import { SearchAccountCartModals } from '@/components/SearchAccountCartModals';
 import { CustomCursor } from '@/components/CustomCursor';
 
-import { WorkProject, StudentProject, ServiceItem } from '@/types';
+import { ServiceItem } from '@/types';
 
 export default function HomeClient() {
   const [preloaderDone, setPreloaderDone] = useState(false);
@@ -62,13 +61,13 @@ export default function HomeClient() {
   const [discussOpen, setDiscussOpen] = useState(false);
   const [discussType, setDiscussType] = useState('Physical Product / Hardware');
 
-  const [selectedProject, setSelectedProject] = useState<WorkProject | StudentProject | null>(null);
+
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
 
-  const isAnyModalOpen = Boolean(selectedProject || discussOpen || searchOpen || accountOpen || cartOpen);
+  const isAnyModalOpen = Boolean(discussOpen || searchOpen || accountOpen || cartOpen);
 
 
   useEffect(() => {
@@ -153,7 +152,7 @@ export default function HomeClient() {
 
           {/* 6. Selected Engineering Work */}
           <section id="selected-work" aria-label="Selected engineering projects">
-            <SelectedWork onSelectProject={(project) => setSelectedProject(project)} />
+            <SelectedWork />
           </section>
 
           {/* 7. Services Overview */}
@@ -168,7 +167,7 @@ export default function HomeClient() {
 
           {/* 9. Featured Student Projects */}
           <section id="student-projects" aria-label="Student engineering project blueprints">
-            <StudentProjects onSelectProject={(project) => setSelectedProject(project)} />
+            <StudentProjects />
           </section>
 
           {/* 10. How We Deliver (8-Step Process) */}
@@ -198,11 +197,7 @@ export default function HomeClient() {
         initialType={discussType}
       />
 
-      <ProjectDetailModal
-        project={selectedProject}
-        onClose={() => setSelectedProject(null)}
-        onOpenDiscuss={() => handleOpenDiscuss(selectedProject?.title)}
-      />
+
 
       <SearchAccountCartModals
         searchOpen={searchOpen}

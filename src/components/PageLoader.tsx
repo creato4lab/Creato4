@@ -38,9 +38,10 @@ export function PageLoader() {
     }, 3500);
   }, [stopLoading]);
 
-  // Trigger stop on route change completion
+  // Trigger stop on route change completion and scroll to top
   useEffect(() => {
     stopLoading();
+    window.scrollTo(0, 0);
   }, [pathname, searchParams, stopLoading]);
 
   // Intercept internal link clicks for instant feedback
