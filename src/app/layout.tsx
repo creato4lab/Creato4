@@ -137,6 +137,8 @@ export const metadata: Metadata = {
 const organizationSchema = generateOrganizationSchema();
 const websiteSchema = generateWebSiteSchema();
 
+import SessionProviderWrapper from "@/components/SessionProviderWrapper";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -167,11 +169,13 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
       </head>
       <body className="min-h-full flex flex-col font-sans">
-        <GlobalUIProvider>
-          <GlobalUIWrapper>
-            {children}
-          </GlobalUIWrapper>
-        </GlobalUIProvider>
+        <SessionProviderWrapper>
+          <GlobalUIProvider>
+            <GlobalUIWrapper>
+              {children}
+            </GlobalUIWrapper>
+          </GlobalUIProvider>
+        </SessionProviderWrapper>
 
         {/* Analytics — loads only when IDs are configured */}
         <Analytics />

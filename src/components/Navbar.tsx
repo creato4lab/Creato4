@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, User, ShoppingBag, ArrowUpRight, Menu, X, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from 'motion/react';
+import { useSession } from 'next-auth/react';
 import { Creato4LabLogoMark } from './LogoMark';
 
 interface NavbarProps {
@@ -24,6 +25,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [isScrolled, setIsScrolled]     = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+
+  const { data: session } = useSession();
 
   // Spring-driven scroll progress (0 = top, 1 = scrolled)
   const scrollProgress = useMotionValue(0);
@@ -53,6 +56,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const linkSize      = useTransform(spring, [0, 1], [11.5, 10.5]);
 
   const navLinks = [
+    { name: 'SHOP', href: '/shop' },
     {
       name: 'WORK', href: '/#work',
       dropdown: [
@@ -245,43 +249,54 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               </motion.div>
 
-              {/* CTA Button — label morphs too */}
-              <motion.button
-                onClick={onOpenDiscuss}
-                className="group flex items-center justify-center rounded-full bg-[#1A3C2F] text-[#FAF8F5] font-semibold hover:bg-[#234B3C] shadow-sm cursor-pointer whitespace-nowrap overflow-hidden"
-                style={{
-                  paddingLeft: useTransform(spring, [0, 1], [24, 16]),
-                  paddingRight: useTransform(spring, [0, 1], [24, 16]),
-                  paddingTop: useTransform(spring, [0, 1], [10, 8]),
-                  paddingBottom: useTransform(spring, [0, 1], [10, 8]),
-                  fontSize: useTransform(spring, [0, 1], [12, 11]),
-                  letterSpacing: useTransform(spring, (v) => `${0.06 - v * 0.02}em`),
-                  gap: useTransform(spring, [0, 1], [6, 4]),
-                }}
-              >
-                <div className="flex items-center">
-                  <span>Discuss</span>
-                  <motion.span
-                    style={{
-                      display: 'inline-block',
-                      overflow: 'hidden',
-                      whiteSpace: 'pre',
-                      width: useTransform(spring, [0, 1], [68, 0]),
-                      opacity: useTransform(spring, [0, 0.8], [1, 0]),
-                    }}
-                  >
-                    {" Your Idea"}
-                  </motion.span>
-                </div>
-                <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:rotate-45 shrink-0" />
-              </motion.button>
+              {/* CTA Button */}
+              {session?.user ? (
+                <Link
+                  href="/dashboard"
+                  className="group flex items-center justify-center rounded-full bg-[#1A3C2F] text-[#FAF8F5] font-semibold hover:bg-[#234B3C] shadow-sm cursor-pointer whitespace-nowrap overflow-hidden"
+                  style={{
+                    paddingLeft: '24px',
+                    paddingRight: '24px',
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                    fontSize: '12px',
+                    letterSpacing: '0.06em',
+                    gap: '6px',
+                  }}
+                >
+                  Hi, {session.user.name?.split(' ')[0] || 'User'}
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  className="group flex items-center justify-center rounded-full bg-[#1A3C2F] text-[#FAF8F5] font-semibold hover:bg-[#234B3C] shadow-sm cursor-pointer whitespace-nowrap overflow-hidden"
+                  style={{
+                    paddingLeft: '24px',
+                    paddingRight: '24px',
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                    fontSize: '12px',
+                    letterSpacing: '0.06em',
+                    gap: '6px',
+                  }}
+                >
+                  Login
+                  <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:rotate-45 shrink-0" />
+                </Link>
+              )}
             </div>
 
             {/* ── MOBILE HAMBURGER ───────────────────────── */}
             <div className="flex lg:hidden items-center gap-2">
-              <button onClick={onOpenDiscuss} className="px-3.5 py-1.5 rounded-full bg-[#1A3C2F] text-[#FAF8F5] text-[11px] font-semibold cursor-pointer">
-                Discuss
-              </button>
+              {session?.user ? (
+                <Link href="/dashboard" className="px-3.5 py-1.5 rounded-full bg-[#1A3C2F] text-[#FAF8F5] text-[11px] font-semibold cursor-pointer">
+                  Hi, {session.user.name?.split(' ')[0] || 'User'}
+                </Link>
+              ) : (
+                <Link href="/login" className="px-3.5 py-1.5 rounded-full bg-[#1A3C2F] text-[#FAF8F5] text-[11px] font-semibold cursor-pointer">
+                  Login
+                </Link>
+              )}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="p-2 text-[#1A3C2F] hover:bg-[#1A3C2F]/6 rounded-full transition-colors cursor-pointer"
@@ -341,13 +356,25 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <ShoppingBag className="w-4 h-4" /> Saved ({cartCount})
                 </button>
               </div>
-              <button
-                onClick={() => { setMobileMenuOpen(false); onOpenDiscuss(); }}
-                className="w-full py-3.5 rounded-full bg-[#1A3C2F] text-[#FAF8F5] text-xs font-bold uppercase tracking-widest text-center shadow-md flex items-center justify-center gap-2"
-              >
-                <span>Discuss Your Idea</span>
-                <ArrowUpRight className="w-4 h-4" />
-              </button>
+              {session?.user ? (
+                <Link
+                  href="/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full py-3.5 rounded-full bg-[#1A3C2F] text-[#FAF8F5] text-xs font-bold uppercase tracking-widest text-center shadow-md flex items-center justify-center gap-2"
+                >
+                  <span>Hi, {session.user.name?.split(' ')[0] || 'User'}</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full py-3.5 rounded-full bg-[#1A3C2F] text-[#FAF8F5] text-xs font-bold uppercase tracking-widest text-center shadow-md flex items-center justify-center gap-2"
+                >
+                  <span>Login</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </Link>
+              )}
             </div>
           </motion.div>
         )}
