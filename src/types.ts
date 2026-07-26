@@ -71,3 +71,17 @@ export interface DiscussionFormData {
   phone: string;
   companyOrCollege: string;
 }
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: 'Admin' | 'Client' | 'Lead Engineer' | 'Student Developer';
+  status: 'Active' | 'Away' | 'Suspended';
+  joinedDate: string;
+  lastActive: string;
+  projectsCount: number;
+  avatar?: string;
+  phone?: string;
+}
+

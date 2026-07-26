@@ -19,6 +19,7 @@ import { DiscussionModal } from '@/components/DiscussionModal';
 import { ProjectDetailModal } from '@/components/ProjectDetailModal';
 import { SearchAccountCartModals } from '@/components/SearchAccountCartModals';
 import { CustomCursor } from '@/components/CustomCursor';
+import { AdminDashboardModal } from '@/components/AdminDashboardModal';
 
 import { WorkProject, StudentProject, ServiceItem } from '@/types';
 
@@ -67,9 +68,23 @@ export default function HomeClient() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [adminOpen, setAdminOpen] = useState(false);
+
+  // Hash route trigger for #admin
+  useEffect(() => {
+    const handleHash = () => {
+      if (window.location.hash === '#admin') {
+        setAdminOpen(true);
+      }
+    };
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
 
   // Lock background scroll when any modal is open
-  const isAnyModalOpen = Boolean(selectedProject || discussOpen || searchOpen || accountOpen || cartOpen);
+  const isAnyModalOpen = Boolean(selectedProject || discussOpen || searchOpen || accountOpen || cartOpen || adminOpen);
+
 
   useEffect(() => {
     const lenisInstance = (window as any).lenis;
@@ -133,6 +148,7 @@ export default function HomeClient() {
           onOpenSearch={() => setSearchOpen(true)}
           onOpenAccount={() => setAccountOpen(true)}
           onOpenCart={() => setCartOpen(true)}
+          onOpenAdmin={() => setAdminOpen(true)}
           cartCount={cartItems.length}
         />
 
@@ -212,9 +228,16 @@ export default function HomeClient() {
         onCloseAccount={() => setAccountOpen(false)}
         onCloseCart={() => setCartOpen(false)}
         onOpenDiscuss={() => handleOpenDiscuss('Search/Account Portal Inquiry')}
+        onOpenAdmin={() => setAdminOpen(true)}
         cartItems={cartItems}
         onRemoveFromCart={handleRemoveFromCart}
+      />
+
+      <AdminDashboardModal
+        isOpen={adminOpen}
+        onClose={() => setAdminOpen(false)}
       />
     </div>
   );
 }
+

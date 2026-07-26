@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, User, ShoppingBag, ArrowUpRight, Menu, X, ChevronDown } from 'lucide-react';
+import { Search, User, ShoppingBag, ArrowUpRight, Menu, X, ChevronDown, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from 'motion/react';
 import { useSession } from 'next-auth/react';
@@ -10,6 +10,7 @@ interface NavbarProps {
   onOpenSearch: () => void;
   onOpenAccount: () => void;
   onOpenCart: () => void;
+  onOpenAdmin?: () => void;
   cartCount?: number;
 }
 
@@ -20,6 +21,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenSearch,
   onOpenAccount,
   onOpenCart,
+  onOpenAdmin,
   cartCount = 0,
 }) => {
   const [isScrolled, setIsScrolled]     = useState(false);
@@ -239,6 +241,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <Link href="/dashboard" aria-label="Account" className="p-1.5 hover:text-[#1A3C2F] hover:bg-[#1A3C2F]/6 rounded-full transition-colors cursor-pointer flex items-center justify-center">
                   <User className="w-4 h-4 stroke-[1.5]" />
                 </Link>
+                {onOpenAdmin && (
+                  <button onClick={onOpenAdmin} aria-label="Admin Portal" title="Admin Portal" className="p-1.5 hover:text-[#1A3C2F] hover:bg-[#1A3C2F]/6 rounded-full transition-colors cursor-pointer">
+                    <Shield className="w-4 h-4 stroke-[1.8] text-[#C4A35A]" />
+                  </button>
+                )}
                 <button onClick={onOpenCart} aria-label="Cart" className="p-1.5 hover:text-[#1A3C2F] hover:bg-[#1A3C2F]/6 rounded-full transition-colors relative cursor-pointer">
                   <ShoppingBag className="w-4 h-4 stroke-[1.5]" />
                   {cartCount > 0 && (
@@ -345,14 +352,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             </nav>
 
             <div className="space-y-4 pt-6 border-t border-[#E8E2D9]">
-              <div className="flex justify-around py-2 text-[#5C6B60]">
-                <button onClick={() => { setMobileMenuOpen(false); onOpenSearch(); }} className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider">
+              <div className="grid grid-cols-4 gap-1 py-2 text-[#5C6B60] text-center">
+                <button onClick={() => { setMobileMenuOpen(false); onOpenSearch(); }} className="flex flex-col items-center gap-1 text-[10px] font-semibold uppercase tracking-wider">
                   <Search className="w-4 h-4" /> Search
                 </button>
-                <Link href="/dashboard" onClick={() => { setMobileMenuOpen(false); }} className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider">
+                <Link href="/dashboard" onClick={() => { setMobileMenuOpen(false); }} className="flex flex-col items-center gap-1 text-[10px] font-semibold uppercase tracking-wider">
                   <User className="w-4 h-4" /> Account
                 </Link>
-                <button onClick={() => { setMobileMenuOpen(false); onOpenCart(); }} className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider">
+                <button onClick={() => { setMobileMenuOpen(false); onOpenAdmin?.(); }} className="flex flex-col items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[#1A3C2F]">
+                  <Shield className="w-4 h-4 text-[#C4A35A]" /> Admin
+                </button>
+                <button onClick={() => { setMobileMenuOpen(false); onOpenCart(); }} className="flex flex-col items-center gap-1 text-[10px] font-semibold uppercase tracking-wider">
                   <ShoppingBag className="w-4 h-4" /> Saved ({cartCount})
                 </button>
               </div>

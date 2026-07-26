@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Search, User, ShoppingBag, ArrowRight, Check, Trash2 } from 'lucide-react';
+import { X, Search, User, ShoppingBag, ArrowRight, Check, Trash2, Shield } from 'lucide-react';
 import { WORK_PROJECTS, STUDENT_PROJECTS, SERVICES } from '../data';
 
 interface SearchAccountCartModalsProps {
@@ -11,6 +11,7 @@ interface SearchAccountCartModalsProps {
   onCloseAccount: () => void;
   onCloseCart: () => void;
   onOpenDiscuss: () => void;
+  onOpenAdmin?: () => void;
   cartItems: string[];
   onRemoveFromCart: (id: string) => void;
 }
@@ -23,6 +24,7 @@ export const SearchAccountCartModals: React.FC<SearchAccountCartModalsProps> = (
   onCloseAccount,
   onCloseCart,
   onOpenDiscuss,
+  onOpenAdmin,
   cartItems,
   onRemoveFromCart,
 }) => {
@@ -218,6 +220,21 @@ export const SearchAccountCartModals: React.FC<SearchAccountCartModalsProps> = (
                     <span>Lab Gerber & CAD Downloads</span>
                     <ArrowRight className="w-4 h-4 text-[#C4A35A]" />
                   </button>
+
+                  {onOpenAdmin && (
+                    <button
+                      onClick={() => {
+                        onCloseAccount();
+                        onOpenAdmin();
+                      }}
+                      className="w-full p-3.5 rounded-xl border border-[#1A3C2F]/20 bg-[#1A3C2F] text-[#FAF8F5] text-xs font-bold hover:bg-[#234B3C] flex items-center justify-between shadow-sm cursor-pointer"
+                    >
+                      <span className="flex items-center gap-2">
+                        <Shield className="w-4 h-4 text-[#C4A35A]" /> Admin User Directory
+                      </span>
+                      <ArrowRight className="w-4 h-4 text-[#C4A35A]" />
+                    </button>
+                  )}
                 </div>
               </div>
 
