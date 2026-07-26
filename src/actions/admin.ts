@@ -3,10 +3,12 @@
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 
+import { redirect } from 'next/navigation';
+
 async function requireAdmin() {
   const session = await auth();
   if (!session || !session.user || !session.user.email) {
-    throw new Error("Unauthorized");
+    redirect('/login');
   }
   
   const user = await prisma.user.findUnique({
@@ -15,7 +17,7 @@ async function requireAdmin() {
   });
 
   if (user?.role !== "ADMIN") {
-    throw new Error("Forbidden: Admin access required.");
+    redirect('/dashboard');
   }
 
   return session.user;
