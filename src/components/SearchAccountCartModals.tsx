@@ -81,10 +81,10 @@ export const SearchAccountCartModals: React.FC<SearchAccountCartModalsProps> = (
               <div className="max-h-96 overflow-y-auto space-y-4 pr-1">
                 {query.trim() === '' ? (
                   <div className="text-center py-8 text-xs text-[#5C6B60]">
-                    Try searching for <span className="font-bold text-[#1A3C2F]">"Drone"</span>,{' '}
-                    <span className="font-bold text-[#1A3C2F]">"PCB"</span>,{' '}
-                    <span className="font-bold text-[#1A3C2F]">"Health Kiosk"</span>, or{' '}
-                    <span className="font-bold text-[#1A3C2F]">"ESP32"</span>.
+                    Try searching for <span className="font-bold text-[#1A3C2F]">&quot;Drone&quot;</span>,{' '}
+                    <span className="font-bold text-[#1A3C2F]">&quot;PCB&quot;</span>,{' '}
+                    <span className="font-bold text-[#1A3C2F]">&quot;Health Kiosk&quot;</span>, or{' '}
+                    <span className="font-bold text-[#1A3C2F]">&quot;ESP32&quot;</span>.
                   </div>
                 ) : (
                   <>
@@ -158,7 +158,7 @@ export const SearchAccountCartModals: React.FC<SearchAccountCartModalsProps> = (
                       filteredStudent.length === 0 &&
                       filteredServices.length === 0 && (
                         <div className="text-center py-8 text-xs text-[#5C6B60]">
-                          No engineering records found matching "{query}".
+                          No engineering records found matching &quot;{query}&quot;.
                         </div>
                       )}
                   </>
@@ -263,7 +263,7 @@ export const SearchAccountCartModals: React.FC<SearchAccountCartModalsProps> = (
                   {savedStudentProjects.length === 0 ? (
                     <div className="text-center py-12 text-xs text-[#5C6B60]">
                       <ShoppingBag className="w-10 h-10 text-[#E8E2D9] mx-auto mb-3" />
-                      No saved student project blueprints yet. Explore the "Ready-To-Build Projects" section to save kits!
+                      No saved student project blueprints yet. Explore the &quot;Ready-To-Build Projects&quot; section to save kits!
                     </div>
                   ) : (
                     savedStudentProjects.map((s) => (

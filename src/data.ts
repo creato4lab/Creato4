@@ -91,7 +91,7 @@ export const WORK_PROJECTS: WorkProject[] = [
     description: 'A smart prepaid IoT water meter system featuring a 3-device ecosystem (User Meter, Society Node, and Government Unit) designed for the BGI Hackathon 2026. It monitors water quantity and quality (TDS, Turbidity, pH) in real-time while detecting leakages, pipe cuts, and meter tampering.',
     challenge: 'Detecting micro-leakages, illegal pipe cuts before the meter, and physical meter tampering in real-time while ensuring offline communication reliability in remote areas.',
     solution: 'Engineered a dual-dashboard prepaid water control system utilizing ESP32 microcontrollers, YF-S201 flow sensors, pressure sensors, MPU6050 IMUs for tamper detection, and TDS/Turbidity/pH probes. Implemented an offline-first mesh network (ESP-NOW) with SD storage to sync data when Wi-Fi is unavailable, alongside a manual emergency water reserve trigger.',
-    technologies: ['ESP32', 'ESP-NOW Mesh', 'YF-S201 Flow Sensor', 'MPU6050 Accelerometer', 'TDS / Turbidity / pH Sensors', 'Firebase Firestore'],
+    technologies: ['ESP32', 'ESP-NOW Mesh', 'YF-S201 Flow Sensor', 'MPU6050 Accelerometer', 'TDS / Turbidity / pH Sensors', 'PostgreSQL Database'],
     outcomes: [
       'Selected for BGI Hackathon 2026 Theme: Smart Cities & Urban Innovation',
       'Designed a 3-device architecture (User Meter, Society Node, and Government Unit) with sub-1 second response time',
@@ -469,11 +469,11 @@ export const STUDENT_PROJECTS: StudentProject[] = [
     price: '₹6,499',
     image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80',
     description: 'Smart college campus utility app for classroom booking, bus schedule tracking, assignment submissions, and student noticeboard.',
-    techStack: ['React', 'Firebase', 'Tailwind CSS', 'Progressive Web App'],
-    includes: ['React PWA Web Source Code', 'Firebase Authentication & Firestore Rules', 'Interactive Campus Map Component', 'PWA Manifest Setup'],
+    techStack: ['React', 'PostgreSQL', 'Tailwind CSS', 'Progressive Web App'],
+    includes: ['React PWA Web Source Code', 'PostgreSQL Authentication & RLS Rules', 'Interactive Campus Map Component', 'PWA Manifest Setup'],
     specifications: {
       'PWA Support': 'Offline-First Service Worker',
-      'Database': 'Firebase Firestore Realtime DB',
+      'Database': 'PostgreSQL Realtime DB',
       'Authentication': 'Google OAuth + Student ID',
       'UI Framework': 'Tailwind CSS',
     },

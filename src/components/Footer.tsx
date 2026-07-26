@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { Linkedin, Instagram, Mail, Phone, MapPin, ArrowUpRight } from 'lucide-react';
 import { Creato4LabLogoMark } from './LogoMark';
 import { motion, useMotionValue, useMotionTemplate } from 'motion/react';
@@ -262,10 +263,14 @@ export const Footer: React.FC<FooterProps> = ({ onOpenDiscuss }) => {
         {/* Bottom Row */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between text-[0.75rem] text-[#FAF8F5]/50 gap-4 relative z-10">
           <p>© 2026 Creato4. All rights reserved.</p>
-          <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-[#FAF8F5] transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-[#FAF8F5] transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-[#FAF8F5] transition-colors">Security Policy</a>
+          <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-end">
+            <Link href="/privacy-policy" className="hover:text-[#FAF8F5] transition-colors">Privacy Policy</Link>
+            <Link href="/terms-of-service" className="hover:text-[#FAF8F5] transition-colors">Terms of Service</Link>
+            <Link href="/eula" className="hover:text-[#FAF8F5] transition-colors">EULA</Link>
+            <Link href="/refund-policy" className="hover:text-[#FAF8F5] transition-colors">Refund Policy</Link>
+            <Link href="/shipping-policy" className="hover:text-[#FAF8F5] transition-colors">Shipping Policy</Link>
+            <Link href="/intellectual-property" className="hover:text-[#FAF8F5] transition-colors">IP Rights</Link>
+            <Link href="/cookie-policy" className="hover:text-[#FAF8F5] transition-colors">Cookie Policy</Link>
           </div>
         </div>
 
