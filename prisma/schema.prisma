@@ -197,12 +197,15 @@ enum LicenseType {
 
 model Ticket {
   id            String   @id @default(cuid())
-  subject       String
-  message       String   @db.Text
+  subject       String?
+  message       String?  @db.Text
+  name          String?
+  phone         String?
+  email         String?
   status        TicketStatus @default(OPEN)
   
-  userId        String
-  user          User     @relation(fields: [userId], references: [id])
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id])
   
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

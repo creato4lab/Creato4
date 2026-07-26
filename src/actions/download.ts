@@ -35,7 +35,7 @@ export async function generateDownloadUrl(productId: string, fileType: 'sourceCo
     where: {
       userId: session.user.id,
       productId: productId,
-      status: "ACTIVE"
+      isActive: true
     }
   });
 

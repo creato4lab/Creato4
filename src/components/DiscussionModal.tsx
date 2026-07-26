@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Send, User, Phone, CheckCircle2 } from 'lucide-react';
+import { X, Send, User, Phone, CheckCircle2, Loader2 } from 'lucide-react';
+import { createConsultationTicket } from '@/actions/ticket';
 
 interface DiscussionModalProps {
   isOpen: boolean;
@@ -12,15 +13,29 @@ export const DiscussionModal: React.FC<DiscussionModalProps> = ({
   isOpen,
   onClose,
 }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitted(true);
+    if (!formData.name || !formData.phone) return;
+    
+    setIsSubmitting(true);
+    const res = await createConsultationTicket({
+      name: formData.name,
+      phone: formData.phone,
+    });
+    setIsSubmitting(false);
+
+    if (res.success) {
+      setIsSubmitted(true);
+    } else {
+      alert("Failed to submit request. Please try again.");
+    }
   };
 
   const resetForm = () => {
@@ -106,9 +121,14 @@ export const DiscussionModal: React.FC<DiscussionModalProps> = ({
 
                 <button
                   type="submit"
-                  className="w-full mt-2 flex items-center justify-center gap-2 py-4 rounded-xl bg-[#1A3C2F] text-[#FAF8F5] text-[11px] font-bold uppercase tracking-wider hover:bg-[#234B3C] shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                  disabled={isSubmitting}
+                  className="w-full mt-2 flex items-center justify-center gap-2 py-4 rounded-xl bg-[#1A3C2F] text-[#FAF8F5] text-[11px] font-bold uppercase tracking-wider hover:bg-[#234B3C] shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50"
                 >
-                  Request Callback <Send className="w-4 h-4 ml-1" />
+                  {isSubmitting ? (
+                    <>Submitting... <Loader2 className="w-4 h-4 ml-1 animate-spin" /></>
+                  ) : (
+                    <>Request Callback <Send className="w-4 h-4 ml-1" /></>
+                  )}
                 </button>
               </form>
             </div>
