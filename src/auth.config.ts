@@ -13,6 +13,7 @@ function isAdminEmail(email: string | null | undefined): boolean {
 }
 
 export const authConfig = {
+  trustHost: true,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,

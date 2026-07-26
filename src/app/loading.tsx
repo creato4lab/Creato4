@@ -1,16 +1,21 @@
 export default function Loading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FAF8F5]">
-      <div className="flex flex-col items-center gap-4">
-        {/* Animated loader */}
-        <div className="relative w-12 h-12">
-          <div className="absolute inset-0 rounded-full border-2 border-[#E8E2D9]" />
-          <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-[#1A3C2F] animate-spin" />
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center pointer-events-none">
+      <div className="flex flex-col items-center gap-3 p-4 rounded-2xl bg-[#FAF8F5]/95 backdrop-blur-md border border-[#C4A35A]/30 shadow-xl shadow-stone-900/10">
+        <div className="relative w-10 h-10 flex items-center justify-center">
+          <div className="absolute inset-0 rounded-full border-[1.5px] border-[#C4A35A]/25 border-t-[#C4A35A] animate-spin [animation-duration:0.8s]" />
+          <div className="w-6 h-6 rounded-md bg-[#1A3C2F] flex items-center justify-center shadow-xs">
+            <span className="text-[10px] font-extrabold text-[#C4A35A] tracking-wider">
+              C4
+            </span>
+          </div>
         </div>
-        <p className="text-xs uppercase tracking-[0.2em] font-semibold text-[#5C6B60]">
-          Loading
-        </p>
+        <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#1A3C2F]">
+          CREATO4
+        </span>
       </div>
     </div>
   );
 }
+
+
