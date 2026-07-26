@@ -57,7 +57,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   events: {
-    async signIn({ user }) {
+    signIn({ user }) {
       if (!user.email) return;
 
       const name = user.name || user.email.split("@")[0];
@@ -67,38 +67,41 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         timeStyle: "short",
       });
 
-      try {
-        // Check if user already existed before this sign-in
-        const existing = await prisma.user.findUnique({
-          where: { email: user.email },
-          select: { createdAt: true },
-        });
-
-        const isNew = !existing || 
-          (Date.now() - existing.createdAt.getTime()) < 10_000; // created within last 10s = new
-
-        if (isNew) {
-          await sendEmail({
-            to: user.email,
-            subject: "Welcome to Creato4 Lab 🚀 — Your Engineering Journey Starts Now",
-            html: getWelcomeEmail({ name, email: user.email }),
+      // Fire and forget email notification so it doesn't block the login flow!
+      Promise.resolve().then(async () => {
+        try {
+          // Check if user already existed before this sign-in
+          const existing = await prisma.user.findUnique({
+            where: { email: user.email },
+            select: { createdAt: true },
           });
-        } else {
-          await sendEmail({
-            to: user.email,
-            subject: "🔐 New Sign-In Detected — Creato4 Lab",
-            html: getLoginAlertEmail({
-              name,
-              email: user.email,
-              time: now,
-              device: "Web Browser",
-              location: "India",
-            }),
-          });
+
+          const isNew = !existing || 
+            (Date.now() - existing.createdAt.getTime()) < 10_000; // created within last 10s = new
+
+          if (isNew) {
+            await sendEmail({
+              to: user.email,
+              subject: "Welcome to Creato4 Lab 🚀 — Your Engineering Journey Starts Now",
+              html: getWelcomeEmail({ name, email: user.email }),
+            });
+          } else {
+            await sendEmail({
+              to: user.email,
+              subject: "🔐 New Sign-In Detected — Creato4 Lab",
+              html: getLoginAlertEmail({
+                name,
+                email: user.email,
+                time: now,
+                device: "Web Browser",
+                location: "India",
+              }),
+            });
+          }
+        } catch (err) {
+          console.error("[auth] Email notification failed:", err);
         }
-      } catch (err) {
-        console.error("[auth] Email notification failed:", err);
-      }
+      });
     },
   },
 });
