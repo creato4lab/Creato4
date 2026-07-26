@@ -23,8 +23,6 @@ import {
   Phone,
   Briefcase
 } from 'lucide-react';
-import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebase';
 import { AdminUser } from '../types';
 
 interface AdminDashboardModalProps {
@@ -133,8 +131,6 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ isOpen
   const [roleFilter, setRoleFilter] = useState<string>('All');
   const [statusFilter, setStatusFilter] = useState<string>('All');
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
-  const [loadingFirebase, setLoadingFirebase] = useState(true);
-  const [firebaseConnected, setFirebaseConnected] = useState(false);
 
   // Modal State for Add User
   const [showAddModal, setShowAddModal] = useState(false);
@@ -147,52 +143,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ isOpen
   // Edit User Modal State
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
 
-  // Subscribe to Firebase Firestore real-time updates
-  useEffect(() => {
-    if (!isOpen) return;
 
-    try {
-      const usersRef = collection(db, 'users');
-      const unsubscribe = onSnapshot(
-        usersRef,
-        (snapshot) => {
-          setFirebaseConnected(true);
-          setLoadingFirebase(false);
-          if (!snapshot.empty) {
-            const fetchedUsers: AdminUser[] = snapshot.docs.map((docSnap) => {
-              const data = docSnap.data();
-              return {
-                id: docSnap.id,
-                name: data.name || 'Unnamed User',
-                email: data.email || '',
-                role: data.role || 'Client',
-                status: data.status || 'Active',
-                joinedDate: data.joinedDate || new Date().toISOString().split('T')[0],
-                lastActive: data.lastActive || 'Recently',
-                projectsCount: data.projectsCount ?? 1,
-                avatar: data.avatar || undefined,
-                phone: data.phone || ''
-              };
-            });
-            setUsers(fetchedUsers);
-          } else {
-            // Keep local fallback list if database collection hasn't been populated yet
-            setUsers(INITIAL_MOCK_USERS);
-          }
-        },
-        (error) => {
-          console.warn('Firestore subscription notice (using robust local fallback):', error);
-          setFirebaseConnected(false);
-          setLoadingFirebase(false);
-        }
-      );
-
-      return () => unsubscribe();
-    } catch (err) {
-      console.warn('Firebase connection exception fallback:', err);
-      setLoadingFirebase(false);
-    }
-  }, [isOpen]);
 
   // Handlers for Firestore CRUD
   const handleAddUser = async (e: React.FormEvent) => {
@@ -210,28 +161,12 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ isOpen
       projectsCount: 1
     };
 
-    try {
-      if (firebaseConnected) {
-        await addDoc(collection(db, 'users'), {
-          ...newUserObj,
-          createdAt: serverTimestamp()
-        });
-      } else {
-        // Fallback local update
-        const localNew: AdminUser = {
-          ...newUserObj,
-          id: `usr-${Date.now()}`
-        };
-        setUsers((prev) => [localNew, ...prev]);
-      }
-    } catch (err) {
-      console.error('Error adding user:', err);
-      const localNew: AdminUser = {
-        ...newUserObj,
-        id: `usr-${Date.now()}`
-      };
-      setUsers((prev) => [localNew, ...prev]);
-    }
+    // Fallback local update
+    const localNew: AdminUser = {
+      ...newUserObj,
+      id: `usr-${Date.now()}`
+    };
+    setUsers((prev) => [localNew, ...prev]);
 
     // Reset Form
     setNewUserName('');
@@ -243,13 +178,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ isOpen
   };
 
   const handleUpdateRole = async (userId: string, newRole: AdminUser['role']) => {
-    try {
-      if (firebaseConnected && !userId.startsWith('usr-')) {
-        await updateDoc(doc(db, 'users', userId), { role: newRole });
-      }
-    } catch (err) {
-      console.error('Error updating role in Firebase:', err);
-    }
+
     setUsers((prev) =>
       prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
     );
@@ -262,13 +191,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ isOpen
     const nextStatus: AdminUser['status'] =
       currentStatus === 'Active' ? 'Suspended' : 'Active';
 
-    try {
-      if (firebaseConnected && !userId.startsWith('usr-')) {
-        await updateDoc(doc(db, 'users', userId), { status: nextStatus });
-      }
-    } catch (err) {
-      console.error('Error updating status in Firebase:', err);
-    }
+
     setUsers((prev) =>
       prev.map((u) => (u.id === userId ? { ...u, status: nextStatus } : u))
     );
@@ -277,13 +200,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ isOpen
   const handleDeleteUser = async (userId: string) => {
     if (!window.confirm('Are you sure you want to delete this user profile?')) return;
 
-    try {
-      if (firebaseConnected && !userId.startsWith('usr-')) {
-        await deleteDoc(doc(db, 'users', userId));
-      }
-    } catch (err) {
-      console.error('Error deleting user in Firebase:', err);
-    }
+
     setUsers((prev) => prev.filter((u) => u.id !== userId));
   };
 
@@ -351,8 +268,8 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ isOpen
                   <Shield className="w-3 h-3 text-[#C4A35A]" /> ADMIN PORTAL
                 </span>
                 <span className="flex items-center gap-1.5 text-[11px] font-bold text-[#5C6B60] bg-[#F5F0EA] px-2.5 py-0.5 rounded-full border border-[#E8E2D9]">
-                  <span className={`w-2 h-2 rounded-full ${firebaseConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-                  {firebaseConnected ? 'Firebase Realtime Connected' : 'Local / Offline Sync'}
+                  <span className={`w-2 h-2 rounded-full bg-emerald-500`} />
+                  Local Demo Mode
                 </span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1A3C2F] tracking-tight">
