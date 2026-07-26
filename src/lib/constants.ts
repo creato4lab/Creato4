@@ -21,7 +21,7 @@ export const SITE_CONFIG = {
 
   // ─── Contact ───────────────────────────────────────
   email: process.env.NEXT_PUBLIC_COMPANY_EMAIL || 'creato4lab@gmail.com',
-  phone: process.env.NEXT_PUBLIC_COMPANY_PHONE || '+91-9909089344',
+  phone: process.env.NEXT_PUBLIC_COMPANY_PHONE || '+91 99090 89344',
   address: {
     streetAddress: process.env.NEXT_PUBLIC_COMPANY_STREET || 'Surat, Gujarat, India',
     addressLocality: process.env.NEXT_PUBLIC_COMPANY_CITY || 'Surat',
@@ -33,10 +33,7 @@ export const SITE_CONFIG = {
   // ─── Social ────────────────────────────────────────
   social: {
     linkedin: process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://www.linkedin.com/company/creato4-lab',
-    instagram: process.env.NEXT_PUBLIC_INSTAGRAM_URL || 'https://www.instagram.com/creato4.lab',
-    github: process.env.NEXT_PUBLIC_GITHUB_URL || '',
-    youtube: process.env.NEXT_PUBLIC_YOUTUBE_URL || '',
-    twitter: process.env.NEXT_PUBLIC_TWITTER_URL || '',
+    instagram: process.env.NEXT_PUBLIC_INSTAGRAM_URL || 'https://www.instagram.com/creato4.lab?igsh=MWh4bGZybXBxZ3Rj&utm_source=qr',
   },
 
   // ─── SEO ───────────────────────────────────────────
