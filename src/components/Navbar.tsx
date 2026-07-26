@@ -54,47 +54,47 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const navLinks = [
     {
-      name: 'WORK', href: '#work',
+      name: 'WORK', href: '/#work',
       dropdown: [
-        { label: 'Smart Privacy Health Kiosk', href: '#work' },
-        { label: 'Agri-Titan X6 Drone', href: '#work' },
-        { label: 'SmartPrint Station', href: '#work' },
-        { label: 'Smart Safety Helmet', href: '#work' },
-        { label: 'Autonomous Disinfection Robot', href: '#work' },
-        { label: 'Smart Industrial Power Monitor', href: '#work' },
+        { label: 'Smart Privacy Health Kiosk', href: '/#work' },
+        { label: 'Agri-Titan X6 Drone', href: '/#work' },
+        { label: 'SmartPrint Station', href: '/#work' },
+        { label: 'Smart Safety Helmet', href: '/#work' },
+        { label: 'Autonomous Disinfection Robot', href: '/#work' },
+        { label: 'Smart Industrial Power Monitor', href: '/#work' },
       ],
     },
     {
-      name: 'SERVICES', href: '#services',
+      name: 'SERVICES', href: '/#services',
       dropdown: [
-        { label: 'Product Engineering', href: '#services' },
-        { label: 'Mechanical Design & CAD', href: '#services' },
-        { label: 'Electronics & PCB', href: '#services' },
-        { label: 'Embedded Systems & IoT', href: '#services' },
-        { label: 'Software Development', href: '#services' },
-        { label: 'AI & Automation', href: '#services' },
+        { label: 'Product Engineering', href: '/#services' },
+        { label: 'Mechanical Design & CAD', href: '/#services' },
+        { label: 'Electronics & PCB', href: '/#services' },
+        { label: 'Embedded Systems & IoT', href: '/#services' },
+        { label: 'Software Development', href: '/#services' },
+        { label: 'AI & Automation', href: '/#services' },
       ],
     },
     {
-      name: 'STUDENT PROJECTS', href: '#student-projects',
+      name: 'STUDENT ZONE', href: '/#student-projects',
       dropdown: [
-        { label: 'Featured Blueprints', href: '#student-projects' },
-        { label: 'Popular DIY Kits', href: '#student-projects' },
-        { label: 'Advanced Robotics', href: '#student-projects' },
+        { label: 'Featured Blueprints', href: '/#student-projects' },
+        { label: 'Popular DIY Kits', href: '/#student-projects' },
+        { label: 'Advanced Robotics', href: '/#student-projects' },
       ],
     },
     {
-      name: 'PROCESS', href: '#process',
+      name: 'PROCESS', href: '/#process',
       dropdown: [
-        { label: '8-Step Engineering Methodology', href: '#process' },
-        { label: 'Proof of Concept & Feasibility', href: '#process' },
+        { label: '8-Step Engineering Methodology', href: '/#process' },
+        { label: 'Proof of Concept & Feasibility', href: '/#process' },
       ],
     },
     {
-      name: 'ABOUT', href: '#team',
+      name: 'ABOUT', href: '/#team',
       dropdown: [
-        { label: 'Engineering Lab Team', href: '#team' },
-        { label: 'Lab Achievements & Awards', href: '#trust' },
+        { label: 'Engineering Lab Team', href: '/#team' },
+        { label: 'Lab Achievements & Awards', href: '/#trust' },
       ],
     },
   ];

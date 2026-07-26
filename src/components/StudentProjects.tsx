@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
+import Link from 'next/link';
 import { ArrowRight, BookOpen, Layers, CheckCircle2 } from 'lucide-react';
 import { STUDENT_PROJECTS } from '../data';
 import { StudentProject } from '../types';
@@ -146,13 +147,13 @@ export const StudentProjects: React.FC<StudentProjectsProps> = ({ onSelectProjec
 
         {/* Link Below */}
         <div className="text-center mt-12">
-          <button
-            onClick={() => setActiveTab('Hardware')}
+          <Link
+            href="/shop"
             className="inline-flex items-center gap-2 text-[0.75rem] font-extrabold uppercase tracking-[0.2em] text-[#1A3C2F] hover:underline cursor-pointer"
           >
             <span>Explore All Student Projects</span>
             <ArrowRight className="w-4 h-4" />
-          </button>
+          </Link>
         </div>
 
       </div>
