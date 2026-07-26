@@ -139,6 +139,7 @@ const websiteSchema = generateWebSiteSchema();
 
 import SessionProviderWrapper from "@/components/SessionProviderWrapper";
 import NextTopLoader from 'nextjs-toploader';
+import { PageLoaderWrapper } from "@/components/PageLoaderWrapper";
 
 export default function RootLayout({
   children,
@@ -172,6 +173,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
         <NextTopLoader color="#C4A35A" showSpinner={false} shadow="0 0 10px #C4A35A,0 0 5px #C4A35A" />
+        <PageLoaderWrapper />
         <SessionProviderWrapper>
           <GlobalUIProvider>
             <GlobalUIWrapper>
