@@ -1,26 +1,28 @@
+"use client";
+
 import React, { useState, useEffect, useRef } from 'react';
-import { Preloader } from './components/Preloader';
-import { Navbar } from './components/Navbar';
-import { Hero } from './components/Hero';
-import { QuickEntry } from './components/QuickEntry';
-import { TrustCredibility } from './components/TrustCredibility';
-import { SelectedWork } from './components/SelectedWork';
-import { ServicesOverview } from './components/ServicesOverview';
-import { Web3DCta } from './components/Web3DCta';
-import { StudentProjects } from './components/StudentProjects';
-import { HowWeDeliver } from './components/HowWeDeliver';
-import { TeamSection } from './components/TeamSection';
-import { DiscussionCTA } from './components/DiscussionCTA';
-import { Footer } from './components/Footer';
+import { Preloader } from '@/components/Preloader';
+import { Navbar } from '@/components/Navbar';
+import { Hero } from '@/components/Hero';
+import { QuickEntry } from '@/components/QuickEntry';
+import { TrustCredibility } from '@/components/TrustCredibility';
+import { SelectedWork } from '@/components/SelectedWork';
+import { ServicesOverview } from '@/components/ServicesOverview';
+import { Web3DCta } from '@/components/Web3DCta';
+import { StudentProjects } from '@/components/StudentProjects';
+import { HowWeDeliver } from '@/components/HowWeDeliver';
+import { TeamSection } from '@/components/TeamSection';
+import { DiscussionCTA } from '@/components/DiscussionCTA';
+import { Footer } from '@/components/Footer';
 
-import { DiscussionModal } from './components/DiscussionModal';
-import { ProjectDetailModal } from './components/ProjectDetailModal';
-import { SearchAccountCartModals } from './components/SearchAccountCartModals';
-import { CustomCursor } from './components/CustomCursor';
+import { DiscussionModal } from '@/components/DiscussionModal';
+import { ProjectDetailModal } from '@/components/ProjectDetailModal';
+import { SearchAccountCartModals } from '@/components/SearchAccountCartModals';
+import { CustomCursor } from '@/components/CustomCursor';
 
-import { WorkProject, StudentProject, ServiceItem } from './types';
+import { WorkProject, StudentProject, ServiceItem } from '@/types';
 
-export default function App() {
+export default function HomeClient() {
   const [preloaderDone, setPreloaderDone] = useState(false);
 
   // Smooth scroll
@@ -81,7 +83,7 @@ export default function App() {
   }, [isAnyModalOpen]);
 
   // Saved student project blueprints
-  const [cartItems, setCartItems] = useState<string[]>([]);
+  const [cartItems, setCartItems] = useState<string[]>(['iot-weather-station', 'robotic-arm-6dof']);
 
   const handleOpenDiscuss = (type?: string) => {
     if (type) setDiscussType(type);
@@ -140,30 +142,44 @@ export default function App() {
           <Hero onOpenDiscuss={() => handleOpenDiscuss('Product & Technology Vision')} />
 
           {/* 4. Quick Entry ("WHAT ARE YOU LOOKING TO BUILD?") */}
-          <QuickEntry onSelectOption={handleQuickEntryOption} />
+          <section id="quick-entry" aria-label="What are you looking to build?">
+            <QuickEntry onSelectOption={handleQuickEntryOption} />
+          </section>
 
           {/* 5. Trust & Credibility */}
-          <TrustCredibility />
+          <section id="trust" aria-label="Achievements and credentials">
+            <TrustCredibility />
+          </section>
 
           {/* 6. Selected Engineering Work */}
-          <SelectedWork onSelectProject={(project) => setSelectedProject(project)} />
+          <section id="selected-work" aria-label="Selected engineering projects">
+            <SelectedWork onSelectProject={(project) => setSelectedProject(project)} />
+          </section>
 
           {/* 7. Services Overview */}
-          <ServicesOverview
-            onSelectService={(service: ServiceItem) => handleOpenDiscuss(service.title)}
-          />
+          <section id="services" aria-label="Engineering services">
+            <ServicesOverview
+              onSelectService={(service: ServiceItem) => handleOpenDiscuss(service.title)}
+            />
+          </section>
 
           {/* 8. 3D Website Service CTA */}
           <Web3DCta onOpenDiscuss={() => handleOpenDiscuss('Interactive 3D Web Experience')} />
 
           {/* 9. Featured Student Projects */}
-          <StudentProjects onSelectProject={(project) => setSelectedProject(project)} />
+          <section id="student-projects" aria-label="Student engineering project blueprints">
+            <StudentProjects onSelectProject={(project) => setSelectedProject(project)} />
+          </section>
 
           {/* 10. How We Deliver (8-Step Process) */}
-          <HowWeDeliver />
+          <section id="how-we-deliver" aria-label="Our 8-step development process">
+            <HowWeDeliver />
+          </section>
 
           {/* 11. Team */}
-          <TeamSection />
+          <section id="team" aria-label="Our engineering team">
+            <TeamSection />
+          </section>
 
           {/* 12. Free Initial Discussion CTA */}
           <DiscussionCTA onOpenDiscuss={() => handleOpenDiscuss('Initial Project Discussion')} />

@@ -4,6 +4,35 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import { sendEmail } from "@/lib/mailer";
 import { redirect } from "next/navigation";
+import { validateConsultationInput, sanitizeString } from "@/lib/validation";
+
+// Sliding window rate limiter: Max 3 callback submissions per phone/email every 10 minutes
+const submissionTracker = new Map<string, { count: number; firstAt: number }>();
+
+function isRateLimited(identifier: string): boolean {
+  const now = Date.now();
+  const windowMs = 10 * 60 * 1000; // 10 minutes
+  const maxSubmissions = 3;
+
+  const record = submissionTracker.get(identifier);
+  if (!record) {
+    submissionTracker.set(identifier, { count: 1, firstAt: now });
+    return false;
+  }
+
+  if (now - record.firstAt > windowMs) {
+    // Reset window
+    submissionTracker.set(identifier, { count: 1, firstAt: now });
+    return false;
+  }
+
+  if (record.count >= maxSubmissions) {
+    return true;
+  }
+
+  record.count += 1;
+  return false;
+}
 
 export async function createConsultationTicket(data: {
   name: string;
@@ -11,8 +40,30 @@ export async function createConsultationTicket(data: {
   email?: string;
   subject?: string;
   message?: string;
+  websiteUrl?: string; // Honeypot field for bot spam trap
 }) {
   try {
+    // Honeypot check: Bots fill hidden websiteUrl field
+    if (data.websiteUrl && data.websiteUrl.trim().length > 0) {
+      console.warn("🤖 Bot submission blocked via honeypot trap:", data.phone);
+      return { success: true, ticketId: "spamtrap_ignored" };
+    }
+
+    // Validate input
+    const validation = validateConsultationInput(data);
+    if (!validation.valid) {
+      return { success: false, error: validation.errors.join(' ') };
+    }
+
+    // Rate limit check
+    const rateLimitKey = `${data.phone.trim()}_${data.email ? data.email.trim() : 'noemail'}`;
+    if (isRateLimited(rateLimitKey)) {
+      return {
+        success: false,
+        error: "Too many callback requests. Please wait a few minutes before submitting again.",
+      };
+    }
+
     const session = await auth();
     const userId = session?.user?.id || null;
 

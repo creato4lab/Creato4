@@ -82,14 +82,15 @@ export async function generateDownloadUrl(productId: string, fileType: 'sourceCo
       return { error: "Failed to generate secure download link. Please contact support." };
     }
   } else {
-    // MOCK IMPLEMENTATION (For development before R2 credentials are added)
-    console.warn("⚠️ Cloudflare R2 Credentials not found in .env. Generating a mock download URL instead.");
+    if (process.env.NODE_ENV === "production") {
+      console.error("❌ Production Error: Cloudflare R2 credentials (R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY) are missing in environment variables.");
+      return { error: "Secure asset storage is currently undergoing maintenance. Please contact support." };
+    }
+
+    // MOCK IMPLEMENTATION (For local development only)
+    console.warn("⚠️ Cloudflare R2 Credentials not found in .env. Generating a mock download URL in development mode.");
     
-    // Simulate a network delay
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // In a real scenario, this would be a real S3 URL.
-    // For the mock, we'll just redirect to the website's homepage or a dummy file.
     const mockSignedUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}?mock_download=${encodeURIComponent(objectKey)}&expires=in_5_minutes&token=mock_signature_12345`;
     
     return { 

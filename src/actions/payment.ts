@@ -69,6 +69,15 @@ export async function verifyPayment(
       return { error: "Unauthorized" };
     }
 
+    // 1. Prevent Replay Attack (Check if payment was already recorded)
+    const existingOrder = await prisma.order.findUnique({
+      where: { razorpayId: razorpay_payment_id }
+    });
+    if (existingOrder) {
+      return { error: "Payment has already been verified and processed." };
+    }
+
+    // 2. Verify HMAC Signature
     const generated_signature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
       .update(razorpay_order_id + "|" + razorpay_payment_id)
@@ -78,11 +87,41 @@ export async function verifyPayment(
       return { error: "Payment verification failed. Invalid signature." };
     }
 
-    // Success! Create Order and License in DB
+    // 3. Fetch Razorpay Order from Razorpay API to verify original server notes & amount
+    let razorpayOrder;
+    try {
+      razorpayOrder = await razorpay.orders.fetch(razorpay_order_id);
+    } catch (err) {
+      console.error("Error fetching order from Razorpay:", err);
+      return { error: "Failed to verify order details with payment gateway." };
+    }
+
+    if (!razorpayOrder) {
+      return { error: "Order not found on payment gateway." };
+    }
+
+    // 4. Server-Side Price & Product Validation
+    const product = await prisma.product.findUnique({ where: { id: productId } });
+    if (!product) {
+      return { error: "Product not found." };
+    }
+
+    let expectedPrice = product.price;
+    if (licenseType === "COMMERCIAL") expectedPrice = Math.round(expectedPrice * 2.5);
+    if (licenseType === "ENTERPRISE") expectedPrice = Math.round(expectedPrice * 8);
+    const expectedAmountInPaise = expectedPrice * 100;
+
+    // Validate that the paid amount matches expected server price
+    if (Number(razorpayOrder.amount) !== expectedAmountInPaise || amountPaid !== expectedAmountInPaise) {
+      console.error(`🚨 Security Alert: Amount mismatch! Razorpay amount: ${razorpayOrder.amount}, Client amountPaid: ${amountPaid}, Expected: ${expectedAmountInPaise}`);
+      return { error: "Payment verification failed. Amount mismatch." };
+    }
+
+    // 5. Success! Create Order and License in DB
     const order = await prisma.order.create({
       data: {
         userId: session.user.id,
-        total: amountPaid / 100, // convert paise back to INR
+        total: expectedAmountInPaise / 100, // convert paise back to INR
         currency: "INR",
         status: "COMPLETED",
         razorpayId: razorpay_payment_id,
@@ -90,7 +129,7 @@ export async function verifyPayment(
           create: [
             {
               productId,
-              price: amountPaid / 100,
+              price: expectedAmountInPaise / 100,
               licenseType,
             }
           ]
@@ -115,8 +154,7 @@ export async function verifyPayment(
     });
 
     // Send order confirmation email
-    const product = await prisma.product.findUnique({ where: { id: productId } });
-    if (product && session.user.email) {
+    if (session.user.email) {
       const name = session.user.name || session.user.email.split("@")[0];
       const date = new Date().toLocaleDateString("en-IN", {
         timeZone: "Asia/Kolkata",
@@ -131,7 +169,7 @@ export async function verifyPayment(
           orderId: order.id,
           productName: product.title,
           licenseType,
-          amount: amountPaid / 100,
+          amount: expectedAmountInPaise / 100,
           licenseKey: license.licenseKey,
           date,
         }),

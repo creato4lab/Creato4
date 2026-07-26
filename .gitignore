@@ -1,13 +1,45 @@
+# ============================================================
+# Creato4 Lab — Git Ignore
+# ============================================================
+
+# Dependencies
 node_modules/
+
+# Build output
 build/
 dist/
-coverage/
-.DS_Store
-*.log
-.env*
-!.env.example
-
-/src/generated/prisma
 .next/
 out/
+
+# Environment — NEVER commit secrets
+.env
+.env.local
+.env.development
+.env.production
+!.env.example
+
+# Generated files
+/src/generated/prisma
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Coverage
+coverage/
+
+# Vercel
 .vercel/
+
+# Debug & dev artifacts
+*.tsbuildinfo

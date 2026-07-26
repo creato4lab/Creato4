@@ -17,9 +17,9 @@ export default function NewProductPage() {
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
+    const data = Object.fromEntries(formData.entries()) as Record<string, string>;
     
-    const result = await createProduct(data);
+    const result = await createProduct(data as Parameters<typeof createProduct>[0]);
     
     if (result.error) {
       setError(result.error);

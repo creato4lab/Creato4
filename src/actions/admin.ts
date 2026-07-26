@@ -63,22 +63,43 @@ export async function getAdminProducts() {
   });
 }
 
-export async function createProduct(data: any) {
+export async function createProduct(data: {
+  title: string;
+  description: string;
+  shortDescription: string;
+  price: number | string;
+  category: string;
+  difficulty: string;
+  hardwareUsed?: string;
+  softwareUsed?: string;
+  whatsIncluded?: string;
+  images?: string;
+  sourceCodePath?: string;
+  cadFilePath?: string;
+  pdfDocPath?: string;
+}) {
   await requireAdmin();
   
+  // Validate input
+  const { validateProductInput } = await import("@/lib/validation");
+  const validation = validateProductInput(data);
+  if (!validation.valid) {
+    return { error: validation.errors.join(' ') };
+  }
+
   // Basic slug generation from title
   const slug = data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
   try {
     const product = await prisma.product.create({
       data: {
-        title: data.title,
+        title: data.title.trim(),
         slug,
-        description: data.description,
-        shortDescription: data.shortDescription,
+        description: data.description.trim(),
+        shortDescription: data.shortDescription.trim(),
         price: Number(data.price),
-        category: data.category,
-        difficulty: data.difficulty,
+        category: data.category as any,
+        difficulty: data.difficulty as any,
         hardwareUsed: data.hardwareUsed ? data.hardwareUsed.split(',').map((s: string) => s.trim()) : [],
         softwareUsed: data.softwareUsed ? data.softwareUsed.split(',').map((s: string) => s.trim()) : [],
         whatsIncluded: data.whatsIncluded ? data.whatsIncluded.split(',').map((s: string) => s.trim()) : [],

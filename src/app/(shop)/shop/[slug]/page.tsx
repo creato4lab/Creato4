@@ -5,14 +5,35 @@ import { getProductBySlug } from '@/actions/product';
 import { ArrowLeft, Check, AlertTriangle, Cpu, Code } from 'lucide-react';
 import { LicenseCheckout } from '@/components/LicenseCheckout';
 
+import { SITE_CONFIG } from '@/lib/constants';
+import { generateProductSchema } from '@/lib/schemas';
+
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
   const { product } = await getProductBySlug(params.slug);
-  if (!product) return { title: 'Product Not Found - Creato4 Lab' };
-  
+  if (!product) return { title: 'Product Not Found — Creato4 Lab' };
+
+  const canonicalUrl = `${SITE_CONFIG.url}/shop/${params.slug}`;
+
   return {
     title: `${product.title} — Creato4 Lab`,
-    description: product.shortDescription,
+    description: product.shortDescription || product.description.slice(0, 160),
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title: `${product.title} — Creato4 Lab`,
+      description: product.shortDescription || product.description.slice(0, 160),
+      url: canonicalUrl,
+      type: 'article',
+      images: product.images && product.images.length > 0 ? product.images : [`${SITE_CONFIG.url}/creato4-full-brand.png`],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${product.title} — Creato4 Lab`,
+      description: product.shortDescription || product.description.slice(0, 160),
+      images: product.images && product.images.length > 0 ? product.images : [`${SITE_CONFIG.url}/creato4-full-brand.png`],
+    },
   };
 }
 
@@ -29,8 +50,23 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
   const commercialPrice = Math.round(basePrice * 2.5);
   const enterprisePrice = Math.round(basePrice * 8);
 
+  const productSchema = generateProductSchema({
+    name: product.title,
+    description: product.shortDescription || product.description,
+    price: basePrice,
+    slug: product.slug,
+    category: product.category,
+    image: product.images[0] || `${SITE_CONFIG.url}/creato4-full-brand.png`,
+  });
+
   return (
     <div className="min-h-screen bg-[#FAF8F5] pt-24 pb-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(productSchema),
+        }}
+      />
       
       {/* Top Navigation */}
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 mb-8">

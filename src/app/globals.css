@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+}
+
 @layer base {
   :root {
     --bg-primary: #FAF8F5;
@@ -15,14 +20,14 @@
   }
 
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background-color: var(--bg-primary);
     color: var(--text-primary);
     overflow-x: hidden;
   }
 
   h1, h2, h3, h4, .font-heading {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), sans-serif;
     letter-spacing: -0.02em;
   }
 }
