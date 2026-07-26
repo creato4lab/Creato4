@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { motion } from 'motion/react';
 import Link from 'next/link';
 import { ArrowRight, Sparkles, Tag } from 'lucide-react';
