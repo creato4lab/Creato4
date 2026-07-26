@@ -14,14 +14,19 @@ export function PageLoader() {
     setLoading(true);
     setVisible(true);
     setProgress(0);
+    
+    // Safety fallback: auto-hide after 3 seconds if route change fails or gets stuck
+    setTimeout(() => {
+      stopLoading();
+    }, 3000);
   }, []);
 
   const stopLoading = useCallback(() => {
     setProgress(100);
     setTimeout(() => {
       setLoading(false);
-      setTimeout(() => setVisible(false), 400);
-    }, 300);
+      setTimeout(() => setVisible(false), 200); // reduced from 400ms to feel faster
+    }, 50); // reduced from 300ms to make it lightning fast
   }, []);
 
   // Trigger on route change
@@ -39,8 +44,14 @@ export function PageLoader() {
       if (!href) return;
       // Only trigger for internal links
       if (href.startsWith('/') || href.startsWith(window.location.origin)) {
-        const targetPath = href.replace(window.location.origin, '');
-        if (targetPath !== pathname) {
+        // Ignore purely anchor links
+        if (href.includes('#') && href.split('#')[0] === window.location.pathname) {
+            return;
+        }
+        
+        const url = new URL(href, window.location.origin);
+        const targetSearch = url.search.replace(/^\?/, '');
+        if (url.pathname !== pathname || targetSearch !== searchParams.toString()) {
           startLoading();
         }
       }
