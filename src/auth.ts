@@ -1,5 +1,4 @@
 import NextAuth from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import { authConfig } from "./auth.config";
 import prisma from "./lib/prisma";
 import { sendEmail } from "./lib/mailer";
@@ -12,29 +11,40 @@ const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "")
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  adapter: PrismaAdapter(prisma as any),
   session: { strategy: "jwt" },
   callbacks: {
     ...authConfig.callbacks,
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
+      // On initial sign-in, user and account are populated
       if (user && user.email) {
         const isAdmin = ADMIN_EMAILS.includes(user.email.toLowerCase());
-        const dbUser = await prisma.user.findUnique({
-          where: { email: user.email },
-          select: { role: true, id: true },
-        });
+        const role = isAdmin ? "ADMIN" : "USER";
 
-        // Sync admin status in DB if email is in ADMIN_EMAILS
-        if (isAdmin && dbUser && dbUser.role !== "ADMIN") {
-          await prisma.user.update({
+        // Upsert user into DB so we always have a record
+        try {
+          const dbUser = await prisma.user.upsert({
             where: { email: user.email },
-            data: { role: "ADMIN" },
+            create: {
+              email: user.email,
+              name: user.name || null,
+              image: user.image || null,
+              role,
+            },
+            update: {
+              name: user.name || undefined,
+              image: user.image || undefined,
+              ...(isAdmin ? { role: "ADMIN" } : {}),
+            },
+            select: { id: true, role: true },
           });
-          token.role = "ADMIN";
-        } else {
-          token.role = dbUser?.role || "USER";
+
+          token.role = dbUser.role;
+          token.id = dbUser.id;
+        } catch (err) {
+          console.error("[auth] DB upsert failed, using fallback:", err);
+          token.role = role;
+          token.id = user.id;
         }
-        token.id = dbUser?.id || user.id;
       }
       return token;
     },
@@ -47,7 +57,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   events: {
-    async signIn({ user, isNewUser }) {
+    async signIn({ user }) {
       if (!user.email) return;
 
       const name = user.name || user.email.split("@")[0];
@@ -57,36 +67,38 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         timeStyle: "short",
       });
 
-      // Ensure admin email is updated to ADMIN role in DB on sign in
-      if (ADMIN_EMAILS.includes(user.email.toLowerCase())) {
-        await prisma.user.updateMany({
+      try {
+        // Check if user already existed before this sign-in
+        const existing = await prisma.user.findUnique({
           where: { email: user.email },
-          data: { role: "ADMIN" },
+          select: { createdAt: true },
         });
-      }
 
-      if (isNewUser) {
-        // Send welcome email for brand new users
-        await sendEmail({
-          to: user.email,
-          subject: "Welcome to Creato4 Lab 🚀 — Your Engineering Journey Starts Now",
-          html: getWelcomeEmail({ name, email: user.email }),
-        });
-      } else {
-        // Send login alert for returning users
-        await sendEmail({
-          to: user.email,
-          subject: "🔐 New Sign-In Detected — Creato4 Lab",
-          html: getLoginAlertEmail({
-            name,
-            email: user.email,
-            time: now,
-            device: "Web Browser",
-            location: "India",
-          }),
-        });
+        const isNew = !existing || 
+          (Date.now() - existing.createdAt.getTime()) < 10_000; // created within last 10s = new
+
+        if (isNew) {
+          await sendEmail({
+            to: user.email,
+            subject: "Welcome to Creato4 Lab 🚀 — Your Engineering Journey Starts Now",
+            html: getWelcomeEmail({ name, email: user.email }),
+          });
+        } else {
+          await sendEmail({
+            to: user.email,
+            subject: "🔐 New Sign-In Detected — Creato4 Lab",
+            html: getLoginAlertEmail({
+              name,
+              email: user.email,
+              time: now,
+              device: "Web Browser",
+              location: "India",
+            }),
+          });
+        }
+      } catch (err) {
+        console.error("[auth] Email notification failed:", err);
       }
     },
   },
 });
-
