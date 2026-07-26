@@ -5,18 +5,19 @@ import { auth } from "@/auth";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-const AWS_REGION = process.env.AWS_REGION || 'ap-south-1';
-const AWS_BUCKET_NAME = process.env.AWS_BUCKET_NAME || 'creato4-digital-assets';
-const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID;
-const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
+const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID;
+const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME || 'creato4-digital-assets';
+const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID;
+const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY;
 
-// Initialize S3 Client only if credentials exist
-const s3Client = (AWS_ACCESS_KEY_ID && AWS_SECRET_ACCESS_KEY) 
+// Initialize S3 Client for Cloudflare R2 only if credentials exist
+const s3Client = (R2_ACCOUNT_ID && R2_ACCESS_KEY_ID && R2_SECRET_ACCESS_KEY) 
   ? new S3Client({
-      region: AWS_REGION,
+      region: "auto",
+      endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
       credentials: {
-        accessKeyId: AWS_ACCESS_KEY_ID,
-        secretAccessKey: AWS_SECRET_ACCESS_KEY,
+        accessKeyId: R2_ACCESS_KEY_ID,
+        secretAccessKey: R2_SECRET_ACCESS_KEY,
       },
     })
   : null;
@@ -64,10 +65,10 @@ export async function generateDownloadUrl(productId: string, fileType: 'sourceCo
 
   // 5. Generate the secure URL
   if (s3Client) {
-    // REAL IMPLEMENTATION (AWS S3)
+    // REAL IMPLEMENTATION (Cloudflare R2)
     try {
       const command = new GetObjectCommand({
-        Bucket: AWS_BUCKET_NAME,
+        Bucket: R2_BUCKET_NAME,
         Key: objectKey,
         ResponseContentDisposition: `attachment; filename="${product.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${fileType}"`
       });
@@ -81,8 +82,8 @@ export async function generateDownloadUrl(productId: string, fileType: 'sourceCo
       return { error: "Failed to generate secure download link. Please contact support." };
     }
   } else {
-    // MOCK IMPLEMENTATION (For development before AWS credentials are added)
-    console.warn("⚠️ AWS Credentials not found in .env. Generating a mock download URL instead.");
+    // MOCK IMPLEMENTATION (For development before R2 credentials are added)
+    console.warn("⚠️ Cloudflare R2 Credentials not found in .env. Generating a mock download URL instead.");
     
     // Simulate a network delay
     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -95,7 +96,7 @@ export async function generateDownloadUrl(productId: string, fileType: 'sourceCo
       success: true, 
       url: mockSignedUrl, 
       isMock: true,
-      message: "This is a simulated download link because AWS S3 is not yet configured."
+      message: "This is a simulated download link because Cloudflare R2 is not yet configured."
     };
   }
 }
