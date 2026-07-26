@@ -148,6 +148,7 @@ export default function RootLayout({
     <html
       lang={SITE_CONFIG.language}
       className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <head>
         {/* JSON-LD Structured Data */}
@@ -168,7 +169,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
       </head>
-      <body className="min-h-full flex flex-col font-sans">
+      <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
         <SessionProviderWrapper>
           <GlobalUIProvider>
             <GlobalUIWrapper>
