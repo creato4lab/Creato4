@@ -4,6 +4,14 @@ import prisma from "./lib/prisma";
 import { sendEmail } from "./lib/mailer";
 import { getLoginAlertEmail, getWelcomeEmail } from "./lib/emailTemplates";
 
+if (process.env.NETLIFY === "true" || process.env.NODE_ENV === "production") {
+  const prodUrl = process.env.URL || process.env.NEXT_PUBLIC_APP_URL || "https://creato4lab.netlify.app";
+  if (!process.env.AUTH_URL || process.env.AUTH_URL.includes("localhost")) {
+    process.env.AUTH_URL = prodUrl;
+    process.env.NEXTAUTH_URL = prodUrl;
+  }
+}
+
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "")
   .split(",")
   .map((e) => e.trim().toLowerCase())

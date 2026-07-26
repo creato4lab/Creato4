@@ -1,6 +1,13 @@
 import type { NextAuthConfig } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
+const getAppUrl = () => {
+  if (process.env.NETLIFY === "true" || process.env.NODE_ENV === "production") {
+    return process.env.URL || process.env.NEXT_PUBLIC_APP_URL || "https://creato4lab.netlify.app";
+  }
+  return process.env.AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+};
+
 // Admin emails from environment variable (comma-separated)
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "")
   .split(",")
@@ -24,6 +31,21 @@ export const authConfig = {
     signIn: "/login",
   },
   callbacks: {
+    redirect({ url, baseUrl }) {
+      const appUrl = getAppUrl();
+      if (url.startsWith("/")) {
+        return `${appUrl}${url}`;
+      }
+      if ((process.env.NETLIFY === "true" || process.env.NODE_ENV === "production") && url.includes("localhost:3000")) {
+        return url.replace("http://localhost:3000", appUrl);
+      }
+      try {
+        if (new URL(url).origin === new URL(appUrl).origin) {
+          return url;
+        }
+      } catch {}
+      return appUrl;
+    },
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
