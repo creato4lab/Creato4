@@ -104,6 +104,7 @@ export const metadata: Metadata = {
   // ─── Icons & Manifest ─────────────────────────────────
   icons: {
     icon: [
+      { url: "/icon.jpg", type: "image/jpeg" },
       { url: "/favicon.ico", sizes: "any" },
     ],
     apple: [
