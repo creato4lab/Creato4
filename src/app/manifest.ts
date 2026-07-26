@@ -14,7 +14,7 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ['engineering', 'technology', 'education', 'business'],
     icons: [
       {
-        src: '/favicon.ico',
+        src: '/favicon.ico?v=2',
         sizes: 'any',
         type: 'image/x-icon',
       },

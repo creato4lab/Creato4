@@ -104,11 +104,11 @@ export const metadata: Metadata = {
   // ─── Icons & Manifest ─────────────────────────────────
   icons: {
     icon: [
-      { url: "/icon.jpg", type: "image/jpeg" },
-      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.ico?v=2", sizes: "any" },
+      { url: "/creato4-logo.svg?v=2", type: "image/svg+xml" },
     ],
     apple: [
-      { url: "/creato4-full-brand.png", sizes: "180x180" },
+      { url: "/creato4-full-brand.png?v=2", sizes: "180x180" },
     ],
   },
   manifest: "/manifest.webmanifest",
