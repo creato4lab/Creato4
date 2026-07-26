@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Clock, ShieldCheck, MessageSquareCode, Send, CheckCircle2, UserCheck } from 'lucide-react';
+import { Clock, ShieldCheck, MessageSquareCode, Send, CheckCircle2, UserCheck, Loader2 } from 'lucide-react';
+import { createConsultationTicket } from '@/actions/ticket';
 
 interface DiscussionCTAProps {
   onOpenDiscuss?: () => void;
 }
 
 export const DiscussionCTA: React.FC<DiscussionCTAProps> = ({ onOpenDiscuss }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -25,9 +27,23 @@ export const DiscussionCTA: React.FC<DiscussionCTAProps> = ({ onOpenDiscuss }) =
     'AI & Automation Solution',
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setIsSubmitting(true);
+    const res = await createConsultationTicket({
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      subject: formData.projectType,
+      message: formData.message,
+    });
+    setIsSubmitting(false);
+
+    if (res.success) {
+      setSubmitted(true);
+    } else {
+      alert("Failed to submit project inquiry. Please try again.");
+    }
   };
 
   return (
@@ -198,10 +214,17 @@ export const DiscussionCTA: React.FC<DiscussionCTAProps> = ({ onOpenDiscuss }) =
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full py-4 rounded-full bg-[#1A3C2F] text-[#FAF8F5] text-xs font-extrabold uppercase tracking-widest hover:bg-[#234B3C] transition-all duration-300 shadow-md hover:shadow-xl flex items-center justify-center gap-2 cursor-pointer"
+                disabled={isSubmitting}
+                className="w-full py-4 rounded-full bg-[#1A3C2F] text-[#FAF8F5] text-xs font-extrabold uppercase tracking-widest hover:bg-[#234B3C] transition-all duration-300 shadow-md hover:shadow-xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
-                <Send className="w-4 h-4" />
-                <span>Submit Project Inquiry</span>
+                {isSubmitting ? (
+                  <>Submitting Inquiry... <Loader2 className="w-4 h-4 animate-spin" /></>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    <span>Submit Project Inquiry</span>
+                  </>
+                )}
               </button>
             </form>
           ) : (

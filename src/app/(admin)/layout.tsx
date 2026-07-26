@@ -26,13 +26,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       {/* Sidebar */}
       <aside className="w-64 bg-[#1A3C2F] text-[#FAF8F5] fixed h-full flex flex-col hidden md:flex">
         <div className="p-6">
-          <Link href="/admin" className="flex items-center gap-2 mb-8">
-            <div className="w-8 h-8 bg-gradient-to-br from-[#C4A35A] to-[#D4B870] rounded flex items-center justify-center font-black text-[#1A3C2F] text-lg leading-none">
-              ⚡
-            </div>
+          <Link href="/admin" className="flex items-center gap-3 mb-8">
+            <img src="/creato4-logo.svg" alt="Creato4 Logo" className="w-10 h-10 rounded-lg object-contain bg-white/10 p-1" />
             <div>
               <div className="font-black text-lg leading-tight tracking-tight">CREATO4</div>
-              <div className="text-[0.6rem] font-bold text-[#C4A35A] tracking-[0.2em] uppercase">Admin</div>
+              <div className="text-[0.6rem] font-bold text-[#C4A35A] tracking-[0.2em] uppercase">Mission Control</div>
             </div>
           </Link>
 

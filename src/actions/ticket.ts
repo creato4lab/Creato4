@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 export async function createConsultationTicket(data: {
   name: string;
   phone: string;
+  email?: string;
   subject?: string;
   message?: string;
 }) {
@@ -20,8 +21,9 @@ export async function createConsultationTicket(data: {
       data: {
         name: data.name,
         phone: data.phone,
+        email: data.email || null,
         subject: data.subject || "Free Consultation Callback Request",
-        message: data.message || "User requested a callback consultation from the website modal.",
+        message: data.message || "User requested a callback consultation from the website.",
         userId: userId,
         status: "OPEN",
       },
@@ -44,7 +46,11 @@ export async function createConsultationTicket(data: {
             <td style="padding: 8px; font-weight: bold; color: #1A3C2F;">${data.phone}</td>
           </tr>
           <tr>
-            <td style="padding: 8px; font-weight: bold;">Subject:</td>
+            <td style="padding: 8px; font-weight: bold;">Email:</td>
+            <td style="padding: 8px;">${data.email || 'N/A'}</td>
+          </tr>
+          <tr style="background-color: #F5F0EA;">
+            <td style="padding: 8px; font-weight: bold;">Project Type / Subject:</td>
             <td style="padding: 8px;">${ticket.subject}</td>
           </tr>
           <tr style="background-color: #F5F0EA;">
