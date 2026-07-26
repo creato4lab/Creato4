@@ -132,6 +132,7 @@ export const DiscussionCTA: React.FC<DiscussionCTAProps> = ({ onOpenDiscuss }) =
                   <input
                     type="email"
                     required
+                    suppressHydrationWarning
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="john@example.com"

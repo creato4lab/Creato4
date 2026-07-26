@@ -1,0 +1,227 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =========================================
+// AUTH.JS / BETTER AUTH MODELS
+// =========================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role      @default(USER)
+  
+  accounts      Account[]
+  sessions      Session[]
+  orders        Order[]
+  tickets       Ticket[]
+  wishlists     Wishlist[]
+  licenses      License[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// =========================================
+// E-COMMERCE / MARKETPLACE MODELS
+// =========================================
+
+model Product {
+  id                String   @id @default(cuid())
+  title             String
+  slug              String   @unique
+  description       String   @db.Text
+  shortDescription  String
+  price             Float
+  category          ProductCategory
+  difficulty        Difficulty
+  
+  // Product Details
+  hardwareUsed      String[]
+  softwareUsed      String[]
+  whatsIncluded     String[]
+  safetyWarning     String?  @db.Text
+  versionHistory    String?  @db.Text
+  
+  // File Paths (Signed URLs will be generated from these)
+  sourceCodePath    String?
+  cadFilePath       String?
+  pdfDocPath        String?
+  
+  images            String[] // array of image URLs
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  orders            OrderItem[]
+  wishlistedBy      Wishlist[]
+  licenses          License[]
+}
+
+enum ProductCategory {
+  ARDUINO
+  ESP32
+  STM32
+  RASPBERRY_PI
+  PCB_DESIGN
+  CAD_MODEL
+  EMBEDDED_CODE
+  COURSE
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+// =========================================
+// ORDERS & PAYMENTS
+// =========================================
+
+model Order {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  total         Float
+  currency      String      @default("INR")
+  status        OrderStatus @default(PENDING)
+  
+  // Payment Gateway
+  stripeId      String?     @unique
+  razorpayId    String?     @unique
+  invoiceUrl    String?
+  
+  items         OrderItem[]
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model OrderItem {
+  id            String   @id @default(cuid())
+  orderId       String
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id])
+  price         Float
+  licenseType   LicenseType
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+// =========================================
+// LICENSING & DOWNLOADS
+// =========================================
+
+model License {
+  id            String      @id @default(cuid())
+  licenseKey    String      @unique @default(uuid())
+  type          LicenseType
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id])
+  
+  allowedUses   String[]
+  restrictions  String[]
+  
+  isActive      Boolean     @default(true)
+  downloadsUsed Int         @default(0)
+  
+  createdAt     DateTime    @default(now())
+}
+
+enum LicenseType {
+  STUDENT
+  COMMERCIAL
+  ENTERPRISE
+}
+
+// =========================================
+// SUPPORT & USER FEATURES
+// =========================================
+
+model Ticket {
+  id            String   @id @default(cuid())
+  subject       String
+  message       String   @db.Text
+  status        TicketStatus @default(OPEN)
+  
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  @@unique([userId, productId])
+}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, User, ShoppingBag, ArrowUpRight, Menu, X, ChevronDown } from 'lucide-react';
+import Link from 'next/link';
 import { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from 'motion/react';
 import { Creato4LabLogoMark } from './LogoMark';
 
@@ -231,9 +232,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button onClick={onOpenSearch} aria-label="Search" className="p-1.5 hover:text-[#1A3C2F] hover:bg-[#1A3C2F]/6 rounded-full transition-colors cursor-pointer">
                   <Search className="w-4 h-4 stroke-[1.5]" />
                 </button>
-                <button onClick={onOpenAccount} aria-label="Account" className="p-1.5 hover:text-[#1A3C2F] hover:bg-[#1A3C2F]/6 rounded-full transition-colors cursor-pointer">
+                <Link href="/dashboard" aria-label="Account" className="p-1.5 hover:text-[#1A3C2F] hover:bg-[#1A3C2F]/6 rounded-full transition-colors cursor-pointer flex items-center justify-center">
                   <User className="w-4 h-4 stroke-[1.5]" />
-                </button>
+                </Link>
                 <button onClick={onOpenCart} aria-label="Cart" className="p-1.5 hover:text-[#1A3C2F] hover:bg-[#1A3C2F]/6 rounded-full transition-colors relative cursor-pointer">
                   <ShoppingBag className="w-4 h-4 stroke-[1.5]" />
                   {cartCount > 0 && (
@@ -333,9 +334,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button onClick={() => { setMobileMenuOpen(false); onOpenSearch(); }} className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider">
                   <Search className="w-4 h-4" /> Search
                 </button>
-                <button onClick={() => { setMobileMenuOpen(false); onOpenAccount(); }} className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider">
+                <Link href="/dashboard" onClick={() => { setMobileMenuOpen(false); }} className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider">
                   <User className="w-4 h-4" /> Account
-                </button>
+                </Link>
                 <button onClick={() => { setMobileMenuOpen(false); onOpenCart(); }} className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider">
                   <ShoppingBag className="w-4 h-4" /> Saved ({cartCount})
                 </button>
