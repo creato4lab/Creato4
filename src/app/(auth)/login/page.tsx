@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { signIn } from "@/auth";
-import { ArrowRight, Mail, Lock } from "lucide-react";
 
 export default function LoginPage() {
   return (
@@ -30,12 +29,12 @@ export default function LoginPage() {
           <form
             action={async () => {
               "use server";
-              await signIn("google");
+              await signIn("google", { redirectTo: "/dashboard" });
             }}
           >
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-3 py-3.5 px-4 border border-[#E8E2D9] rounded-xl shadow-sm bg-white text-sm font-semibold text-[#1A3C2F] hover:bg-gray-50 focus:outline-none transition-all duration-300 mb-6"
+              className="w-full flex items-center justify-center gap-3 py-3.5 px-4 border border-[#E8E2D9] rounded-xl shadow-sm bg-white text-sm font-semibold text-[#1A3C2F] hover:bg-gray-50 focus:outline-none transition-all duration-300"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -59,94 +58,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#E8E2D9]" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-[#FAF8F5] text-[#5C6B60]">Or continue with email</span>
-            </div>
-          </div>
 
-          <form className="space-y-6 mt-6" action="#" method="POST">
-            <div>
-              <label htmlFor="email" className="block text-xs font-bold uppercase tracking-wider text-[#1A3C2F]">
-                Email address
-              </label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-4 w-4 text-gray-400" />
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  suppressHydrationWarning
-                  className="appearance-none block w-full pl-10 pr-3 py-3.5 border border-[#E8E2D9] rounded-xl bg-white/50 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#1A3C2F] focus:border-[#1A3C2F] text-sm transition-all"
-                  placeholder="john@example.com"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-xs font-bold uppercase tracking-wider text-[#1A3C2F]">
-                Password
-              </label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-4 w-4 text-gray-400" />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  className="appearance-none block w-full pl-10 pr-3 py-3.5 border border-[#E8E2D9] rounded-xl bg-white/50 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#1A3C2F] focus:border-[#1A3C2F] text-sm transition-all"
-                  placeholder="••••••••"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-[#1A3C2F] focus:ring-[#1A3C2F] border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-[#5C6B60]">
-                  Remember me
-                </label>
-              </div>
-
-              <div className="text-sm">
-                <a href="#" className="font-semibold text-[#1A3C2F] hover:text-[#C4A35A] transition-colors">
-                  Forgot password?
-                </a>
-              </div>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                className="w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-extrabold text-[#FAF8F5] bg-[#1A3C2F] hover:bg-[#234B3C] focus:outline-none transition-all duration-300"
-              >
-                Sign in
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </form>
-
-          <div className="mt-8 text-center text-sm text-[#5C6B60]">
-            Don&apos;t have an account?{" "}
-            <Link href="/register" className="font-bold text-[#1A3C2F] hover:text-[#C4A35A] transition-colors">
-              Create an account
-            </Link>
-          </div>
         </div>
       </div>
     </div>
