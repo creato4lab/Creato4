@@ -2,9 +2,11 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getProductBySlug } from '@/actions/product';
-import { ArrowLeft, Check, AlertTriangle, ShieldCheck, Download, Cpu, Code } from 'lucide-react';
+import { ArrowLeft, Check, AlertTriangle, Cpu, Code } from 'lucide-react';
+import { LicenseCheckout } from '@/components/LicenseCheckout';
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const { product } = await getProductBySlug(params.slug);
   if (!product) return { title: 'Product Not Found - Creato4 Lab' };
   
@@ -14,7 +16,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function ProductDetailPage({ params }: { params: { slug: string } }) {
+export default async function ProductDetailPage(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const { product, error } = await getProductBySlug(params.slug);
 
   if (error || !product) {
@@ -130,78 +133,11 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
 
         {/* Right Column: Sticky Checkout / License Picker */}
         <div className="w-full lg:w-[400px] shrink-0">
-          <div className="sticky top-32 bg-white border border-[#1A3C2F]/10 rounded-3xl shadow-[0_20px_40px_-15px_rgba(26,60,47,0.1)] p-6 sm:p-8">
-            
-            <h2 className="text-xl font-black text-[#1A3C2F] mb-6">Select License</h2>
-            
-            <div className="space-y-4 mb-8">
-              {/* Student Tier (Selected by default for UI mockup) */}
-              <label className="relative flex cursor-pointer p-4 rounded-2xl border-2 border-[#1A3C2F] bg-[#1A3C2F]/5 transition-all">
-                <input type="radio" name="license" value="STUDENT" className="peer sr-only" defaultChecked />
-                <div className="flex-1">
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="font-bold text-[#1A3C2F]">Student</span>
-                    <span className="font-black text-lg text-[#1A3C2F]">₹{basePrice.toLocaleString('en-IN')}</span>
-                  </div>
-                  <p className="text-xs text-[#1A3C2F]/60 pr-6">Personal projects & academic use only. No commercial distribution.</p>
-                </div>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 border-[#1A3C2F] flex items-center justify-center">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#1A3C2F]"></div>
-                </div>
-              </label>
-
-              {/* Commercial Tier */}
-              <label className="relative flex cursor-pointer p-4 rounded-2xl border-2 border-transparent hover:border-[#1A3C2F]/20 transition-all">
-                <input type="radio" name="license" value="COMMERCIAL" className="peer sr-only" />
-                <div className="flex-1">
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="font-bold text-[#1A3C2F]">Commercial</span>
-                    <span className="font-black text-lg text-[#1A3C2F]">₹{commercialPrice.toLocaleString('en-IN')}</span>
-                  </div>
-                  <p className="text-xs text-[#1A3C2F]/60 pr-6">Use in up to 3 client projects. Internal team use (up to 5 users).</p>
-                </div>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 border-[#1A3C2F]/20 flex items-center justify-center">
-                  <div className="w-2.5 h-2.5 rounded-full bg-transparent peer-checked:bg-[#1A3C2F]"></div>
-                </div>
-              </label>
-
-              {/* Enterprise Tier */}
-              <label className="relative flex cursor-pointer p-4 rounded-2xl border-2 border-transparent hover:border-[#1A3C2F]/20 transition-all">
-                <input type="radio" name="license" value="ENTERPRISE" className="peer sr-only" />
-                <div className="flex-1">
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="font-bold text-[#1A3C2F]">Enterprise</span>
-                    <span className="font-black text-lg text-[#1A3C2F]">₹{enterprisePrice.toLocaleString('en-IN')}</span>
-                  </div>
-                  <p className="text-xs text-[#1A3C2F]/60 pr-6">Unlimited projects within a single legal entity.</p>
-                </div>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 border-[#1A3C2F]/20 flex items-center justify-center">
-                  <div className="w-2.5 h-2.5 rounded-full bg-transparent peer-checked:bg-[#1A3C2F]"></div>
-                </div>
-              </label>
-            </div>
-
-            <button className="w-full flex items-center justify-center gap-2 bg-[#1A3C2F] text-[#FAF8F5] py-4 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity mb-4">
-              <Download className="w-4 h-4" />
-              Proceed to Checkout
-            </button>
-
-            <div className="text-center">
-              <Link href="/eula" className="text-xs text-[#1A3C2F]/50 hover:text-[#C4A35A] transition-colors underline underline-offset-2">
-                Read End User License Agreement (EULA)
-              </Link>
-            </div>
-
-            <div className="mt-8 pt-6 border-t border-[#1A3C2F]/10 space-y-3">
-              <div className="flex items-center gap-3 text-xs text-[#1A3C2F]/70">
-                <ShieldCheck className="w-4 h-4 text-green-600" /> Secure Payment via Razorpay
-              </div>
-              <div className="flex items-center gap-3 text-xs text-[#1A3C2F]/70">
-                <Download className="w-4 h-4 text-[#C4A35A]" /> Instant Digital Delivery
-              </div>
-            </div>
-
-          </div>
+          <LicenseCheckout 
+            productId={product.id} 
+            productName={product.title} 
+            basePrice={basePrice} 
+          />
         </div>
 
       </div>

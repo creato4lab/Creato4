@@ -1,14 +1,26 @@
 import { auth, signOut } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LogOut, User, Folder, Settings, Download } from "lucide-react";
+import { LogOut, User, Folder, Settings, Download, Key, Calendar, ShieldCheck } from "lucide-react";
+import prisma from "@/lib/prisma";
 
-export default async function DashboardPage() {
+export default async function DashboardPage(props: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const session = await auth();
 
   if (!session?.user) {
-    redirect("/login");
+    redirect("/login?callbackUrl=/dashboard");
   }
+
+  const searchParams = await props.searchParams;
+  const isSuccess = searchParams.success === 'true';
+
+  const licenses = await prisma.license.findMany({
+    where: { userId: session.user.id },
+    include: { product: true },
+    orderBy: { createdAt: 'desc' }
+  });
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] pt-32 pb-20 px-6 sm:px-10 lg:px-16 xl:px-20 relative overflow-hidden">
@@ -96,9 +108,52 @@ export default async function DashboardPage() {
                 </div>
                 <h3 className="text-lg font-bold text-[#1A3C2F]">Digital Engineering Assets</h3>
               </div>
-              <div className="p-6 rounded-2xl border border-dashed border-[#E8E2D9] text-center bg-[#FAF8F5]/50">
-                <p className="text-sm text-[#5C6B60]">No digital products or CAD files purchased yet.</p>
-              </div>
+              
+              {isSuccess && (
+                <div className="bg-green-50 border border-green-200 p-4 rounded-xl mb-6 flex items-start gap-3">
+                  <ShieldCheck className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="text-green-900 font-bold text-sm mb-1">Payment Successful!</h4>
+                    <p className="text-green-800 text-xs">Your order was completed successfully. Your new license has been added to your dashboard.</p>
+                  </div>
+                </div>
+              )}
+
+              {licenses.length === 0 ? (
+                <div className="p-6 rounded-2xl border border-dashed border-[#E8E2D9] text-center bg-[#FAF8F5]/50">
+                  <p className="text-sm text-[#5C6B60]">No digital products or CAD files purchased yet.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {licenses.map((license) => (
+                    <div key={license.id} className="border border-[#E8E2D9] rounded-2xl p-5 bg-white flex flex-col sm:flex-row justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="bg-[#1A3C2F]/5 text-[#1A3C2F] text-[0.6rem] font-bold uppercase px-2 py-1 rounded">
+                            {license.type}
+                          </span>
+                          <span className="text-xs text-[#5C6B60]">
+                            Purchased on {license.createdAt.toLocaleDateString()}
+                          </span>
+                        </div>
+                        <h4 className="text-md font-bold text-[#1A3C2F] mb-2">{license.product.title}</h4>
+                        <div className="flex items-center gap-2 text-xs text-[#5C6B60]">
+                          <Key className="w-3.5 h-3.5" />
+                          <span className="font-mono">{license.licenseKey}</span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-2 shrink-0 justify-center">
+                        <button className="flex items-center justify-center gap-2 bg-[#1A3C2F] text-[#FAF8F5] px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#234B3C] transition-colors">
+                          <Download className="w-3.5 h-3.5" /> Download
+                        </button>
+                        <Link href={`/shop/${license.product.slug}`} className="text-center text-xs text-[#C4A35A] hover:underline font-semibold">
+                          View Details
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
           </div>

@@ -9,11 +9,10 @@ export const metadata = {
   description: 'Browse our collection of engineering blueprints, source code, PCB designs, and CAD models.',
 };
 
-export default async function ShopPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
+export default async function ShopPage(props: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const searchParams = await props.searchParams;
   const categoryParam = searchParams.category as ProductCategory | undefined;
   const difficultyParam = searchParams.difficulty as Difficulty | undefined;
   const searchParam = searchParams.search as string | undefined;
