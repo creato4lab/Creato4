@@ -11,7 +11,8 @@
 // ============================================================
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://creato4.com";
-const LOGO_URL = `${APP_URL}/creato4-logo.svg`;
+// Note: Gmail blocks SVGs and localhost images. We must use a publicly hosted PNG.
+const LOGO_URL = "https://cdn.jsdelivr.net/gh/CHAUHANRUDRA24/Creato4@main/public/creato4logo.png";
 
 // ── Shared shell ─────────────────────────────────────────────
 function shell(preheader: string, body: string): string {
