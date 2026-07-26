@@ -83,6 +83,9 @@ export async function createProduct(data: any) {
         softwareUsed: data.softwareUsed ? data.softwareUsed.split(',').map((s: string) => s.trim()) : [],
         whatsIncluded: data.whatsIncluded ? data.whatsIncluded.split(',').map((s: string) => s.trim()) : [],
         images: data.images ? data.images.split(',').map((s: string) => s.trim()) : [],
+        sourceCodePath: data.sourceCodePath || null,
+        cadFilePath: data.cadFilePath || null,
+        pdfDocPath: data.pdfDocPath || null,
       }
     });
     return { success: true, product };

@@ -134,6 +134,29 @@ export default function NewProductPage() {
             </div>
           </div>
 
+          {/* Secure File Delivery (S3 Keys) */}
+          <div className="space-y-6">
+            <h2 className="text-sm font-black uppercase tracking-widest text-[#1A3C2F]/40 border-b border-[#1A3C2F]/5 pb-2">Digital Delivery (S3 Keys)</h2>
+            <p className="text-xs text-[#1A3C2F]/50">Enter the exact S3 object keys (file paths) where these digital assets are stored. Buyers will receive a secure 5-minute presigned download link to these files.</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-xs font-bold text-[#1A3C2F] mb-2 uppercase tracking-wide">Source Code Key</label>
+                <input type="text" name="sourceCodePath" className="w-full bg-[#FAF8F5] border border-[#1A3C2F]/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C4A35A]/50 focus:border-[#C4A35A]" placeholder="e.g., projects/drone/source.zip" />
+              </div>
+              
+              <div>
+                <label className="block text-xs font-bold text-[#1A3C2F] mb-2 uppercase tracking-wide">CAD File Key</label>
+                <input type="text" name="cadFilePath" className="w-full bg-[#FAF8F5] border border-[#1A3C2F]/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C4A35A]/50 focus:border-[#C4A35A]" placeholder="e.g., projects/drone/cad.step" />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#1A3C2F] mb-2 uppercase tracking-wide">PDF Doc Key</label>
+                <input type="text" name="pdfDocPath" className="w-full bg-[#FAF8F5] border border-[#1A3C2F]/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C4A35A]/50 focus:border-[#C4A35A]" placeholder="e.g., projects/drone/guide.pdf" />
+              </div>
+            </div>
+          </div>
+
           <div className="pt-6 border-t border-[#1A3C2F]/5 flex justify-end">
             <button 
               type="submit" 

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LogOut, User, Folder, Settings, Download, Key, Calendar, ShieldCheck } from "lucide-react";
 import prisma from "@/lib/prisma";
+import { DownloadButton } from "./DownloadButton";
 
 export default async function DashboardPage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -143,9 +144,7 @@ export default async function DashboardPage(props: {
                         </div>
                       </div>
                       <div className="flex flex-col gap-2 shrink-0 justify-center">
-                        <button className="flex items-center justify-center gap-2 bg-[#1A3C2F] text-[#FAF8F5] px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#234B3C] transition-colors">
-                          <Download className="w-3.5 h-3.5" /> Download
-                        </button>
+                        <DownloadButton productId={license.productId} title={license.product.title} />
                         <Link href={`/shop/${license.product.slug}`} className="text-center text-xs text-[#C4A35A] hover:underline font-semibold">
                           View Details
                         </Link>
