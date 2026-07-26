@@ -23,7 +23,7 @@ export function PageLoader() {
       setVisible(false);
       setIsFadingOut(false);
       setProgress(0);
-    }, 280);
+    }, 250);
   }, []);
 
   const startLoading = useCallback(() => {
@@ -31,9 +31,8 @@ export function PageLoader() {
     setIsFadingOut(false);
     setLoading(true);
     setVisible(true);
-    setProgress(18);
+    setProgress(20);
 
-    // Safety fallback: auto-hide after 3.5 seconds if route change gets stuck
     timeoutRef.current = setTimeout(() => {
       stopLoading();
     }, 3500);
@@ -93,7 +92,7 @@ export function PageLoader() {
       setProgress((prev) => {
         if (prev >= 90) return prev;
         const remaining = 90 - prev;
-        return prev + Math.max(remaining * 0.12, 0.4);
+        return prev + Math.max(remaining * 0.15, 0.5);
       });
     }, 80);
 
@@ -103,51 +102,38 @@ export function PageLoader() {
   if (!visible) return null;
 
   return (
-    <div
-      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-        isFadingOut ? 'opacity-0 scale-[1.015]' : 'opacity-100 scale-100'
-      }`}
-      style={{ willChange: 'opacity, transform' }}
-    >
-      {/* Smooth translucent backdrop */}
-      <div className="absolute inset-0 bg-[#FAF8F5]/85 dark:bg-[#0A130F]/90 backdrop-blur-md" />
-
+    <>
       {/* Top minimal progress bar */}
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-stone-200/40 dark:bg-emerald-950/40 overflow-hidden">
+      <div className="fixed top-0 left-0 right-0 z-[10000] h-[2px] overflow-hidden pointer-events-none">
         <div
-          className="h-full bg-gradient-to-r from-[#1A3C2F] via-[#C4A35A] to-[#E8D4A0] transition-all duration-300 ease-out shadow-[0_0_8px_rgba(196,163,90,0.5)]"
+          className="h-full bg-gradient-to-r from-[#1A3C2F] via-[#C4A35A] to-[#E8D4A0] transition-all duration-300 ease-out shadow-[0_0_8px_rgba(196,163,90,0.6)]"
           style={{ width: `${progress}%` }}
         />
       </div>
 
-      {/* Clean Minimalist Centerpiece */}
-      <div className="relative z-10 flex flex-col items-center gap-4 select-none">
-        {/* Sleek Ring & Emblem */}
-        <div className="relative w-11 h-11 flex items-center justify-center">
-          {/* Smooth spinning arc */}
-          <div className="absolute inset-0 rounded-full border-[1.5px] border-stone-200/60 dark:border-emerald-900/30 border-t-[#C4A35A] dark:border-t-[#C4A35A] animate-spin [animation-duration:0.9s]" />
-
-          {/* Inner brand badge */}
-          <div className="w-7 h-7 rounded-md bg-[#1A3C2F] flex items-center justify-center shadow-md">
-            <span className="text-[10px] font-bold tracking-widest text-[#C4A35A]">
+      {/* Floating Logo Badge Loader Only - No full screen backdrop */}
+      <div
+        className={`fixed inset-0 z-[10000] flex items-center justify-center pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          isFadingOut ? 'opacity-0 scale-90' : 'opacity-100 scale-100'
+        }`}
+        style={{ willChange: 'opacity, transform' }}
+      >
+        <div className="flex flex-col items-center gap-3 p-4 rounded-2xl bg-[#1A3C2F]/95 dark:bg-[#0A130F]/95 backdrop-blur-md border border-[#C4A35A]/30 shadow-2xl shadow-black/30">
+          {/* Logo Mark with Gold Spinning Ring */}
+          <div className="relative w-10 h-10 flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full border-[1.5px] border-[#C4A35A]/20 border-t-[#C4A35A] animate-spin [animation-duration:0.8s]" />
+            <span className="text-xs font-extrabold text-[#C4A35A] tracking-wider">
               C4
             </span>
           </div>
-        </div>
 
-        {/* Minimal Brand Label */}
-        <div className="flex flex-col items-center gap-2">
-          <span className="text-[10px] font-semibold tracking-[0.25em] uppercase text-stone-600 dark:text-stone-300">
-            CREATO4 LAB
+          <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-stone-300">
+            CREATO4
           </span>
-
-          {/* Subtle line glow */}
-          <div className="w-10 h-[1.5px] bg-[#C4A35A]/30 rounded-full overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#C4A35A] to-transparent animate-[shimmer_1.4s_infinite_linear]" />
-          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
+
 
