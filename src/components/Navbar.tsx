@@ -15,6 +15,8 @@ interface NavbarProps {
 
 const EASING: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
+const MotionLink = motion(Link);
+
 export const Navbar: React.FC<NavbarProps> = ({
   onOpenDiscuss,
   onOpenSearch,
@@ -139,7 +141,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
 
             {/* ── BRAND LOGO ─────────────────────────────── */}
-            <a href="#" className="flex items-center gap-2.5 group shrink-0">
+            <Link href="/" className="flex items-center gap-2.5 group shrink-0">
               <motion.div style={{ width: logoSize, height: logoSize }}>
                 <MotionLogoMark size={logoSize} />
               </motion.div>
@@ -149,7 +151,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 CREATO4
               </motion.span>
-            </a>
+            </Link>
 
             {/* ── DESKTOP NAV LINKS ─────────────────────── */}
             <nav className="hidden lg:flex items-center">
@@ -160,7 +162,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onMouseEnter={() => setActiveDropdown(link.name)}
                   onMouseLeave={() => setActiveDropdown(null)}
                 >
-                  <motion.a
+                  <MotionLink
                     href={link.href}
                     className="group inline-flex items-center gap-0.5 font-semibold tracking-[0.16em] text-[#5C6B60] hover:text-[#1A3C2F] transition-colors duration-200 uppercase relative"
                     style={{
@@ -185,7 +187,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         opacity: useTransform(spring, [0.6, 1], [1, 0]),
                       }}
                     />
-                  </motion.a>
+                  </MotionLink>
 
                   {/* Dropdown */}
                   <AnimatePresence>
@@ -203,7 +205,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         }}
                       >
                         {link.dropdown.map((item, idx) => (
-                          <a
+                          <Link
                             key={idx}
                             href={item.href}
                             onClick={() => setActiveDropdown(null)}
@@ -211,7 +213,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           >
                             <span>{item.label}</span>
                             <ArrowUpRight className="w-3 h-3 opacity-0 group-hover/item:opacity-100 transition-opacity" />
-                          </a>
+                          </Link>
                         ))}
                       </motion.div>
                     )}
@@ -332,7 +334,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <nav className="flex flex-col gap-6 my-auto">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.name}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
@@ -340,7 +342,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <span>{link.name}</span>
                   <ArrowUpRight className="w-4 h-4 opacity-60" />
-                </a>
+                </Link>
               ))}
             </nav>
 

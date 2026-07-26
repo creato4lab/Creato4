@@ -24,6 +24,30 @@ import { ServiceItem } from '@/types';
 export default function HomeClient() {
   const [preloaderDone, setPreloaderDone] = useState(false);
 
+  useEffect(() => {
+    try {
+      const navEntry = performance.getEntriesByType?.('navigation')?.[0] as PerformanceNavigationTiming | undefined;
+      const isReload = navEntry?.type === 'reload';
+      
+      if (isReload) {
+        sessionStorage.removeItem('creato4_preloader_seen');
+      } else if (sessionStorage.getItem('creato4_preloader_seen') === 'true') {
+        setPreloaderDone(true);
+      }
+    } catch {
+      // Fallback if sessionStorage is disabled/blocked
+    }
+  }, []);
+
+  const handlePreloaderComplete = () => {
+    try {
+      sessionStorage.setItem('creato4_preloader_seen', 'true');
+    } catch {
+      // ignore storage errors
+    }
+    setPreloaderDone(true);
+  };
+
   // Smooth scroll
   useEffect(() => {
     import('lenis')
@@ -122,7 +146,7 @@ export default function HomeClient() {
       <CustomCursor />
       
       {/* 1. Preloader */}
-      {!preloaderDone && <Preloader onComplete={() => setPreloaderDone(true)} />}
+      {!preloaderDone && <Preloader onComplete={handlePreloaderComplete} />}
 
       {/* Main Content (fades in smoothly) */}
       <div className={preloaderDone ? 'opacity-100 transition-opacity duration-500' : 'opacity-0'}>

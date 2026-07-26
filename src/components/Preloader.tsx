@@ -120,6 +120,16 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
         animation: 'splashExit 0.8s cubic-bezier(0.65, 0, 0.35, 1) 6.5s forwards',
       }}
     >
+      {/* Skip button */}
+      <button
+        onClick={() => {
+          document.body.style.overflow = '';
+          onComplete();
+        }}
+        className="absolute top-6 right-6 z-50 px-4 py-2 rounded-full border border-[rgba(201,169,110,.3)] bg-[#050f0a]/60 text-[#c9a96e] text-xs font-bold uppercase tracking-widest hover:bg-[#c9a96e] hover:text-[#050f0a] transition-all cursor-pointer shadow-lg"
+      >
+        Skip Intro →
+      </button>
       {/* Keyframe Styles */}
       <style>{`
         /* PHASE 1 KEYFRAMES */
