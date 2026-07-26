@@ -49,7 +49,7 @@ export default function LegalLayout({
   }, [sections]);
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5]">
+    <div className="min-h-screen bg-[#FAF8F5] pt-[80px] lg:pt-[104px]">
 
       {/* Hero Header */}
       <header className="bg-[#1A3C2F] text-[#FAF8F5] px-6 sm:px-10 lg:px-16 pt-10 pb-16 relative overflow-hidden">
