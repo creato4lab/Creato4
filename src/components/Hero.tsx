@@ -51,17 +51,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss }) => {
             ))}
           </h1>
 
-          {/* Subtext */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.0, ease: 'easeOut' }}
-            className="text-base sm:text-lg text-[#5C6B60] max-w-[560px] leading-relaxed mb-8 font-normal"
-          >
-            From product strategy and mechanical design to electronics, embedded systems, software,
-            and immersive digital experiences — we bring multiple disciplines together to build
-            things that work.
-          </motion.p>
+
 
           {/* CTA Group */}
           <motion.div
@@ -100,26 +90,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss }) => {
             <span>Free initial discussion · No commitment</span>
           </motion.div>
 
-          {/* Quick Stats Pill */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 1.7 }}
-            className="mt-8 pt-8 border-t border-[#E8E2D9] grid grid-cols-3 gap-4 max-w-lg"
-          >
-            <div>
-              <div className="text-xl sm:text-2xl font-bold text-[#1A3C2F]">100%</div>
-              <div className="text-[11px] uppercase tracking-wider text-[#5C6B60]">Real Hardware</div>
-            </div>
-            <div>
-              <div className="text-xl sm:text-2xl font-bold text-[#1A3C2F]">5 Layers</div>
-              <div className="text-[11px] uppercase tracking-wider text-[#5C6B60]">Full Stack Lab</div>
-            </div>
-            <div>
-              <div className="text-xl sm:text-2xl font-bold text-[#1A3C2F]">20 Min</div>
-              <div className="text-[11px] uppercase tracking-wider text-[#5C6B60]">Free Tech Call</div>
-            </div>
-          </motion.div>
+
 
         </div>
 
