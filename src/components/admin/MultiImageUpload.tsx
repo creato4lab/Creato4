@@ -25,29 +25,13 @@ export function MultiImageUpload({ name, label }: MultiImageUploadProps) {
 
   const uploadSingleFile = async (item: ImageFileItem) => {
     try {
-      // 1. Get presigned URL
-      const res = await fetch("/api/admin/upload-url", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          filename: item.file.name,
-          contentType: item.file.type || "image/jpeg",
-          prefix: "images",
-        }),
-      });
+      const formData = new FormData();
+      formData.append("file", item.file);
+      formData.append("prefix", "images");
 
-      const data = await res.json();
-      if (!res.ok || data.error) {
-        throw new Error(data.error || "Failed to get upload URL");
-      }
-
-      const { uploadUrl, key } = data;
-
-      // 2. Upload to R2 with progress tracking
-      await new Promise<void>((resolve, reject) => {
+      const key = await new Promise<string>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        xhr.open("PUT", uploadUrl, true);
-        xhr.setRequestHeader("Content-Type", item.file.type || "image/jpeg");
+        xhr.open("POST", "/api/admin/upload-file", true);
 
         xhr.upload.onprogress = (event) => {
           if (event.lengthComputable) {
@@ -60,17 +44,26 @@ export function MultiImageUpload({ name, label }: MultiImageUploadProps) {
 
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) {
-            resolve();
+            try {
+              const resData = JSON.parse(xhr.responseText);
+              if (resData.key) {
+                resolve(resData.key);
+              } else {
+                reject(new Error(resData.error || "Upload failed"));
+              }
+            } catch {
+              reject(new Error("Invalid server response"));
+            }
           } else {
             reject(new Error(`Upload failed with status ${xhr.status}`));
           }
         };
 
         xhr.onerror = () => reject(new Error("Network error"));
-        xhr.send(item.file);
+        xhr.send(formData);
       });
 
-      // 3. Mark success
+      // Mark success
       setItems((prev) =>
         prev.map((i) =>
           i.id === item.id ? { ...i, status: "success", key, progress: 100 } : i

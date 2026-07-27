@@ -29,30 +29,13 @@ export function FileUpload({ name, label, prefix, accept, required }: FileUpload
     setErrorMsg("");
 
     try {
-      // 1. Get presigned URL from our server
-      const res = await fetch("/api/admin/upload-url", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          filename: file.name,
-          contentType: file.type || "application/octet-stream",
-          prefix,
-        }),
-      });
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("prefix", prefix);
 
-      const data = await res.json();
-
-      if (!res.ok || data.error) {
-        throw new Error(data.error || "Failed to get upload URL");
-      }
-
-      // 2. Upload directly to R2 using XMLHttpRequest to track progress
-      const { uploadUrl, key } = data;
-
-      await new Promise<void>((resolve, reject) => {
+      await new Promise<string>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        xhr.open("PUT", uploadUrl, true);
-        xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+        xhr.open("POST", "/api/admin/upload-file", true);
 
         xhr.upload.onprogress = (event) => {
           if (event.lengthComputable) {
@@ -63,19 +46,27 @@ export function FileUpload({ name, label, prefix, accept, required }: FileUpload
 
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) {
-            resolve();
+            try {
+              const resData = JSON.parse(xhr.responseText);
+              if (resData.key) {
+                resolve(resData.key);
+              } else {
+                reject(new Error(resData.error || "Upload failed"));
+              }
+            } catch {
+              reject(new Error("Invalid server response"));
+            }
           } else {
             reject(new Error(`Upload failed with status ${xhr.status}`));
           }
         };
 
         xhr.onerror = () => reject(new Error("Network error during upload"));
-        xhr.send(file);
+        xhr.send(formData);
+      }).then((key) => {
+        setUploadedKey(key);
+        setStatus("success");
       });
-
-      // 3. Success!
-      setUploadedKey(key);
-      setStatus("success");
     } catch (err: any) {
       console.error("Upload error:", err);
       setStatus("error");
