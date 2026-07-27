@@ -177,3 +177,51 @@ export async function updateTicketStatus(ticketId: string, status: "OPEN" | "IN_
 
   return { success: true, ticket };
 }
+
+export async function getUserTickets() {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { tickets: [], error: "Unauthorized" };
+  }
+
+  try {
+    const tickets = await prisma.ticket.findMany({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: "desc" },
+    });
+    return { tickets, error: null };
+  } catch (err) {
+    console.error("getUserTickets error:", err);
+    return { tickets: [], error: "Failed to load support tickets" };
+  }
+}
+
+export async function createSupportTicket(data: {
+  subject: string;
+  message: string;
+  phone?: string;
+}) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "You must be logged in to create a ticket." };
+  }
+
+  try {
+    const ticket = await prisma.ticket.create({
+      data: {
+        userId: session.user.id,
+        name: session.user.name || "Customer",
+        email: session.user.email || null,
+        phone: data.phone || null,
+        subject: data.subject,
+        message: data.message,
+        status: "OPEN",
+      },
+    });
+
+    return { success: true, ticketId: ticket.id };
+  } catch (err) {
+    console.error("createSupportTicket error:", err);
+    return { success: false, error: "Failed to create support ticket." };
+  }
+}
