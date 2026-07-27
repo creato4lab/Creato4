@@ -12,7 +12,31 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET!,
 });
 
-export async function createRazorpayOrder(productId: string, licenseType: "STUDENT" | "COMMERCIAL" | "ENTERPRISE") {
+// Price multipliers matching PurchaseOptions.tsx
+const PRICE_MULTIPLIERS: Record<string, number> = {
+  STUDENT:           1.0,
+  COMMERCIAL:        2.5,
+  ENTERPRISE:        8.0,
+  SOURCE_CODE_ONLY:  0.6,
+  REPORT_SUBMISSION: 0.4,
+  REPORT_EDITABLE:   0.5,
+  FIRMWARE_FLASH:    0.35,
+};
+
+// Max activations per license tier
+const MAX_ACTIVATIONS: Record<string, number> = {
+  STUDENT:           2,
+  COMMERCIAL:        5,
+  ENTERPRISE:        999,
+  SOURCE_CODE_ONLY:  2,
+  REPORT_SUBMISSION: 1,
+  REPORT_EDITABLE:   1,
+  FIRMWARE_FLASH:    2,
+};
+
+type LicenseTypeAll = "STUDENT" | "COMMERCIAL" | "ENTERPRISE" | "SOURCE_CODE_ONLY" | "REPORT_SUBMISSION" | "REPORT_EDITABLE" | "FIRMWARE_FLASH";
+
+export async function createRazorpayOrder(productId: string, licenseType: LicenseTypeAll) {
   try {
     const session = await auth();
     if (!session || !session.user) {
@@ -27,11 +51,8 @@ export async function createRazorpayOrder(productId: string, licenseType: "STUDE
       return { error: "Product not found." };
     }
 
-    let price = product.price;
-    if (licenseType === "COMMERCIAL") price = Math.round(price * 2.5);
-    if (licenseType === "ENTERPRISE") price = Math.round(price * 8);
-
-    // Razorpay amount is in the smallest currency unit (paise)
+    const multiplier = PRICE_MULTIPLIERS[licenseType] ?? 1.0;
+    const price = Math.round(product.price * multiplier);
     const amountInPaise = price * 100;
 
     const options = {
@@ -46,8 +67,6 @@ export async function createRazorpayOrder(productId: string, licenseType: "STUDE
     };
 
     const order = await razorpay.orders.create(options);
-
-    // We don't create Prisma Order here yet, wait for successful payment
     return { orderId: order.id, amount: options.amount, currency: options.currency };
   } catch (error) {
     console.error("Error creating Razorpay order:", error);
@@ -60,7 +79,7 @@ export async function verifyPayment(
   razorpay_payment_id: string,
   razorpay_signature: string,
   productId: string,
-  licenseType: "STUDENT" | "COMMERCIAL" | "ENTERPRISE",
+  licenseType: LicenseTypeAll,
   amountPaid: number
 ) {
   try {
@@ -106,9 +125,8 @@ export async function verifyPayment(
       return { error: "Product not found." };
     }
 
-    let expectedPrice = product.price;
-    if (licenseType === "COMMERCIAL") expectedPrice = Math.round(expectedPrice * 2.5);
-    if (licenseType === "ENTERPRISE") expectedPrice = Math.round(expectedPrice * 8);
+    const multiplier = PRICE_MULTIPLIERS[licenseType] ?? 1.0;
+    const expectedPrice = Math.round(product.price * multiplier);
     const expectedAmountInPaise = expectedPrice * 100;
 
     // Validate that the paid amount matches expected server price
@@ -142,13 +160,22 @@ export async function verifyPayment(
         type: licenseType,
         userId: session.user.id,
         productId,
-        allowedUses: licenseType === "STUDENT" 
-          ? ["Personal projects", "Academic use"] 
-          : licenseType === "COMMERCIAL" 
+        maxActivations: MAX_ACTIVATIONS[licenseType] ?? 2,
+        allowedUses: licenseType === "STUDENT"
+          ? ["Personal projects", "Academic use"]
+          : licenseType === "COMMERCIAL"
           ? ["Client projects (up to 3)", "Internal team use"]
-          : ["Unlimited projects", "Enterprise deployment"],
-        restrictions: licenseType === "STUDENT" 
-          ? ["No commercial distribution"] 
+          : licenseType === "ENTERPRISE"
+          ? ["Unlimited projects", "Enterprise deployment"]
+          : licenseType === "SOURCE_CODE_ONLY"
+          ? ["Source code access", "Personal/academic use"]
+          : licenseType === "REPORT_SUBMISSION"
+          ? ["Academic/college submission"]
+          : licenseType === "REPORT_EDITABLE"
+          ? ["Editable report files"]
+          : ["Firmware flash to registered devices"],
+        restrictions: ["STUDENT", "SOURCE_CODE_ONLY", "REPORT_SUBMISSION", "REPORT_EDITABLE"].includes(licenseType)
+          ? ["No commercial redistribution"]
           : [],
       }
     });

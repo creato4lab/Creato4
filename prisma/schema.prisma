@@ -198,21 +198,24 @@ enum OrderStatus {
 // =========================================
 
 model License {
-  id            String      @id @default(cuid())
-  licenseKey    String      @unique @default(uuid())
-  type          LicenseType
-  userId        String
-  user          User        @relation(fields: [userId], references: [id])
-  productId     String
-  product       Product     @relation(fields: [productId], references: [id])
-  
-  allowedUses   String[]
-  restrictions  String[]
-  
-  isActive      Boolean     @default(true)
-  downloadsUsed Int         @default(0)
-  
-  createdAt     DateTime    @default(now())
+  id              String      @id @default(cuid())
+  licenseKey      String      @unique @default(uuid())
+  type            LicenseType
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
+  productId       String
+  product         Product     @relation(fields: [productId], references: [id])
+
+  allowedUses     String[]
+  restrictions    String[]
+
+  isActive        Boolean     @default(true)
+  downloadsUsed   Int         @default(0)
+  maxActivations  Int         @default(2)   // 2 for student/standard, 5 commercial, 999 enterprise
+
+  activations     DeviceActivation[]
+
+  createdAt       DateTime    @default(now())
 
   @@index([userId])
   @@index([productId])
@@ -287,3 +290,31 @@ model Review {
   @@index([productId])
   @@index([userId])
 }
+
+// =========================================
+// DEVICE ACTIVATIONS
+// =========================================
+
+model DeviceActivation {
+  id          String    @id @default(cuid())
+  licenseId   String
+  license     License   @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+
+  // Hardware identification
+  chipId      String    // Unique chip identifier: ESP32 efuse MAC, Arduino UniqueID, etc.
+  boardType   String    // e.g. "ESP32-WROOM-32", "Arduino Uno", "Arduino Nano", "ESP32-S3"
+  nickname    String?   // User-defined friendly name e.g. "Lab Bench Unit #1"
+
+  // USB port detection (from WebSerial)
+  usbVendorId  Int?     // e.g. 0x10C4 for Silicon Labs CP2102 (ESP32)
+  usbProductId Int?     // e.g. 0xEA60
+
+  isActive    Boolean   @default(true)
+  lastSeenAt  DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+
+  @@unique([licenseId, chipId])     // One registration per chip per license
+  @@index([licenseId])
+  @@index([chipId])
+}
+
