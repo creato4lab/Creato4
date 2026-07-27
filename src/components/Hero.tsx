@@ -16,9 +16,11 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss, onOpenCinematic }) =>
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  const springConfig = { damping: 20, stiffness: 150 };
-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [10, -10]), springConfig);
-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-10, 10]), springConfig);
+  const springConfig = { damping: 14, stiffness: 220 };
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [18, -18]), springConfig);
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-24, 24]), springConfig);
+  const translateX = useSpring(useTransform(mouseX, [-0.5, 0.5], [-35, 35]), springConfig);
+  const translateY = useSpring(useTransform(mouseY, [-0.5, 0.5], [-25, 25]), springConfig);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
@@ -45,12 +47,14 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss, onOpenCinematic }) =>
         {/* LEFT COLUMN (55% desktop = 7 cols) */}
         <div className="lg:col-span-7 flex flex-col justify-center z-20">
           
-          {/* Interactive Mouse-Tracking Headline Container */}
+          {/* Strong Magnetic Mouse-Tracking Headline Container */}
           <motion.div
             ref={containerRef}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             style={{
+              x: translateX,
+              y: translateY,
               rotateX,
               rotateY,
               transformStyle: 'preserve-3d',
@@ -120,7 +124,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss, onOpenCinematic }) =>
                 </motion.span>
               </div>
 
-              {/* Line 2: Into Reality. */}
+              {/* Line 2: Into Reality. (With Graphic Design Stylized Accent Dot) */}
               <div className="overflow-hidden pb-1 sm:pb-2 flex flex-wrap items-center gap-x-3 sm:gap-x-5">
                 <motion.span
                   initial={{ y: '100%', opacity: 0 }}
@@ -137,7 +141,10 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss, onOpenCinematic }) =>
                   transition={{ duration: 0.8, delay: 0.76, ease: [0.16, 1, 0.3, 1] }}
                   className="inline-block text-[#1A3C2F] group-hover:translate-z-8 transition-transform duration-300"
                 >
-                  Reality.
+                  <span>Reality</span>
+                  <span className="inline-block text-[#C4A35A] group-hover:scale-125 group-hover:rotate-12 transition-transform duration-300 font-black ml-0.5">
+                    .
+                  </span>
                 </motion.span>
               </div>
             </h1>
