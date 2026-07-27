@@ -64,7 +64,13 @@ export const IdeaToPrototype: React.FC<IdeaToPrototypeProps> = ({
 
   return (
     <div className="fixed inset-0 w-screen h-screen z-[99999] select-none bg-black overflow-hidden flex items-center justify-center">
-      {/* 100% Pure Edge-to-Edge Fullscreen Video (No overlays, notices, or text) */}
+      {/* Top-Right Corner Instruction Badge */}
+      <div className="absolute top-6 right-6 z-30 pointer-events-none flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-[#c9a96e]/40 text-[#c9a96e] text-xs font-bold uppercase tracking-widest shadow-xl">
+        <span className="w-2 h-2 rounded-full bg-[#c9a96e] animate-ping" />
+        <span>Press any key or touch to close ✕</span>
+      </div>
+
+      {/* 100% Pure Edge-to-Edge Fullscreen Video */}
       <video
         ref={videoRef}
         autoPlay
