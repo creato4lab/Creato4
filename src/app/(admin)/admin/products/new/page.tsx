@@ -6,6 +6,7 @@ import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { createProduct } from '@/actions/admin';
 import { FileUpload } from '@/components/admin/FileUpload';
+import { MultiImageUpload } from '@/components/admin/MultiImageUpload';
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -129,18 +130,18 @@ export default function NewProductPage() {
               <input type="text" name="whatsIncluded" className="w-full bg-[#FAF8F5] border border-[#1A3C2F]/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C4A35A]/50 focus:border-[#C4A35A]" placeholder="e.g., Source Code, Altium Project Files, 3D STEP files..." />
             </div>
             
-            <div>
-              <label className="block text-xs font-bold text-[#1A3C2F] mb-2 uppercase tracking-wide">Image URLs (Comma separated)</label>
-              <input type="text" name="images" className="w-full bg-[#FAF8F5] border border-[#1A3C2F]/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C4A35A]/50 focus:border-[#C4A35A]" placeholder="https://example.com/img1.jpg, https://example.com/img2.jpg" />
-            </div>
+            <MultiImageUpload 
+              name="images" 
+              label="Product Gallery Images (Unlimited Direct Uploads)" 
+            />
           </div>
 
           {/* Secure Digital Asset Delivery */}
           <div className="space-y-6">
             <h2 className="text-sm font-black uppercase tracking-widest text-[#1A3C2F]/40 border-b border-[#1A3C2F]/5 pb-2">Digital Deliverables & File Uploads</h2>
-            <p className="text-xs text-[#1A3C2F]/50">Upload digital assets for this product. Arduino `.ino` files will be automatically watermarked with hardware locks and zero-width signatures on download. CAD ZIP files are delivered raw as-is.</p>
+            <p className="text-xs text-[#1A3C2F]/50">Upload digital assets for this product. Arduino `.ino` files will be automatically watermarked with hardware locks and zero-width signatures on download. CAD & Gerber ZIP files are delivered raw as-is.</p>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <FileUpload 
                 name="sourceCodePath" 
                 label="Arduino .INO / Source Code (.ZIP / .INO)" 
@@ -149,10 +150,17 @@ export default function NewProductPage() {
               />
               
               <FileUpload 
+                name="pcbGerberPath" 
+                label="PCB Gerber Manufacturing (.ZIP / .GRB)" 
+                prefix="gerber" 
+                accept=".zip,.grb,.gbr" 
+              />
+
+              <FileUpload 
                 name="cadFilePath" 
-                label="CAD File (.ZIP)" 
+                label="3D CAD Model (.ZIP / .STEP / .STL)" 
                 prefix="cad-files" 
-                accept=".zip,.step,.stl,.f3d,.grb"
+                accept=".zip,.step,.stl,.f3d"
               />
 
               <FileUpload 

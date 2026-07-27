@@ -77,6 +77,7 @@ export async function createProduct(data: {
   sourceCodePath?: string;
   cadFilePath?: string;
   pdfDocPath?: string;
+  pcbGerberPath?: string;
   firmwareBinPath?: string;
   firmwareUf2Path?: string;
   firmwareBuildVersion?: string;
@@ -107,10 +108,11 @@ export async function createProduct(data: {
         hardwareUsed: data.hardwareUsed ? data.hardwareUsed.split(",").map((s) => s.trim()) : [],
         softwareUsed: data.softwareUsed ? data.softwareUsed.split(",").map((s) => s.trim()) : [],
         whatsIncluded: data.whatsIncluded ? data.whatsIncluded.split(",").map((s) => s.trim()) : [],
-        images: data.images ? data.images.split(",").map((s) => s.trim()) : [],
+        images: data.images ? data.images.split(",").map((s) => s.trim()).filter(Boolean) : [],
         sourceCodePath: data.sourceCodePath || null,
         cadFilePath: data.cadFilePath || null,
         pdfDocPath: data.pdfDocPath || null,
+        pcbGerberPath: data.pcbGerberPath || null,
         firmwareBinPath: data.firmwareBinPath || null,
         firmwareUf2Path: data.firmwareUf2Path || null,
         firmwareBuildVersion: data.firmwareBuildVersion || null,

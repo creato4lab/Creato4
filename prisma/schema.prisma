@@ -111,6 +111,7 @@ model Product {
   sourceCodePath    String?
   cadFilePath       String?
   pdfDocPath        String?
+  pcbGerberPath     String?
   // Firmware delivery (Phase 3) — R2 object key, never exposed as public URL
   firmwareBinPath       String?   // e.g. "firmware/{productId}/latest.bin" (ESP32/ESP8266)
   firmwareUf2Path       String?   // e.g. "firmware/{productId}/latest.uf2" (RP2040)

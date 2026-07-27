@@ -12,6 +12,7 @@ import { ProductFAQ } from "@/components/ProductFAQ";
 import { RelatedProducts } from "@/components/RelatedProducts";
 import { PurchaseOptions } from "@/components/PurchaseOptions";
 import { RatingStars } from "@/components/RatingStars";
+import { PcbViewer3D } from "@/components/PcbViewer3D";
 import { SITE_CONFIG } from "@/lib/constants";
 import { generateProductSchema } from "@/lib/schemas";
 
@@ -301,10 +302,18 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
               </section>
             )}
 
-            {/* 7. PCB Preview */}
+            {/* 7. 3D PCB Gerber Inspection */}
+            {(product.pcbGerberPath || product.pcbPreviewImage || product.category === 'PCB_DESIGN' || product.category === 'ARDUINO' || product.category === 'ESP32') && (
+              <section>
+                <SectionHeader icon={<Layers className="w-4 h-4 text-[#C4A35A]" />} title="3D Interactive PCB Inspection" />
+                <PcbViewer3D boardTitle={`${product.title} PCB`} pcbImage={product.pcbPreviewImage} />
+              </section>
+            )}
+
+            {/* 8. PCB Preview Image */}
             {product.pcbPreviewImage && (
               <section>
-                <SectionHeader icon={<Layers className="w-4 h-4 text-[#C4A35A]" />} title="PCB Preview" />
+                <SectionHeader icon={<Layers className="w-4 h-4 text-[#C4A35A]" />} title="PCB Photo Preview" />
                 <div className="rounded-2xl overflow-hidden border border-[#1A3C2F]/10 bg-white">
                   <img src={product.pcbPreviewImage} alt="PCB Preview" className="w-full object-contain max-h-96" />
                 </div>
