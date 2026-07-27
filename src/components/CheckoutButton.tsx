@@ -7,7 +7,7 @@ import { createRazorpayOrder, verifyPayment } from '@/actions/payment';
 
 interface CheckoutButtonProps {
   productId: string;
-  licenseType: "STUDENT" | "COMMERCIAL" | "ENTERPRISE";
+  licenseType: "STUDENT" | "COMMERCIAL" | "ENTERPRISE" | "SOURCE_CODE_ONLY" | "REPORT_SUBMISSION" | "REPORT_EDITABLE" | "FIRMWARE_FLASH";
   productName: string;
   variant?: "default" | "compact";
 }

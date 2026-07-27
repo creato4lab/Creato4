@@ -26,6 +26,7 @@ model User {
   tickets       Ticket[]
   wishlists     Wishlist[]
   licenses      License[]
+  reviews       Review[]
   
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -84,27 +85,45 @@ model Product {
   price             Float
   category          ProductCategory
   difficulty        Difficulty
-  
+
+  // Metadata & Discovery
+  tags              String[]
+  version           String?
+  lastUpdated       DateTime?
+  downloadCount     Int      @default(0)
+  rating            Float    @default(0)
+  reviewCount       Int      @default(0)
+
+  // Rich Content
+  features          String[]
+  faqs              Json?    // [{question: string, answer: string}]
+  compatibleBoards  String[]
+  videoUrl          String?
+
   // Product Details
   hardwareUsed      String[]
   softwareUsed      String[]
   whatsIncluded     String[]
   safetyWarning     String?  @db.Text
-  versionHistory    String?  @db.Text
-  
+  versionHistory    Json?    // [{version: string, date: string, notes: string}]
+
   // File Paths (Signed URLs will be generated from these)
   sourceCodePath    String?
   cadFilePath       String?
   pdfDocPath        String?
-  
+
+  // Media
   images            String[] // array of image URLs
-  
+  pcbPreviewImage   String?
+  cadPreviewImage   String?
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-  
+
   orders            OrderItem[]
   wishlistedBy      Wishlist[]
   licenses          License[]
+  reviews           Review[]
 
   @@index([category])
   @@index([slug])
@@ -204,6 +223,10 @@ enum LicenseType {
   STUDENT
   COMMERCIAL
   ENTERPRISE
+  SOURCE_CODE_ONLY
+  REPORT_SUBMISSION
+  REPORT_EDITABLE
+  FIRMWARE_FLASH
 }
 
 // =========================================
@@ -242,7 +265,25 @@ model Wishlist {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   productId String
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  
+
   createdAt DateTime @default(now())
   @@unique([userId, productId])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  rating    Int      // 1-5
+  title     String?
+  body      String?  @db.Text
+  verified  Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([userId])
 }
