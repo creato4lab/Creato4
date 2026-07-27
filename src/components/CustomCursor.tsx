@@ -3,6 +3,7 @@ import { motion, useMotionValue, useSpring } from 'motion/react';
 
 export const CustomCursor: React.FC = () => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isMagnetic, setIsMagnetic] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   // Mouse position values
@@ -25,6 +26,14 @@ export const CustomCursor: React.FC = () => {
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
+      
+      // Check for magnetic target
+      if (target.closest('[data-magnetic="true"]')) {
+        setIsMagnetic(true);
+      } else {
+        setIsMagnetic(false);
+      }
+
       // Check if hovering over an interactive element
       if (
         target.tagName.toLowerCase() === 'a' ||
@@ -64,13 +73,13 @@ export const CustomCursor: React.FC = () => {
           y: mouseY,
         }}
         animate={{
-          scale: 1,
+          scale: isMagnetic ? 1.5 : 1,
           opacity: 1,
         }}
         transition={{ duration: 0.2 }}
       />
 
-      {/* Large trailing magnetic field ring/blob */}
+      {/* Large trailing ring/blob */}
       <motion.div
         className="fixed top-0 left-0 rounded-full border border-[#FAF8F5] pointer-events-none z-[9998] mix-blend-difference flex items-center justify-center"
         style={{
@@ -82,12 +91,11 @@ export const CustomCursor: React.FC = () => {
           height: 32,
         }}
         animate={{
-          scale: isHovered ? 2.2 : 1,
-          backgroundColor: isHovered ? 'rgba(250, 248, 245, 0.15)' : 'rgba(250, 248, 245, 0)',
-          borderWidth: isHovered ? 2 : 1,
-          rotate: isHovered ? 45 : 0,
+          scale: isMagnetic ? 2.4 : isHovered ? 1.8 : 1,
+          backgroundColor: isMagnetic ? 'rgba(250, 248, 245, 0.2)' : isHovered ? 'rgba(250, 248, 245, 0.1)' : 'rgba(250, 248, 245, 0)',
+          borderWidth: isMagnetic ? 2.5 : isHovered ? 2 : 1,
         }}
-        transition={{ type: 'spring', damping: 15, stiffness: 250 }}
+        transition={{ duration: 0.3, ease: 'easeOut' }}
       />
     </>
   );
