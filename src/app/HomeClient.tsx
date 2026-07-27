@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Preloader } from '@/components/Preloader';
 import { Navbar } from '@/components/Navbar';
 import { Hero } from '@/components/Hero';
-import { WhatWeDo } from '@/components/WhatWeDo';
 import { FromIdeaToReality } from '@/components/cinematic/FromIdeaToReality';
 import { QuickEntry } from '@/components/QuickEntry';
 import { TrustCredibility } from '@/components/TrustCredibility';
@@ -184,9 +183,6 @@ export default function HomeClient({ initialProducts = [] }: { initialProducts?:
             onOpenDiscuss={() => handleOpenDiscuss('Product & Technology Vision')}
             onOpenCinematic={() => setCinematicOpen(true)}
           />
-
-          {/* 3.5 What We Do (3D UI & Discipline Overview) */}
-          <WhatWeDo />
 
           {/* 4. Quick Entry ("WHAT ARE YOU LOOKING TO BUILD?") */}
           <section id="quick-entry" aria-label="What are you looking to build?">
