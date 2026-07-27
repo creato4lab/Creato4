@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { motion } from 'motion/react';
-import { ArrowUpRight, ArrowDown, ShieldCheck, Sparkles } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
+import { ArrowUpRight, ArrowDown, Sparkles } from 'lucide-react';
 import { Exploded3DProduct } from './Exploded3DProduct';
 
 interface HeroProps {
@@ -10,7 +10,33 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss, onOpenCinematic }) => {
   const [explosionFactor, setExplosionFactor] = useState(0.8);
-  const headlineLines = ['We Turn Ideas', 'Into Reality.'];
+  const [spotlightPos, setSpotlightPos] = useState({ x: 50, y: 50 });
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springConfig = { damping: 20, stiffness: 150 };
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [10, -10]), springConfig);
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-10, 10]), springConfig);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setSpotlightPos({ x, y });
+
+    const mouseXPos = (e.clientX - rect.left) / rect.width - 0.5;
+    const mouseYPos = (e.clientY - rect.top) / rect.height - 0.5;
+    mouseX.set(mouseXPos);
+    mouseY.set(mouseYPos);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
 
   return (
     <section className="relative min-h-screen pt-24 lg:pt-28 pb-12 w-full flex items-center bg-[#FAF8F5] overflow-hidden border-b border-[#E8E2D9]">
@@ -19,27 +45,72 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss, onOpenCinematic }) =>
         {/* LEFT COLUMN (55% desktop = 7 cols) */}
         <div className="lg:col-span-7 flex flex-col justify-center z-20">
           
+          {/* Interactive Mouse-Tracking Headline Container */}
+          <motion.div
+            ref={containerRef}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            style={{
+              rotateX,
+              rotateY,
+              transformStyle: 'preserve-3d',
+              perspective: 1000,
+            }}
+            className="relative cursor-pointer group py-4 my border-0 select-none"
+          >
+            {/* Dynamic Spotlight Radial Highlight Following Cursor */}
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl blur-2xl"
+              style={{
+                background: `radial-gradient(450px circle at ${spotlightPos.x}% ${spotlightPos.y}%, rgba(196, 163, 90, 0.25), transparent 70%)`,
+              }}
+            />
 
-
-          {/* Headline */}
-          <h1 className="text-[#1A3C2F] font-extrabold tracking-tight text-4xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.05] mb-8 flex flex-col gap-3 sm:gap-5">
-            {headlineLines.map((line, idx) => (
-              <div key={idx} className="overflow-hidden pb-1 sm:pb-2">
+            <h1 className="font-extrabold tracking-tight text-4xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.05] mb-8 flex flex-col gap-3 sm:gap-4 relative z-10">
+              
+              {/* Line 1: We Turn Ideas */}
+              <div className="overflow-hidden pb-1 sm:pb-2 flex flex-wrap items-center gap-x-3 sm:gap-x-5">
                 <motion.span
                   initial={{ y: '100%', opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{
-                    duration: 0.8,
-                    delay: 0.4 + idx * 0.12,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                  className={`block ${idx === 2 ? 'text-[#1A3C2F]' : ''}`}
+                  transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  className="inline-block text-[#1A3C2F] group-hover:translate-z-6 transition-transform duration-300"
                 >
-                  {line}
+                  We Turn
+                </motion.span>
+
+                <motion.span
+                  initial={{ y: '100%', opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.52, ease: [0.16, 1, 0.3, 1] }}
+                  className="inline-block bg-gradient-to-r from-[#C4A35A] via-[#E6CA85] to-[#C4A35A] bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300 drop-shadow-sm"
+                >
+                  Ideas
                 </motion.span>
               </div>
-            ))}
-          </h1>
+
+              {/* Line 2: Into Reality. */}
+              <div className="overflow-hidden pb-1 sm:pb-2 flex flex-wrap items-center gap-x-3 sm:gap-x-5">
+                <motion.span
+                  initial={{ y: '100%', opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.64, ease: [0.16, 1, 0.3, 1] }}
+                  className="inline-block text-[#1A3C2F]"
+                >
+                  Into
+                </motion.span>
+
+                <motion.span
+                  initial={{ y: '100%', opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.76, ease: [0.16, 1, 0.3, 1] }}
+                  className="inline-block bg-gradient-to-r from-[#1A3C2F] via-[#2D5929] to-[#C4A35A] bg-clip-text text-transparent group-hover:translate-z-8 transition-transform duration-300"
+                >
+                  Reality.
+                </motion.span>
+              </div>
+            </h1>
+          </motion.div>
 
           {/* CTA Group */}
           <motion.div
