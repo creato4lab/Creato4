@@ -54,27 +54,31 @@ export const IdeaToPrototype: React.FC<IdeaToPrototypeProps> = ({
     window.addEventListener('keydown', handleTriggerDismiss, { passive: true });
     window.addEventListener('mousedown', handleTriggerDismiss, { passive: true });
     window.addEventListener('touchstart', handleTriggerDismiss, { passive: true });
+    window.addEventListener('touchend', handleTriggerDismiss, { passive: true });
 
     return () => {
       window.removeEventListener('keydown', handleTriggerDismiss);
       window.removeEventListener('mousedown', handleTriggerDismiss);
       window.removeEventListener('touchstart', handleTriggerDismiss);
+      window.removeEventListener('touchend', handleTriggerDismiss);
     };
   }, [onDismiss]);
 
   return (
-    <div className="fixed inset-0 w-screen h-screen z-[99999] select-none bg-black overflow-hidden flex items-center justify-center">
-      {/* Top-Right Corner Instruction Badge */}
-      <div className="absolute top-6 right-6 z-30 pointer-events-none flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-[#c9a96e]/40 text-[#c9a96e] text-xs font-bold uppercase tracking-widest shadow-xl">
-        <span className="w-2 h-2 rounded-full bg-[#c9a96e] animate-ping" />
-        <span>Press any key or touch to close ✕</span>
+    <div className="fixed inset-0 w-full h-[100dvh] min-h-screen z-[99999] select-none bg-black overflow-hidden flex items-center justify-center touch-none">
+      {/* Mobile-Optimized Corner Instruction Badge */}
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-30 pointer-events-none flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-black/70 backdrop-blur-lg border border-[#c9a96e]/50 text-[#c9a96e] text-[10px] sm:text-xs font-bold uppercase tracking-widest shadow-2xl">
+        <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#c9a96e] animate-ping" />
+        <span>Press key or touch to close ✕</span>
       </div>
 
-      {/* 100% Pure Edge-to-Edge Fullscreen Video */}
+      {/* Mobile-Optimized Fullscreen Video */}
       <video
         ref={videoRef}
         autoPlay
         playsInline
+        webkit-playsinline="true"
+        preload="auto"
         muted={isMuted}
         onEnded={() => onEnded?.()}
         className="w-full h-full object-cover"

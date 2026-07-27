@@ -148,7 +148,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] select-none flex items-center justify-center overflow-hidden transition-all duration-700 ease-in-out ${
+      className={`fixed inset-0 w-full h-[100dvh] z-[9999] select-none flex items-center justify-center overflow-hidden touch-none transition-all duration-700 ease-in-out ${
         isExiting ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'
       }`}
       style={{
