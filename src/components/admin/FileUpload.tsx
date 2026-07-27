@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { UploadCloud, CheckCircle, AlertTriangle, Loader2, File as FileIcon, X } from "lucide-react";
+import { UploadCloud, CheckCircle, AlertTriangle, Loader2, File as FileIcon, X, Zap } from "lucide-react";
 
 interface FileUploadProps {
   name?: string; // The form name for the hidden input (e.g., "sourceCodePath")
@@ -13,10 +13,21 @@ interface FileUploadProps {
   onChange?: (key: string) => void;
 }
 
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+}
+
 export function FileUpload({ name, label, prefix, accept, required, value = "", onChange }: FileUploadProps) {
   const [status, setStatus] = useState<"idle" | "uploading" | "success" | "error">(value ? "success" : "idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [progress, setProgress] = useState(0);
+  const [loadedText, setLoadedText] = useState("");
+  const [speedText, setSpeedText] = useState("");
+  const [etaText, setEtaText] = useState("");
   const [uploadedKey, setUploadedKey] = useState(value);
   const [fileName, setFileName] = useState(value ? value.split("/").pop() || value : "");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -28,7 +39,12 @@ export function FileUpload({ name, label, prefix, accept, required, value = "", 
     setFileName(file.name);
     setStatus("uploading");
     setProgress(0);
+    setLoadedText(`0 B / ${formatBytes(file.size)}`);
+    setSpeedText("");
+    setEtaText("");
     setErrorMsg("");
+
+    const startTime = Date.now();
 
     try {
       const keyResult = await new Promise<string>((resolve, reject) => {
@@ -44,6 +60,16 @@ export function FileUpload({ name, label, prefix, accept, required, value = "", 
           if (event.lengthComputable) {
             const pct = Math.round((event.loaded / event.total) * 100);
             setProgress(pct >= 100 ? 99 : pct);
+            setLoadedText(`${formatBytes(event.loaded)} / ${formatBytes(event.total)}`);
+
+            const elapsedSeconds = (Date.now() - startTime) / 1000;
+            if (elapsedSeconds > 0.3) {
+              const bps = event.loaded / elapsedSeconds;
+              setSpeedText(`${formatBytes(bps)}/s`);
+              const remainingBytes = event.total - event.loaded;
+              const etaSec = Math.ceil(remainingBytes / bps);
+              setEtaText(etaSec > 0 && etaSec < 3600 ? `${etaSec}s left` : "");
+            }
           }
         };
 
@@ -101,6 +127,9 @@ export function FileUpload({ name, label, prefix, accept, required, value = "", 
     onChange?.("");
     setFileName("");
     setProgress(0);
+    setLoadedText("");
+    setSpeedText("");
+    setEtaText("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -127,19 +156,31 @@ export function FileUpload({ name, label, prefix, accept, required, value = "", 
       )}
 
       {status === "uploading" && (
-        <div className="bg-white border border-[#1A3C2F]/10 rounded-xl p-4">
-          <div className="flex items-center gap-3 mb-3">
-            <Loader2 className="w-5 h-5 text-[#C4A35A] animate-spin" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[#1A3C2F] truncate">{fileName}</p>
-              <p className="text-xs text-[#1A3C2F]/60">
-                {progress >= 99 ? "Finalizing server upload..." : `Uploading... ${progress}%`}
-              </p>
+        <div className="bg-white border border-[#1A3C2F]/10 rounded-xl p-4 shadow-sm space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <Loader2 className="w-5 h-5 text-[#C4A35A] animate-spin shrink-0" />
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-[#1A3C2F] truncate">{fileName}</p>
+                <p className="text-xs text-[#1A3C2F]/60 font-medium">
+                  {progress >= 99 ? "Finalizing server storage..." : `Uploading: ${loadedText}`}
+                </p>
+              </div>
             </div>
+            {progress < 99 && (
+              <div className="text-right shrink-0">
+                <p className="text-xs font-mono font-black text-[#1A3C2F]">{progress}%</p>
+                {speedText && (
+                  <p className="text-[10px] text-[#C4A35A] font-bold tracking-tight">
+                    {speedText} {etaText ? `• ${etaText}` : ""}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
-          <div className="w-full bg-[#FAF8F5] rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-[#FAF8F5] rounded-full h-2.5 overflow-hidden border border-[#1A3C2F]/10 p-0.5">
             <div
-              className="h-full bg-gradient-to-r from-[#1A3C2F] to-[#C4A35A] transition-all duration-300"
+              className="h-full bg-gradient-to-r from-[#1A3C2F] via-[#2A5C48] to-[#C4A35A] rounded-full transition-all duration-150 shadow-sm"
               style={{ width: `${progress}%` }}
             />
           </div>
