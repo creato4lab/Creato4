@@ -11,6 +11,7 @@ interface FileUploadProps {
   required?: boolean;
   value?: string;
   onChange?: (key: string) => void;
+  onFileSelected?: (file: File | null) => void;
 }
 
 function formatBytes(bytes: number): string {
@@ -21,7 +22,7 @@ function formatBytes(bytes: number): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
 }
 
-export function FileUpload({ name, label, prefix, accept, required, value = "", onChange }: FileUploadProps) {
+export function FileUpload({ name, label, prefix, accept, required, value = "", onChange, onFileSelected }: FileUploadProps) {
   const [status, setStatus] = useState<"idle" | "uploading" | "success" | "error">(value ? "success" : "idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [progress, setProgress] = useState(0);
@@ -43,6 +44,7 @@ export function FileUpload({ name, label, prefix, accept, required, value = "", 
     setSpeedText("");
     setEtaText("");
     setErrorMsg("");
+    onFileSelected?.(file);
 
     const startTime = Date.now();
 
@@ -125,6 +127,7 @@ export function FileUpload({ name, label, prefix, accept, required, value = "", 
     setStatus("idle");
     setUploadedKey("");
     onChange?.("");
+    onFileSelected?.(null);
     setFileName("");
     setProgress(0);
     setLoadedText("");

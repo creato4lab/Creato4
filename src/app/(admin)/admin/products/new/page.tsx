@@ -6,12 +6,16 @@ import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { createProduct } from '@/actions/admin';
 import { FileUpload } from '@/components/admin/FileUpload';
+import { CadViewer } from '@/components/admin/CadViewer';
+import { GerberViewer } from '@/components/admin/GerberViewer';
 import { MultiImageUpload } from '@/components/admin/MultiImageUpload';
 
 export default function NewProductPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [cadFile, setCadFile] = useState<File | null>(null);
+  const [gerberFile, setGerberFile] = useState<File | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -158,19 +162,27 @@ export default function NewProductPage() {
                 accept=".zip,.ino,.c,.cpp,.rar,.tar.gz" 
               />
               
-              <FileUpload 
-                name="pcbGerberPath" 
-                label="PCB Gerber Manufacturing (.ZIP / .GRB)" 
-                prefix="gerber" 
-                accept=".zip,.grb,.gbr" 
-              />
+              <div className="flex flex-col gap-2">
+                <FileUpload 
+                  name="pcbGerberPath" 
+                  label="PCB Gerber Manufacturing (.ZIP / .GRB)" 
+                  prefix="gerber" 
+                  accept=".zip,.grb,.gbr" 
+                  onFileSelected={(file) => setGerberFile(file)}
+                />
+                <GerberViewer file={gerberFile} />
+              </div>
 
-              <FileUpload 
-                name="cadFilePath" 
-                label="3D CAD Model (.ZIP / .STEP / .STL)" 
-                prefix="cad-files" 
-                accept=".zip,.step,.stl,.f3d"
-              />
+              <div className="flex flex-col gap-2">
+                <FileUpload 
+                  name="cadFilePath" 
+                  label="3D CAD Model (.ZIP / .STEP / .STL)" 
+                  prefix="cad-files" 
+                  accept=".zip,.step,.stl,.f3d"
+                  onFileSelected={(file) => setCadFile(file)}
+                />
+                <CadViewer file={cadFile} />
+              </div>
 
               <FileUpload 
                 name="pdfDocPath" 
@@ -178,6 +190,25 @@ export default function NewProductPage() {
                 prefix="docs" 
                 accept=".pdf,.docx,.doc" 
               />
+
+              <FileUpload 
+                name="firmwareBinPath" 
+                label="Pre-Compiled Firmware Binary (.BIN / .HEX)" 
+                prefix="firmware" 
+                accept=".bin,.hex" 
+              />
+
+              <FileUpload 
+                name="firmwareUf2Path" 
+                label="UF2 Firmware Image (.UF2)" 
+                prefix="firmware" 
+                accept=".uf2" 
+              />
+
+              <div className="lg:col-span-2">
+                <label className="block text-xs font-bold text-[#1A3C2F] mb-2 uppercase tracking-wide">Initial Firmware Build Version (e.g. v1.0.0)</label>
+                <input type="text" name="firmwareBuildVersion" className="w-full bg-[#FAF8F5] border border-[#1A3C2F]/10 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#C4A35A]/50 focus:border-[#C4A35A]" placeholder="v1.0.0" defaultValue="v1.0.0" />
+              </div>
             </div>
           </div>
 
