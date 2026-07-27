@@ -17,7 +17,7 @@ interface Particle {
 export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const onCompleteRef = useRef(onComplete);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
