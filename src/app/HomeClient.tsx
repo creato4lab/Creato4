@@ -53,18 +53,22 @@ export default function HomeClient({ initialProducts = [] }: { initialProducts?:
   const [preloaderDone, setPreloaderDone] = useState(false);
 
   useEffect(() => {
-    // Temporarily disabled skipping so the full cinematic animation plays on every load
-    // if (
-    //   localStorage.getItem('creato4_preloader_seen') === 'true' ||
-    //   document.documentElement.getAttribute('data-preloader-seen') === 'true'
-    // ) {
-    //   setPreloaderDone(true);
-    // }
+    try {
+      const { getCookie } = require('@/lib/cookies');
+      const seenCookie = getCookie('creato4_splash_seen');
+      if (seenCookie === 'true') {
+        setPreloaderDone(true);
+      }
+    } catch {
+      // ignore
+    }
   }, []);
 
   // Stable reference — never re-creates, so Preloader's useEffect won't re-run
   const handlePreloaderComplete = useCallback(() => {
     try {
+      const { setCookie } = require('@/lib/cookies');
+      setCookie('creato4_splash_seen', 'true', 7);
       localStorage.setItem('creato4_preloader_seen', 'true');
       document.documentElement.setAttribute('data-preloader-seen', 'true');
     } catch {
