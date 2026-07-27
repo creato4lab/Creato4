@@ -4,19 +4,21 @@ import React, { useState, useRef } from "react";
 import { UploadCloud, CheckCircle, AlertTriangle, Loader2, File as FileIcon, X } from "lucide-react";
 
 interface FileUploadProps {
-  name: string; // The form name for the hidden input (e.g., "sourceCodePath")
+  name?: string; // The form name for the hidden input (e.g., "sourceCodePath")
   label: string;
   prefix: string; // R2 folder prefix (e.g., "source-code")
   accept?: string; // e.g., ".zip,.rar", ".pdf", ".bin,.uf2"
   required?: boolean;
+  value?: string;
+  onChange?: (key: string) => void;
 }
 
-export function FileUpload({ name, label, prefix, accept, required }: FileUploadProps) {
-  const [status, setStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
+export function FileUpload({ name, label, prefix, accept, required, value = "", onChange }: FileUploadProps) {
+  const [status, setStatus] = useState<"idle" | "uploading" | "success" | "error">(value ? "success" : "idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [progress, setProgress] = useState(0);
-  const [uploadedKey, setUploadedKey] = useState("");
-  const [fileName, setFileName] = useState("");
+  const [uploadedKey, setUploadedKey] = useState(value);
+  const [fileName, setFileName] = useState(value ? value.split("/").pop() || value : "");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,6 +121,7 @@ export function FileUpload({ name, label, prefix, accept, required }: FileUpload
       }
 
       setUploadedKey(keyResult);
+      onChange?.(keyResult);
       setStatus("success");
     } catch (err: any) {
       console.error("Upload error:", err);
@@ -127,9 +130,21 @@ export function FileUpload({ name, label, prefix, accept, required }: FileUpload
     }
   };
 
-  const handleClear = () => {
+  const handleClear = async () => {
+    if (uploadedKey) {
+      try {
+        await fetch("/api/admin/delete-file", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key: uploadedKey }),
+        });
+      } catch (err) {
+        console.error("Failed to delete file from R2:", err);
+      }
+    }
     setStatus("idle");
     setUploadedKey("");
+    onChange?.("");
     setFileName("");
     setProgress(0);
     if (fileInputRef.current) {

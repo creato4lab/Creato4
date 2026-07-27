@@ -117,7 +117,19 @@ export function MultiImageUpload({ name, label }: MultiImageUploadProps) {
     });
   };
 
-  const handleRemove = (id: string) => {
+  const handleRemove = async (id: string) => {
+    const itemToRemove = items.find((i) => i.id === id);
+    if (itemToRemove?.key) {
+      try {
+        await fetch("/api/admin/delete-file", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key: itemToRemove.key }),
+        });
+      } catch (err) {
+        console.error("Failed to delete image from R2:", err);
+      }
+    }
     setItems((prev) => prev.filter((i) => i.id !== id));
   };
 
