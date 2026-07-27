@@ -105,10 +105,10 @@ export function FirmwarePushClient({ products }: { products: ProductItem[] }) {
         {/* Binary Uploads */}
         <div className="space-y-4 pt-2 border-t border-[#1A3C2F]/10">
           <FileUpload
-            label="Upload Binary (.bin / .hex) to R2"
+            label="Upload Binary/Source (.bin / .hex / .ino) to R2"
             value={firmwareBinPath}
             onChange={setFirmwareBinPath}
-            accept=".bin,.hex"
+            accept=".bin,.hex,.ino"
             prefix="firmware"
           />
 
