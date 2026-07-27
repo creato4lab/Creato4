@@ -95,17 +95,17 @@ export function PurchaseOptions({ productId, productName, basePrice }: PurchaseO
       <p className="text-xs text-[#1A3C2F]/50 mb-5">Choose the package that fits your needs</p>
 
       {/* Tier Selection */}
-      <div className="space-y-2.5 mb-5">
+      <div className="space-y-2 mb-5">
         {visibleTiers.map((tier) => {
           const tierPrice = Math.round(basePrice * tier.priceMultiplier);
           const isSelected = selected === tier.id;
           return (
             <label
               key={tier.id}
-              className={`flex items-start gap-3 cursor-pointer p-3.5 rounded-2xl border-2 transition-all ${
+              className={`flex items-center gap-3 cursor-pointer px-4 py-3.5 rounded-2xl border-2 transition-all ${
                 isSelected
                   ? "border-[#1A3C2F] bg-[#1A3C2F]/[0.04]"
-                  : "border-[#1A3C2F]/10 hover:border-[#1A3C2F]/25"
+                  : "border-[#1A3C2F]/10 hover:border-[#1A3C2F]/25 bg-white"
               }`}
             >
               <input
@@ -116,29 +116,31 @@ export function PurchaseOptions({ productId, productName, basePrice }: PurchaseO
                 checked={isSelected}
                 onChange={() => setSelected(tier.id)}
               />
-              {/* Radio indicator */}
-              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center mt-0.5 flex-shrink-0 transition-colors ${
+
+              {/* Radio dot */}
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
                 isSelected ? "border-[#1A3C2F]" : "border-[#1A3C2F]/25"
               }`}>
                 {isSelected && <div className="w-2 h-2 rounded-full bg-[#1A3C2F]" />}
               </div>
 
+              {/* Label + description (grows) */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2 mb-0.5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-[#1A3C2F]">{tier.label}</span>
-                    {tier.badge && (
-                      <span className="text-[0.6rem] font-black uppercase tracking-wider bg-[#C4A35A] text-[#1A3C2F] px-2 py-0.5 rounded-full">
-                        {tier.badge}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-sm font-extrabold text-[#1A3C2F] whitespace-nowrap">
-                    ₹{tierPrice.toLocaleString("en-IN")}
-                  </span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm font-bold text-[#1A3C2F] leading-tight">{tier.label}</span>
+                  {tier.badge && (
+                    <span className="text-[0.55rem] font-black uppercase tracking-wider bg-[#C4A35A] text-[#1A3C2F] px-2 py-0.5 rounded-full leading-none">
+                      {tier.badge}
+                    </span>
+                  )}
                 </div>
-                <p className="text-xs text-[#1A3C2F]/55 leading-relaxed">{tier.description}</p>
+                <p className="text-[0.7rem] text-[#1A3C2F]/50 leading-relaxed mt-0.5 line-clamp-1">{tier.description}</p>
               </div>
+
+              {/* Price (fixed right) */}
+              <span className="text-sm font-extrabold text-[#1A3C2F] whitespace-nowrap flex-shrink-0 ml-1">
+                ₹{tierPrice.toLocaleString("en-IN")}
+              </span>
             </label>
           );
         })}
@@ -146,7 +148,7 @@ export function PurchaseOptions({ productId, productName, basePrice }: PurchaseO
         {/* Show more/less toggle */}
         <button
           onClick={() => setShowAll((v) => !v)}
-          className="w-full flex items-center justify-center gap-1.5 text-xs font-semibold text-[#1A3C2F]/50 hover:text-[#1A3C2F] transition-colors py-1"
+          className="w-full flex items-center justify-center gap-1.5 text-xs font-semibold text-[#1A3C2F]/45 hover:text-[#1A3C2F] transition-colors py-1.5"
         >
           {showAll ? (
             <><ChevronUp className="w-3.5 h-3.5" /> Show fewer options</>
@@ -155,6 +157,7 @@ export function PurchaseOptions({ productId, productName, basePrice }: PurchaseO
           )}
         </button>
       </div>
+
 
       {/* What's included in selected tier */}
       <div className="bg-[#1A3C2F]/[0.03] border border-[#1A3C2F]/8 rounded-2xl p-4 mb-5">
