@@ -53,14 +53,18 @@ export async function POST(req: NextRequest) {
 
     // 2. Stream upload to Cloudflare R2 using @aws-sdk/lib-storage Upload manager
     if (s3Client) {
+      const { Readable } = await import("stream");
       const { Upload } = await import("@aws-sdk/lib-storage");
+
+      const fileBuffer = Buffer.from(await file.arrayBuffer());
+      const nodeStream = Readable.from(fileBuffer);
 
       const parallelUploads3 = new Upload({
         client: s3Client,
         params: {
           Bucket: R2_BUCKET,
           Key: objectKey,
-          Body: file.stream(),
+          Body: nodeStream,
           ContentType: file.type || "application/octet-stream",
         },
         queueSize: 4,

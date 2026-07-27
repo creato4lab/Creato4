@@ -31,93 +31,46 @@ export function FileUpload({ name, label, prefix, accept, required, value = "", 
     setErrorMsg("");
 
     try {
-      let keyResult = "";
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("prefix", prefix);
 
-      // 1. Try same-origin /api/admin/upload-file POST route first (immune to CORS network errors)
-      try {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("prefix", prefix);
+      const keyResult = await new Promise<string>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/api/admin/upload-file", true);
 
-        keyResult = await new Promise<string>((resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          xhr.open("POST", "/api/admin/upload-file", true);
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const pct = Math.round((event.loaded / event.total) * 100);
+            setProgress(pct);
+          }
+        };
 
-          xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) {
-              const pct = Math.round((event.loaded / event.total) * 100);
-              setProgress(pct);
-            }
-          };
-
-          xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              try {
-                const resData = JSON.parse(xhr.responseText);
-                if (resData.key) {
-                  resolve(resData.key);
-                } else {
-                  reject(new Error(resData.error || "Server upload failed"));
-                }
-              } catch {
-                reject(new Error("Invalid server response"));
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const resData = JSON.parse(xhr.responseText);
+              if (resData.key) {
+                resolve(resData.key);
+              } else {
+                reject(new Error(resData.error || "Upload failed"));
               }
-            } else {
-              reject(new Error(`Server upload status ${xhr.status}`));
+            } catch {
+              reject(new Error("Invalid server response"));
             }
-          };
-
-          xhr.onerror = () => reject(new Error("Network error during server upload"));
-          xhr.send(formData);
-        });
-      } catch (serverErr) {
-        console.warn("[FileUpload] Server upload route fallback, trying presigned URL:", serverErr);
-      }
-
-      // 2. Fallback to presigned PUT URL if server upload route was skipped/failed
-      if (!keyResult) {
-        const urlRes = await fetch("/api/admin/upload-url", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            filename: file.name,
-            contentType: file.type || "application/octet-stream",
-            prefix,
-          }),
-        });
-
-        const urlData = await urlRes.json();
-        if (!urlRes.ok || !urlData.uploadUrl || !urlData.key) {
-          throw new Error(urlData.error || "Failed to generate presigned upload URL.");
-        }
-
-        const { uploadUrl, key } = urlData;
-
-        await new Promise<void>((resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          xhr.open("PUT", uploadUrl, true);
-
-          xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) {
-              const pct = Math.round((event.loaded / event.total) * 100);
-              setProgress(pct);
+          } else {
+            try {
+              const errData = JSON.parse(xhr.responseText);
+              reject(new Error(errData.error || `Upload failed with status ${xhr.status}`));
+            } catch {
+              reject(new Error(`Upload failed with status ${xhr.status}`));
             }
-          };
+          }
+        };
 
-          xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              resolve();
-            } else {
-              reject(new Error(`Presigned upload rejected with status ${xhr.status}`));
-            }
-          };
-
-          xhr.onerror = () => reject(new Error("Direct presigned upload network error"));
-          xhr.send(file);
-        });
-
-        keyResult = key;
-      }
+        xhr.onerror = () => reject(new Error("Network connection error during upload."));
+        xhr.send(formData);
+      });
 
       setUploadedKey(keyResult);
       onChange?.(keyResult);
