@@ -138,12 +138,15 @@ export async function GET(req: NextRequest) {
     objectKey = `${objectKey || "sample"}.zip`;
   }
 
-  // 4. Apply Watermarking (Phase 5)
+  // 4. Apply Watermarking & Protection
   let watermarkedBuffer: Buffer = rawBuffer;
-  const isZip = objectKey.endsWith(".zip") || objectKey.endsWith(".rar") || fileType === "sourceCode";
   const ext = objectKey.split(".").pop() || "txt";
 
-  if (isZip) {
+  if (fileType === "cadFile") {
+    // Deliver CAD files/ZIPs raw as-is without alteration
+    watermarkedBuffer = rawBuffer;
+    cleanFilename += `.${ext}`;
+  } else if (fileType === "sourceCode" || ext === "zip" || ext === "rar") {
     try {
       watermarkedBuffer = await watermarkZipBuffer(rawBuffer, metadata);
       cleanFilename += ".zip";
@@ -188,8 +191,9 @@ export async function GET(req: NextRequest) {
   }
 
   // 6. Return watermarked stream
+  const isZipHeader = ext === "zip" || ext === "rar" || fileType === "sourceCode";
   const responseHeaders = new Headers();
-  responseHeaders.set("Content-Type", isZip ? "application/zip" : "application/octet-stream");
+  responseHeaders.set("Content-Type", isZipHeader ? "application/zip" : "application/octet-stream");
   responseHeaders.set("Content-Disposition", `attachment; filename="${cleanFilename}"`);
   responseHeaders.set("Content-Length", watermarkedBuffer.length.toString());
   responseHeaders.set("X-Watermark-ID", downloadId);

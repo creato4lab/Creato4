@@ -138,9 +138,9 @@ export default function NewProductPage() {
           {/* Secure Digital Asset Delivery */}
           <div className="space-y-6">
             <h2 className="text-sm font-black uppercase tracking-widest text-[#1A3C2F]/40 border-b border-[#1A3C2F]/5 pb-2">Digital Deliverables & File Uploads</h2>
-            <p className="text-xs text-[#1A3C2F]/50">Upload digital assets for this product. All source code and `.ino` files will be automatically watermarked with hidden zero-width steganographic signatures upon customer download.</p>
+            <p className="text-xs text-[#1A3C2F]/50">Upload digital assets for this product. Arduino `.ino` files will be automatically watermarked with hardware locks and zero-width signatures on download. CAD ZIP files are delivered raw as-is.</p>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <FileUpload 
                 name="sourceCodePath" 
                 label="Arduino .INO / Source Code (.ZIP / .INO)" 
@@ -150,42 +150,17 @@ export default function NewProductPage() {
               
               <FileUpload 
                 name="cadFilePath" 
-                label="PCB Gerber / CAD Model (.ZIP / .STEP / .STL)" 
+                label="CAD File (.ZIP)" 
                 prefix="cad-files" 
                 accept=".zip,.step,.stl,.f3d,.grb"
               />
 
               <FileUpload 
                 name="pdfDocPath" 
-                label="Documentation & Schematics (.PDF)" 
+                label="Documentation (.PDF / .DOCX)" 
                 prefix="docs" 
-                accept=".pdf" 
+                accept=".pdf,.docx,.doc" 
               />
-            </div>
-
-            <div className="pt-4 mt-4 border-t border-[#1A3C2F]/5">
-              <h3 className="text-xs font-bold text-[#1A3C2F] mb-4 uppercase tracking-wide">Secure Browser Flashing Binaries (Phase 3)</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <FileUpload 
-                  name="firmwareBinPath" 
-                  label="ESP32 / ESP8266 Compiled Firmware (.BIN)" 
-                  prefix="firmware" 
-                  accept=".bin" 
-                />
-                
-                <FileUpload 
-                  name="firmwareUf2Path" 
-                  label="RP2040 Raspberry Pi Pico Firmware (.UF2)" 
-                  prefix="firmware" 
-                  accept=".uf2" 
-                />
-
-                <div>
-                  <label className="block text-xs font-bold text-[#1A3C2F] mb-3 uppercase tracking-wide">Firmware Build Version</label>
-                  <input type="text" name="firmwareBuildVersion" className="w-full bg-[#FAF8F5] border border-[#1A3C2F]/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C4A35A]/50 focus:border-[#C4A35A]" placeholder="e.g., v1.2.0" />
-                  <p className="text-[10px] text-[#1A3C2F]/50 mt-2">Required if uploading binary stream for WebSerial flashing.</p>
-                </div>
-              </div>
             </div>
           </div>
 
