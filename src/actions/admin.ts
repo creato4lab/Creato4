@@ -228,3 +228,50 @@ export async function inspectLeakedCode(rawCodeText: string) {
       : null,
   };
 }
+
+export async function getAdminLicenses() {
+  await requireAdmin();
+  const licenses = await prisma.license.findMany({
+    orderBy: { createdAt: "desc" },
+    include: {
+      user: { select: { id: true, name: true, email: true } },
+      product: { select: { id: true, title: true, slug: true, category: true } },
+      activations: {
+        where: { isActive: true },
+        select: { id: true, chipId: true, boardType: true, nickname: true, lastSeenAt: true },
+      },
+    },
+  });
+
+  return licenses.map((l) => ({
+    ...l,
+    createdAt: l.createdAt.toISOString(),
+    activations: l.activations.map((a) => ({
+      ...a,
+      lastSeenAt: a.lastSeenAt.toISOString(),
+    })),
+  }));
+}
+
+export async function toggleLicenseStatus(licenseId: string) {
+  await requireAdmin();
+  try {
+    const existing = await prisma.license.findUnique({
+      where: { id: licenseId },
+      select: { isActive: true },
+    });
+
+    if (!existing) return { error: "License not found" };
+
+    const updated = await prisma.license.update({
+      where: { id: licenseId },
+      data: { isActive: !existing.isActive },
+    });
+
+    return { success: true, isActive: updated.isActive };
+  } catch (err) {
+    console.error("Error toggling license status:", err);
+    return { error: "Failed to update license status." };
+  }
+}
+
