@@ -154,6 +154,18 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        {/* Inline script to prevent preloader flashing on page reloads */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                if (localStorage.getItem('creato4_preloader_seen') === 'true') {
+                  document.documentElement.setAttribute('data-preloader-seen', 'true');
+                }
+              } catch (e) {}
+            `
+          }}
+        />
         {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"

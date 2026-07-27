@@ -17,6 +17,10 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    if (document.documentElement.getAttribute('data-preloader-seen') === 'true') {
+      return;
+    }
+
     // Prevent scrolling during splash
     document.body.style.overflow = 'hidden';
 
@@ -96,11 +100,11 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
 
     render();
 
-    // Auto-remove splash from DOM after 7.2s
+    // Auto-remove splash from DOM after 7.4s (allows 0.8s fadeout starting at 6.5s to finish)
     const timer = setTimeout(() => {
       document.body.style.overflow = 'unset';
       onComplete();
-    }, 7200);
+    }, 7400);
 
     return () => {
       cancelAnimationFrame(animationFrameId);
@@ -112,7 +116,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
 
   return (
     <div
-      className="fixed inset-0 z-[9999] select-none flex items-center justify-center overflow-hidden"
+      className="preloader-container fixed inset-0 z-[9999] select-none flex items-center justify-center overflow-hidden"
       style={{
         backgroundColor: '#050f0a',
         backgroundImage:
@@ -455,6 +459,10 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           100% {
             opacity: 0;
           }
+        }
+
+        html[data-preloader-seen="true"] .preloader-container {
+          display: none !important;
         }
       `}</style>
 

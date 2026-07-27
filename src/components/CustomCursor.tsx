@@ -64,8 +64,8 @@ export const CustomCursor: React.FC = () => {
           y: mouseY,
         }}
         animate={{
-          scale: isHovered ? 0 : 1,
-          opacity: isHovered ? 0 : 1,
+          scale: 1,
+          opacity: 1,
         }}
         transition={{ duration: 0.2 }}
       />
@@ -83,7 +83,7 @@ export const CustomCursor: React.FC = () => {
         }}
         animate={{
           scale: isHovered ? 1.8 : 1,
-          backgroundColor: isHovered ? 'rgba(250, 248, 245, 0.1)' : 'transparent',
+          backgroundColor: isHovered ? 'rgba(250, 248, 245, 0.1)' : 'rgba(250, 248, 245, 0)',
           borderWidth: isHovered ? 2 : 1,
         }}
         transition={{ duration: 0.3, ease: 'easeOut' }}

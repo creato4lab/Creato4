@@ -26,7 +26,10 @@ export default function HomeClient() {
 
   useEffect(() => {
     try {
-      if (localStorage.getItem('creato4_preloader_seen') === 'true') {
+      if (
+        localStorage.getItem('creato4_preloader_seen') === 'true' ||
+        document.documentElement.getAttribute('data-preloader-seen') === 'true'
+      ) {
         setPreloaderDone(true);
       }
     } catch {
@@ -37,6 +40,7 @@ export default function HomeClient() {
   const handlePreloaderComplete = () => {
     try {
       localStorage.setItem('creato4_preloader_seen', 'true');
+      document.documentElement.setAttribute('data-preloader-seen', 'true');
     } catch {
       // ignore storage errors
     }
@@ -143,8 +147,8 @@ export default function HomeClient() {
       {/* 1. Preloader */}
       {!preloaderDone && <Preloader onComplete={handlePreloaderComplete} />}
 
-      {/* Main Content (fades in smoothly) */}
-      <div className={preloaderDone ? 'opacity-100 transition-opacity duration-500' : 'opacity-0'}>
+      {/* Main Content */}
+      <div className="opacity-100">
         {/* 2. Fixed Navigation */}
         <Navbar
           onOpenDiscuss={() => handleOpenDiscuss('General Consultation')}
