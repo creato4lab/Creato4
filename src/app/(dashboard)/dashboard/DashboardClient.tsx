@@ -1,5 +1,6 @@
 "use client";
 
+import { signOut } from "next-auth/react";
 import React, { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
@@ -124,14 +125,12 @@ export function DashboardClient({
             >
               <Package className="w-4 h-4 text-[#C4A35A]" /> Shop Catalog
             </Link>
-            <form action="/api/auth/signout" method="POST">
-              <button
-                type="submit"
-                className="px-5 py-2.5 rounded-full bg-[#1A3C2F] text-[#FAF8F5] text-xs font-bold uppercase tracking-wider hover:bg-[#234B3C] shadow-sm transition-colors flex items-center gap-2"
-              >
-                <LogOut className="w-4 h-4" /> Sign Out
-              </button>
-            </form>
+            <button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="px-5 py-2.5 rounded-full bg-[#1A3C2F] text-[#FAF8F5] text-xs font-bold uppercase tracking-wider hover:bg-[#234B3C] shadow-sm transition-colors flex items-center gap-2 cursor-pointer"
+            >
+              <LogOut className="w-4 h-4" /> Sign Out
+            </button>
           </div>
         </div>
 
