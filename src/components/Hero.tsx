@@ -10,24 +10,33 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss, onOpenCinematic }) => {
   const [explosionFactor, setExplosionFactor] = useState(0.8);
-  const [spotlightPos, setSpotlightPos] = useState({ x: 50, y: 50 });
+  const [isMagnetAttached, setIsMagnetAttached] = useState(false);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  const springConfig = { damping: 14, stiffness: 220 };
-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [18, -18]), springConfig);
-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-24, 24]), springConfig);
-  const translateX = useSpring(useTransform(mouseX, [-0.5, 0.5], [-35, 35]), springConfig);
-  const translateY = useSpring(useTransform(mouseY, [-0.5, 0.5], [-25, 25]), springConfig);
+  // Dynamic spring physics — high stiffness when attached for instant snap, elastic recoil when detaching
+  const springConfig = isMagnetAttached 
+    ? { damping: 12, stiffness: 280, mass: 0.4 } 
+    : { damping: 8, stiffness: 120, mass: 1.2 };
+
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [22, -22]), springConfig);
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-28, 28]), springConfig);
+  const translateX = useSpring(useTransform(mouseX, [-0.5, 0.5], [-45, 45]), springConfig);
+  const translateY = useSpring(useTransform(mouseY, [-0.5, 0.5], [-35, 35]), springConfig);
+
+  const handleMouseEnter = () => {
+    setIsMagnetAttached(true);
+  };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setSpotlightPos({ x, y });
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    setCursorPos({ x, y });
 
     const mouseXPos = (e.clientX - rect.left) / rect.width - 0.5;
     const mouseYPos = (e.clientY - rect.top) / rect.height - 0.5;
@@ -36,6 +45,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss, onOpenCinematic }) =>
   };
 
   const handleMouseLeave = () => {
+    setIsMagnetAttached(false);
     mouseX.set(0);
     mouseY.set(0);
   };
@@ -50,6 +60,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss, onOpenCinematic }) =>
           {/* Strong Magnetic Mouse-Tracking Headline Container */}
           <motion.div
             ref={containerRef}
+            onMouseEnter={handleMouseEnter}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             style={{
@@ -62,6 +73,41 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss, onOpenCinematic }) =>
             }}
             className="relative cursor-pointer group py-4 my border-0 select-none"
           >
+            {/* Magnetic Field Attach / Detach Shockwave Rings */}
+            {isMagnetAttached && (
+              <motion.div
+                initial={{ scale: 0.2, opacity: 0.8 }}
+                animate={{ scale: 2.2, opacity: 0 }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
+                aria-hidden="true"
+                className="absolute pointer-events-none rounded-full border-2 border-[#1A3C2F]/30 z-10"
+                style={{
+                  left: cursorPos.x - 60,
+                  top: cursorPos.y - 60,
+                  width: 120,
+                  height: 120,
+                }}
+              />
+            )}
+
+            {/* Floating Magnetic Field Cursor Target Indicator */}
+            {isMagnetAttached && (
+              <motion.div
+                animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 180] }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+                aria-hidden="true"
+                className="absolute pointer-events-none z-30 rounded-full border border-dashed border-[#C4A35A]/60 flex items-center justify-center"
+                style={{
+                  left: cursorPos.x - 24,
+                  top: cursorPos.y - 24,
+                  width: 48,
+                  height: 48,
+                }}
+              >
+                <div className="w-2 h-2 rounded-full bg-[#1A3C2F]" />
+              </motion.div>
+            )}
+
             {/* Magical Twinkling Stars Floating Particles on Hover */}
             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20">
               {/* Star 1 - Top Right */}

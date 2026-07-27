@@ -70,7 +70,7 @@ export const CustomCursor: React.FC = () => {
         transition={{ duration: 0.2 }}
       />
 
-      {/* Large trailing ring/blob */}
+      {/* Large trailing magnetic field ring/blob */}
       <motion.div
         className="fixed top-0 left-0 rounded-full border border-[#FAF8F5] pointer-events-none z-[9998] mix-blend-difference flex items-center justify-center"
         style={{
@@ -82,11 +82,12 @@ export const CustomCursor: React.FC = () => {
           height: 32,
         }}
         animate={{
-          scale: isHovered ? 1.8 : 1,
-          backgroundColor: isHovered ? 'rgba(250, 248, 245, 0.1)' : 'rgba(250, 248, 245, 0)',
+          scale: isHovered ? 2.2 : 1,
+          backgroundColor: isHovered ? 'rgba(250, 248, 245, 0.15)' : 'rgba(250, 248, 245, 0)',
           borderWidth: isHovered ? 2 : 1,
+          rotate: isHovered ? 45 : 0,
         }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
+        transition={{ type: 'spring', damping: 15, stiffness: 250 }}
       />
     </>
   );
