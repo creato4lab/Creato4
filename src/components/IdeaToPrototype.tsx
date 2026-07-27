@@ -72,7 +72,19 @@ export const IdeaToPrototype: React.FC<IdeaToPrototypeProps> = ({
         <span>Press key or touch to close ✕</span>
       </div>
 
-      {/* Mobile-Optimized Fullscreen Video */}
+      {/* Blurred Background Video (Fills blank space on mobile) */}
+      <video
+        autoPlay
+        playsInline
+        webkit-playsinline="true"
+        preload="auto"
+        muted
+        loop
+        className="absolute inset-0 w-full h-full object-cover blur-3xl opacity-50 scale-110 pointer-events-none sm:hidden"
+        src="/videos/intro-video.mp4"
+      />
+
+      {/* Mobile-Optimized Fullscreen Video (Foreground) */}
       <video
         ref={videoRef}
         autoPlay
@@ -81,7 +93,7 @@ export const IdeaToPrototype: React.FC<IdeaToPrototypeProps> = ({
         preload="auto"
         muted={isMuted}
         onEnded={() => onEnded?.()}
-        className="w-full h-full object-contain sm:object-cover bg-black"
+        className="relative z-10 w-full h-full object-contain sm:object-cover"
         src="/videos/intro-video.mp4"
       />
     </div>
