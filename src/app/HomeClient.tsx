@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Preloader } from '@/components/Preloader';
 import { Navbar } from '@/components/Navbar';
 import { Hero } from '@/components/Hero';
@@ -53,19 +53,17 @@ export default function HomeClient({ initialProducts = [] }: { initialProducts?:
   const [preloaderDone, setPreloaderDone] = useState(false);
 
   useEffect(() => {
-    try {
-      if (
-        localStorage.getItem('creato4_preloader_seen') === 'true' ||
-        document.documentElement.getAttribute('data-preloader-seen') === 'true'
-      ) {
-        setPreloaderDone(true);
-      }
-    } catch {
-      // Fallback if localStorage is disabled/blocked
-    }
+    // Temporarily disabled skipping so the full cinematic animation plays on every load
+    // if (
+    //   localStorage.getItem('creato4_preloader_seen') === 'true' ||
+    //   document.documentElement.getAttribute('data-preloader-seen') === 'true'
+    // ) {
+    //   setPreloaderDone(true);
+    // }
   }, []);
 
-  const handlePreloaderComplete = () => {
+  // Stable reference — never re-creates, so Preloader's useEffect won't re-run
+  const handlePreloaderComplete = useCallback(() => {
     try {
       localStorage.setItem('creato4_preloader_seen', 'true');
       document.documentElement.setAttribute('data-preloader-seen', 'true');
@@ -73,7 +71,7 @@ export default function HomeClient({ initialProducts = [] }: { initialProducts?:
       // ignore storage errors
     }
     setPreloaderDone(true);
-  };
+  }, []);
 
   // Smooth scroll
   useEffect(() => {

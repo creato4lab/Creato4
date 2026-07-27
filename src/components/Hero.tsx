@@ -33,9 +33,9 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss }) => {
           </motion.div>
 
           {/* Headline */}
-          <h1 className="text-[#1A3C2F] font-extrabold uppercase tracking-tight text-4xl sm:text-6xl md:text-7xl lg:text-8xl leading-[0.95] mb-6 space-y-1">
+          <h1 className="text-[#1A3C2F] font-extrabold uppercase tracking-tight text-4xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.05] mb-8 flex flex-col gap-1 sm:gap-2">
             {headlineLines.map((line, idx) => (
-              <div key={idx} className="overflow-hidden py-0.5">
+              <div key={idx} className="overflow-hidden pb-1 sm:pb-2">
                 <motion.span
                   initial={{ y: '100%', opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}

@@ -159,9 +159,10 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                if (localStorage.getItem('creato4_preloader_seen') === 'true') {
-                  document.documentElement.setAttribute('data-preloader-seen', 'true');
-                }
+                // Temporarily disabled to allow preloader to play on every load
+                // if (localStorage.getItem('creato4_preloader_seen') === 'true') {
+                //   document.documentElement.setAttribute('data-preloader-seen', 'true');
+                // }
               } catch (e) {}
             `
           }}
