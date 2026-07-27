@@ -44,7 +44,7 @@ export default function NewProductPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-sm border border-[#1A3C2F]/10 overflow-hidden max-w-4xl">
+      <div className="bg-white rounded-3xl shadow-sm border border-[#1A3C2F]/10 overflow-hidden w-full max-w-[1500px]">
         <form onSubmit={handleSubmit} className="p-6 sm:p-10 space-y-8">
           
           {error && (

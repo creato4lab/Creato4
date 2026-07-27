@@ -51,18 +51,24 @@ export async function POST(req: NextRequest) {
     const cleanFilename = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
     const objectKey = `${prefix}/${timestamp}-${cleanFilename}`;
 
-    const fileBuffer = Buffer.from(await file.arrayBuffer());
-
-    // 2. Upload to Cloudflare R2
+    // 2. Stream upload to Cloudflare R2 using @aws-sdk/lib-storage Upload manager
     if (s3Client) {
-      const command = new PutObjectCommand({
-        Bucket: R2_BUCKET,
-        Key: objectKey,
-        Body: fileBuffer,
-        ContentType: file.type || "application/octet-stream",
+      const { Upload } = await import("@aws-sdk/lib-storage");
+
+      const parallelUploads3 = new Upload({
+        client: s3Client,
+        params: {
+          Bucket: R2_BUCKET,
+          Key: objectKey,
+          Body: file.stream(),
+          ContentType: file.type || "application/octet-stream",
+        },
+        queueSize: 4,
+        partSize: 5 * 1024 * 1024, // 5MB chunks
+        leavePartsOnError: false,
       });
 
-      await s3Client.send(command);
+      await parallelUploads3.done();
     } else {
       console.warn("[/api/admin/upload-file] R2 credentials missing, simulating upload.");
     }

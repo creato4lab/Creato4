@@ -76,7 +76,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
       {/* Main Content */}
       <main className="flex-1 md:ml-64 p-6 sm:p-10">
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full max-w-[1600px] mx-auto">
           {children}
         </div>
       </main>
