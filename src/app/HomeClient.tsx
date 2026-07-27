@@ -52,18 +52,6 @@ export default function HomeClient({ initialProducts = [] }: { initialProducts?:
 
   const [preloaderDone, setPreloaderDone] = useState(false);
 
-  useEffect(() => {
-    try {
-      const { getCookie } = require('@/lib/cookies');
-      const seenCookie = getCookie('creato4_splash_seen');
-      if (seenCookie === 'true') {
-        setPreloaderDone(true);
-      }
-    } catch {
-      // ignore
-    }
-  }, []);
-
   // Stable reference — never re-creates, so Preloader's useEffect won't re-run
   const handlePreloaderComplete = useCallback(() => {
     try {

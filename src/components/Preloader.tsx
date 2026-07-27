@@ -160,13 +160,13 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       {/* Background Constellation Canvas */}
       <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-10" />
 
-      {/* Main Framed Cinema Experience */}
+      {/* Main Fullscreen Cinema Experience */}
       <div className="relative z-20 w-full h-full flex items-center justify-center">
         <IdeaToPrototype
           onEnded={handleFinish}
           isMuted={isMuted}
           onToggleSound={toggleSound}
-          onSkip={handleFinish}
+          onDismiss={handleFinish}
         />
       </div>
     </div>
