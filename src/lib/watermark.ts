@@ -66,16 +66,50 @@ export function decodeSteganography(text: string): string | null {
 }
 
 /**
- * Embeds zero-width steganographic token into source code lines (e.g. after setup() or loop())
+ * Embeds executable C++ license guard into .ino / C++ files so that if removed or edited, code fails to compile/run.
+ */
+export function injectExecutableLicenseCheck(code: string, meta: WatermarkMetadata): string {
+  if (code.includes("_c4_verify_guard")) return code;
+
+  const b64Key = Buffer.from(meta.licenseKey).toString("base64");
+  const b64User = Buffer.from(meta.userId).toString("base64");
+
+  const guardCode = `
+// ─── CREATO4 EXECUTABLE LICENSE GUARD ──────────────────────────────────────
+static const char _c4_b64_k1[] = "${b64Key}";
+static const char _c4_b64_u2[] = "${b64User}";
+static inline bool _c4_verify_guard() {
+  return (_c4_b64_k1[0] != 0 && _c4_b64_u2[0] != 0);
+}
+// ────────────────────────────────────────────────────────────────────────────
+`;
+
+  let updatedCode = guardCode + "\n" + code;
+
+  if (updatedCode.includes("void setup() {")) {
+    updatedCode = updatedCode.replace(
+      "void setup() {",
+      `void setup() {\n  if (!_c4_verify_guard()) { while(1) { delay(1000); } } // Creato4 Guard`
+    );
+  } else if (updatedCode.includes("void setup()")) {
+    updatedCode = updatedCode.replace(
+      "void setup()",
+      `void setup() {\n  if (!_c4_verify_guard()) { while(1) { delay(1000); } } // Creato4 Guard`
+    );
+  }
+
+  return updatedCode;
+}
+
+/**
+ * Embeds zero-width steganographic token into source code lines
  */
 export function injectSteganographyIntoCode(code: string, meta: WatermarkMetadata): string {
   const payload = `C4L:${meta.downloadId}:${meta.userId}:${meta.licenseId}`;
   const zwPayload = encodeSteganography(payload);
 
-  // If already steganographed, don't duplicate
   if (code.includes(ZW_SEP)) return code;
 
-  // Insert invisible watermark right after setup(), loop(), or main line
   if (code.includes("void setup()")) {
     return code.replace("void setup()", `void setup()${zwPayload}`);
   }
@@ -86,7 +120,6 @@ export function injectSteganographyIntoCode(code: string, meta: WatermarkMetadat
     return code.replace("int main(", `int main(${zwPayload}`);
   }
 
-  // Fallback: append at end of first line
   const lines = code.split("\n");
   if (lines.length > 0) {
     lines[0] += zwPayload;
@@ -125,39 +158,66 @@ function getCommentHeader(fileExt: string, meta: WatermarkMetadata): string {
 
   const ext = fileExt.toLowerCase();
 
-  // Multi-line C-style /* ... */
   if (["c", "cpp", "h", "hpp", "ino", "js", "ts", "jsx", "tsx", "css", "java", "cs", "go", "rs", "kt", "swift", "scala"].includes(ext)) {
     return `/*\n${textLines.map((l) => ` * ${l}`).join("\n")}\n */\n\n`;
   }
 
-  // Hash-style #
   if (["py", "sh", "bash", "zsh", "pl", "rb", "yaml", "yml", "r", "cmake", "dockerfile", "makefile"].includes(ext) || ext === "makefile") {
     return `${textLines.map((l) => `# ${l}`).join("\n")}\n\n`;
   }
 
-  // HTML/XML-style <!-- ... -->
   if (["html", "htm", "xml", "svg"].includes(ext)) {
     return `<!--\n${textLines.map((l) => `  ${l}`).join("\n")}\n-->\n\n`;
   }
 
-  // Semicolon-style ; (Assembly, Lisp, INI)
   if (["asm", "s", "ini", "clj"].includes(ext)) {
     return `${textLines.map((l) => `; ${l}`).join("\n")}\n\n`;
   }
 
-  // Double-dash-style -- (VHDL, Lua, SQL)
   if (["vhd", "vhdl", "lua", "sql"].includes(ext)) {
     return `${textLines.map((l) => `-- ${l}`).join("\n")}\n\n`;
   }
 
-  // Default fallback block
   return `/*\n${textLines.map((l) => ` * ${l}`).join("\n")}\n */\n\n`;
 }
 
 /**
+ * Watermarks PDF documents with customer full name & license key in footer using pdf-lib
+ */
+export async function watermarkPdfWithCustomerName(
+  pdfBuffer: Buffer,
+  meta: WatermarkMetadata
+): Promise<Buffer> {
+  try {
+    const { PDFDocument, rgb, StandardFonts } = await import("pdf-lib");
+    const pdfDoc = await PDFDocument.load(pdfBuffer);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const pages = pdfDoc.getPages();
+
+    const customerText = `Licensed to: ${meta.userName || meta.userEmail || meta.userId} | License: ${meta.licenseKey} | Creato4 Lab Digital Asset`;
+
+    pages.forEach((page) => {
+      const { width } = page.getSize();
+      page.drawText(customerText, {
+        x: 30,
+        y: 15,
+        size: 7.5,
+        font: fontBold,
+        color: rgb(0.1, 0.24, 0.18),
+        opacity: 0.7,
+      });
+    });
+
+    const savedBytes = await pdfDoc.save();
+    return Buffer.from(savedBytes);
+  } catch (err) {
+    console.error("PDF Customer Name Watermark error:", err);
+    return pdfBuffer;
+  }
+}
+
+/**
  * Watermarks a ZIP file in-memory.
- * Unpacks the zip, injects watermark comments AND zero-width steganography into source code files,
- * adds a hidden .watermark.json file, and repacks.
  */
 export async function watermarkZipBuffer(
   zipBuffer: Buffer,
@@ -180,7 +240,11 @@ export async function watermarkZipBuffer(
       let originalContent = await zipEntry.async("string");
       const header = getCommentHeader(ext, meta);
 
-      // Inject steganographic zero-width watermark into source files (.ino, .c, .cpp, .h, etc.)
+      const isArduinoOrC = ["ino", "c", "cpp"].includes(ext.toLowerCase());
+      if (isArduinoOrC) {
+        originalContent = injectExecutableLicenseCheck(originalContent, meta);
+      }
+
       const isSourceCode = ["ino", "c", "cpp", "h", "hpp", "py", "js", "ts"].includes(ext.toLowerCase());
       if (isSourceCode) {
         originalContent = injectSteganographyIntoCode(originalContent, meta);
@@ -192,7 +256,7 @@ export async function watermarkZipBuffer(
         zip.file(filePath, originalContent);
       }
     } catch {
-      // Ignore binary parsing errors
+      // Ignore binary files
     }
   }
 
@@ -217,21 +281,31 @@ export async function watermarkZipBuffer(
   );
 
   zip.file(".watermark.json", watermarkJson);
-  zip.file("LICENSE_WATERMARK.txt", `${getCommentHeader("txt", meta)}\nThis digital product is uniquely registered to ${meta.userEmail || meta.userId}.\nAuthorized use only under Creato4 Lab Terms & EULA.\n`);
+  zip.file("LICENSE_WATERMARK.txt", `${getCommentHeader("txt", meta)}\nThis digital product is uniquely registered to ${meta.userName || meta.userEmail || meta.userId}.\nAuthorized use only under Creato4 Lab Terms & EULA.\n`);
 
   return await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" });
 }
 
 /**
- * Watermarks a standalone text/CAD file by prepending the watermark header and steganography.
+ * Watermarks a standalone text/CAD/PDF file.
  */
-export function watermarkTextBuffer(
+export async function watermarkTextBuffer(
   contentBuffer: Buffer,
   fileExt: string,
   meta: WatermarkMetadata
-): Buffer {
+): Promise<Buffer> {
+  const ext = fileExt.toLowerCase();
+
+  if (ext === "pdf") {
+    return await watermarkPdfWithCustomerName(contentBuffer, meta);
+  }
+
   let text = contentBuffer.toString("utf-8");
-  const isSourceCode = ["ino", "c", "cpp", "h", "hpp", "py", "js", "ts"].includes(fileExt.toLowerCase());
+  if (["ino", "c", "cpp"].includes(ext)) {
+    text = injectExecutableLicenseCheck(text, meta);
+  }
+
+  const isSourceCode = ["ino", "c", "cpp", "h", "hpp", "py", "js", "ts"].includes(ext);
   if (isSourceCode) {
     text = injectSteganographyIntoCode(text, meta);
   }

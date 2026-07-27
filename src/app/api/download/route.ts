@@ -138,7 +138,7 @@ export async function GET(req: NextRequest) {
       cleanFilename += `.${ext}`;
     }
   } else {
-    watermarkedBuffer = watermarkTextBuffer(rawBuffer, ext, metadata);
+    watermarkedBuffer = await watermarkTextBuffer(rawBuffer, ext, metadata);
     cleanFilename += `.${ext}`;
   }
 
