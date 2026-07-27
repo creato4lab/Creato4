@@ -23,7 +23,7 @@ export function LicenseCheckout({ productId, productName, basePrice }: LicenseCh
       
       <div className="space-y-4 mb-8">
         {/* Student Tier */}
-        <label className={`relative flex cursor-pointer p-4 rounded-2xl border-2 transition-all ${selectedLicense === 'STUDENT' ? 'border-[#1A3C2F] bg-[#1A3C2F]/5' : 'border-transparent hover:border-[#1A3C2F]/20'}`}>
+        <label className={`flex items-center justify-between cursor-pointer p-4 rounded-2xl border-2 transition-all ${selectedLicense === 'STUDENT' ? 'border-[#1A3C2F] bg-[#1A3C2F]/5' : 'border-[#1A3C2F]/10 hover:border-[#1A3C2F]/20'}`}>
           <input 
             type="radio" 
             name="license" 
@@ -32,20 +32,20 @@ export function LicenseCheckout({ productId, productName, basePrice }: LicenseCh
             checked={selectedLicense === 'STUDENT'}
             onChange={() => setSelectedLicense('STUDENT')}
           />
-          <div className="flex-1">
+          <div className="flex-1 pr-4">
             <div className="flex justify-between items-start mb-1">
               <span className="font-bold text-[#1A3C2F]">Student</span>
               <span className="font-black text-lg text-[#1A3C2F]">₹{basePrice.toLocaleString('en-IN')}</span>
             </div>
-            <p className="text-xs text-[#1A3C2F]/60 pr-6">Personal projects & academic use only. No commercial distribution.</p>
+            <p className="text-xs text-[#1A3C2F]/60">Personal projects & academic use only. No commercial distribution.</p>
           </div>
-          <div className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedLicense === 'STUDENT' ? 'border-[#1A3C2F]' : 'border-[#1A3C2F]/20'}`}>
+          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${selectedLicense === 'STUDENT' ? 'border-[#1A3C2F]' : 'border-[#1A3C2F]/20'}`}>
             <div className={`w-2.5 h-2.5 rounded-full ${selectedLicense === 'STUDENT' ? 'bg-[#1A3C2F]' : 'bg-transparent'}`}></div>
           </div>
         </label>
 
         {/* Commercial Tier */}
-        <label className={`relative flex cursor-pointer p-4 rounded-2xl border-2 transition-all ${selectedLicense === 'COMMERCIAL' ? 'border-[#1A3C2F] bg-[#1A3C2F]/5' : 'border-transparent hover:border-[#1A3C2F]/20'}`}>
+        <label className={`flex items-center justify-between cursor-pointer p-4 rounded-2xl border-2 transition-all ${selectedLicense === 'COMMERCIAL' ? 'border-[#1A3C2F] bg-[#1A3C2F]/5' : 'border-[#1A3C2F]/10 hover:border-[#1A3C2F]/20'}`}>
           <input 
             type="radio" 
             name="license" 
@@ -54,20 +54,20 @@ export function LicenseCheckout({ productId, productName, basePrice }: LicenseCh
             checked={selectedLicense === 'COMMERCIAL'}
             onChange={() => setSelectedLicense('COMMERCIAL')}
           />
-          <div className="flex-1">
+          <div className="flex-1 pr-4">
             <div className="flex justify-between items-start mb-1">
               <span className="font-bold text-[#1A3C2F]">Commercial</span>
               <span className="font-black text-lg text-[#1A3C2F]">₹{commercialPrice.toLocaleString('en-IN')}</span>
             </div>
-            <p className="text-xs text-[#1A3C2F]/60 pr-6">Use in up to 3 client projects. Internal team use (up to 5 users).</p>
+            <p className="text-xs text-[#1A3C2F]/60">Use in up to 3 client projects. Internal team use (up to 5 users).</p>
           </div>
-          <div className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedLicense === 'COMMERCIAL' ? 'border-[#1A3C2F]' : 'border-[#1A3C2F]/20'}`}>
+          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${selectedLicense === 'COMMERCIAL' ? 'border-[#1A3C2F]' : 'border-[#1A3C2F]/20'}`}>
             <div className={`w-2.5 h-2.5 rounded-full ${selectedLicense === 'COMMERCIAL' ? 'bg-[#1A3C2F]' : 'bg-transparent'}`}></div>
           </div>
         </label>
 
         {/* Enterprise Tier */}
-        <label className={`relative flex cursor-pointer p-4 rounded-2xl border-2 transition-all ${selectedLicense === 'ENTERPRISE' ? 'border-[#1A3C2F] bg-[#1A3C2F]/5' : 'border-transparent hover:border-[#1A3C2F]/20'}`}>
+        <label className={`flex items-center justify-between cursor-pointer p-4 rounded-2xl border-2 transition-all ${selectedLicense === 'ENTERPRISE' ? 'border-[#1A3C2F] bg-[#1A3C2F]/5' : 'border-[#1A3C2F]/10 hover:border-[#1A3C2F]/20'}`}>
           <input 
             type="radio" 
             name="license" 
@@ -76,14 +76,14 @@ export function LicenseCheckout({ productId, productName, basePrice }: LicenseCh
             checked={selectedLicense === 'ENTERPRISE'}
             onChange={() => setSelectedLicense('ENTERPRISE')}
           />
-          <div className="flex-1">
+          <div className="flex-1 pr-4">
             <div className="flex justify-between items-start mb-1">
               <span className="font-bold text-[#1A3C2F]">Enterprise</span>
               <span className="font-black text-lg text-[#1A3C2F]">₹{enterprisePrice.toLocaleString('en-IN')}</span>
             </div>
-            <p className="text-xs text-[#1A3C2F]/60 pr-6">Unlimited projects within a single legal entity.</p>
+            <p className="text-xs text-[#1A3C2F]/60">Unlimited projects within a single legal entity.</p>
           </div>
-          <div className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedLicense === 'ENTERPRISE' ? 'border-[#1A3C2F]' : 'border-[#1A3C2F]/20'}`}>
+          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${selectedLicense === 'ENTERPRISE' ? 'border-[#1A3C2F]' : 'border-[#1A3C2F]/20'}`}>
             <div className={`w-2.5 h-2.5 rounded-full ${selectedLicense === 'ENTERPRISE' ? 'bg-[#1A3C2F]' : 'bg-transparent'}`}></div>
           </div>
         </label>
