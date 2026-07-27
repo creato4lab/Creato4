@@ -58,7 +58,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 1.2, ease: 'easeOut' }}
-            className="flex flex-wrap items-center gap-4 mb-4"
+            className="flex flex-wrap items-center gap-4 mt-8"
           >
             {/* Primary CTA */}
             <button
@@ -77,17 +77,6 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss }) => {
               <span>Explore Our Work</span>
               <ArrowDown className="w-4 h-4 transition-transform duration-300 group-hover:translate-y-0.5" />
             </a>
-          </motion.div>
-
-          {/* Note */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.8 }}
-            transition={{ duration: 0.4, delay: 1.5 }}
-            className="flex items-center gap-2 text-[0.75rem] text-[#5C6B60] font-medium"
-          >
-            <ShieldCheck className="w-3.5 h-3.5 text-[#C4A35A]" />
-            <span>Free initial discussion · No commitment</span>
           </motion.div>
 
 
