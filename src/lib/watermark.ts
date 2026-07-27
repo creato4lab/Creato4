@@ -12,6 +12,7 @@ export interface WatermarkMetadata {
   productTitle: string;
   purchasedAt?: string;
   downloadedAt: string;
+  chipId?: string | null;
 }
 
 // ─── Zero-Width Steganography Constants ────────────────────────────────────────
@@ -66,6 +67,51 @@ export function decodeSteganography(text: string): string | null {
 }
 
 /**
+ * Injects physical Microcontroller Hardware Lock into .ino / C++ code.
+ * If executed on any hardware board other than buyer's Chip ID, execution halts.
+ */
+export function injectHardwareChipLock(code: string, meta: WatermarkMetadata): string {
+  if (!meta.chipId || code.includes("_c4_hw_chip_lock")) return code;
+
+  const cleanChip = meta.chipId.replace(/[^a-zA-Z0-9]/g, "");
+
+  const hwGuardCode = `
+// ─── CREATO4 HARDWARE CHIP-LOCK (Bound to physical board: ${meta.chipId}) ──
+#if defined(ESP32)
+  #include <esp_system.h>
+#endif
+
+static inline bool _c4_hw_chip_lock() {
+#if defined(ESP32)
+  uint64_t _c4_mac = ESP.getEfuseMac();
+  char _c4_chip_str[32];
+  snprintf(_c4_chip_str, sizeof(_c4_chip_str), "%04X%08X", (uint16_t)(_c4_mac >> 32), (uint32_t)_c4_mac);
+  return (strstr(_c4_chip_str, "${cleanChip}") != NULL || "${cleanChip}"[0] == 0);
+#else
+  return true;
+#endif
+}
+// ──────────────────────────────────────────────────────────────────────────
+`;
+
+  let updatedCode = hwGuardCode + "\n" + code;
+
+  if (updatedCode.includes("void setup() {")) {
+    updatedCode = updatedCode.replace(
+      "void setup() {",
+      `void setup() {\n  if (!_c4_hw_chip_lock()) { while(1) { delay(1000); } } // Creato4 Hardware Lock`
+    );
+  } else if (updatedCode.includes("void setup()")) {
+    updatedCode = updatedCode.replace(
+      "void setup()",
+      `void setup() {\n  if (!_c4_hw_chip_lock()) { while(1) { delay(1000); } } // Creato4 Hardware Lock`
+    );
+  }
+
+  return updatedCode;
+}
+
+/**
  * Embeds executable C++ license guard into .ino / C++ files so that if removed or edited, code fails to compile/run.
  */
 export function injectExecutableLicenseCheck(code: string, meta: WatermarkMetadata): string {
@@ -102,31 +148,38 @@ static inline bool _c4_verify_guard() {
 }
 
 /**
- * Embeds zero-width steganographic token into source code lines
+ * Distributes multi-chunk hidden watermarks throughout the code (header macro, mid-code struct, zero-width signatures)
  */
-export function injectSteganographyIntoCode(code: string, meta: WatermarkMetadata): string {
+export function injectMultiChunkWatermark(code: string, meta: WatermarkMetadata): string {
+  let updatedCode = code;
+
+  // Chunk 1: Header Macro
+  if (!updatedCode.includes("_C4_SYS_LICENSE_SIG")) {
+    const macroChunk = `#define _C4_SYS_LICENSE_SIG "${meta.licenseId}"\n`;
+    updatedCode = macroChunk + updatedCode;
+  }
+
+  // Chunk 2: Mid-Code Static Struct
+  if (!updatedCode.includes("_c4_sys_meta")) {
+    const b64DownloadRef = Buffer.from(meta.downloadId).toString("base64");
+    const structChunk = `\nstatic const struct { const char* ref; const char* tag; } _c4_sys_meta = { "${b64DownloadRef}", "CREATO4_LAB" };\n`;
+    updatedCode += structChunk;
+  }
+
+  // Chunk 3: Distributed Zero-Width Steganography
   const payload = `C4L:${meta.downloadId}:${meta.userId}:${meta.licenseId}`;
   const zwPayload = encodeSteganography(payload);
 
-  if (code.includes(ZW_SEP)) return code;
-
-  if (code.includes("void setup()")) {
-    return code.replace("void setup()", `void setup()${zwPayload}`);
-  }
-  if (code.includes("void loop()")) {
-    return code.replace("void loop()", `void loop()${zwPayload}`);
-  }
-  if (code.includes("int main(")) {
-    return code.replace("int main(", `int main(${zwPayload}`);
+  if (!updatedCode.includes(ZW_SEP)) {
+    if (updatedCode.includes("void setup()")) {
+      updatedCode = updatedCode.replace("void setup()", `void setup()${zwPayload}`);
+    }
+    if (updatedCode.includes("void loop()")) {
+      updatedCode = updatedCode.replace("void loop()", `void loop()${zwPayload}`);
+    }
   }
 
-  const lines = code.split("\n");
-  if (lines.length > 0) {
-    lines[0] += zwPayload;
-    return lines.join("\n");
-  }
-
-  return code + zwPayload;
+  return updatedCode;
 }
 
 /**
@@ -147,6 +200,7 @@ function getCommentHeader(fileExt: string, meta: WatermarkMetadata): string {
     ` Customer ID   : ${meta.userId}`,
     ` Customer      : ${meta.userName || "N/A"} (${meta.userEmail || "N/A"})`,
     ` Download Ref  : ${meta.downloadId}`,
+    ` Bound Chip ID : ${meta.chipId || "Unbound (Multi-Device)"}`,
     ` Timestamp     : ${meta.downloadedAt}`,
     divider,
     " © 2026 Creato4 Lab. All Rights Reserved.",
@@ -242,12 +296,11 @@ export async function watermarkZipBuffer(
 
       const isArduinoOrC = ["ino", "c", "cpp"].includes(ext.toLowerCase());
       if (isArduinoOrC) {
+        if (meta.chipId) {
+          originalContent = injectHardwareChipLock(originalContent, meta);
+        }
         originalContent = injectExecutableLicenseCheck(originalContent, meta);
-      }
-
-      const isSourceCode = ["ino", "c", "cpp", "h", "hpp", "py", "js", "ts"].includes(ext.toLowerCase());
-      if (isSourceCode) {
-        originalContent = injectSteganographyIntoCode(originalContent, meta);
+        originalContent = injectMultiChunkWatermark(originalContent, meta);
       }
 
       if (!originalContent.includes("CREATO4 LAB — LICENSED INTELLECTUAL PROPERTY")) {
@@ -273,6 +326,7 @@ export async function watermarkZipBuffer(
       customerEmail: meta.userEmail,
       productTitle: meta.productTitle,
       downloadId: meta.downloadId,
+      boundChipId: meta.chipId || null,
       downloadedAt: meta.downloadedAt,
       checksum: Buffer.from(`${meta.licenseId}:${meta.userId}:${meta.downloadId}`).toString("base64"),
     },
@@ -281,7 +335,7 @@ export async function watermarkZipBuffer(
   );
 
   zip.file(".watermark.json", watermarkJson);
-  zip.file("LICENSE_WATERMARK.txt", `${getCommentHeader("txt", meta)}\nThis digital product is uniquely registered to ${meta.userName || meta.userEmail || meta.userId}.\nAuthorized use only under Creato4 Lab Terms & EULA.\n`);
+  zip.file("LICENSE_WATERMARK.txt", `${getCommentHeader("txt", meta)}\nThis digital product is uniquely registered to ${meta.userName || meta.userEmail || meta.userId}.\nBound Chip ID: ${meta.chipId || "Multi-Device"}\nAuthorized use only under Creato4 Lab Terms & EULA.\n`);
 
   return await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" });
 }
@@ -302,12 +356,11 @@ export async function watermarkTextBuffer(
 
   let text = contentBuffer.toString("utf-8");
   if (["ino", "c", "cpp"].includes(ext)) {
+    if (meta.chipId) {
+      text = injectHardwareChipLock(text, meta);
+    }
     text = injectExecutableLicenseCheck(text, meta);
-  }
-
-  const isSourceCode = ["ino", "c", "cpp", "h", "hpp", "py", "js", "ts"].includes(ext);
-  if (isSourceCode) {
-    text = injectSteganographyIntoCode(text, meta);
+    text = injectMultiChunkWatermark(text, meta);
   }
 
   const header = getCommentHeader(fileExt, meta);

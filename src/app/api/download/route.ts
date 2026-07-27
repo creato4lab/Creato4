@@ -69,6 +69,20 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  const chipIdParam = searchParams.get("chipId");
+
+  // Lookup active device activation if not passed in query params
+  let activeChipId = chipIdParam;
+  if (!activeChipId) {
+    const firstActivation = await prisma.deviceActivation.findFirst({
+      where: { licenseId: license.id, isActive: true },
+      select: { chipId: true },
+    });
+    if (firstActivation) {
+      activeChipId = firstActivation.chipId;
+    }
+  }
+
   const downloadId = `dl_${crypto.randomUUID()}`;
   const nowIso = new Date().toISOString();
 
@@ -84,6 +98,7 @@ export async function GET(req: NextRequest) {
     productTitle: license.product.title,
     purchasedAt: license.createdAt.toISOString(),
     downloadedAt: nowIso,
+    chipId: activeChipId,
   };
 
   let rawBuffer: Buffer;
