@@ -16,14 +16,11 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss, onOpenCinematic }) =>
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  const [isLocked, setIsLocked] = useState(false);
-
-  // Heavy sticky magnetic spring physics (sticky drag, high damping & mass)
-  const springConfig = { damping: 28, stiffness: 180, mass: 1.2 };
-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [16, -16]), springConfig);
-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-22, 22]), springConfig);
-  const translateX = useSpring(useTransform(mouseX, [-0.5, 0.5], [-45, 45]), springConfig);
-  const translateY = useSpring(useTransform(mouseY, [-0.5, 0.5], [-35, 35]), springConfig);
+  const springConfig = { damping: 14, stiffness: 220 };
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [18, -18]), springConfig);
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-24, 24]), springConfig);
+  const translateX = useSpring(useTransform(mouseX, [-0.5, 0.5], [-35, 35]), springConfig);
+  const translateY = useSpring(useTransform(mouseY, [-0.5, 0.5], [-25, 25]), springConfig);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
@@ -34,26 +31,11 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss, onOpenCinematic }) =>
 
     const mouseXPos = (e.clientX - rect.left) / rect.width - 0.5;
     const mouseYPos = (e.clientY - rect.top) / rect.height - 0.5;
-    const dist = Math.sqrt(mouseXPos * mouseXPos + mouseYPos * mouseYPos);
-
-    // Breakout Detachment Force Logic:
-    // When cursor pulls away towards boundary (>0.38), magnet snaps and detaches!
-    if (dist > 0.38) {
-      if (isLocked) setIsLocked(false);
-      // Sudden snap back (detach force feeling)
-      mouseX.set(mouseXPos * 0.15);
-      mouseY.set(mouseYPos * 0.15);
-    } else {
-      if (!isLocked) setIsLocked(true);
-      // Sticky magnetic attraction with heavy physical resistance
-      const stickyPull = 1 - Math.pow(dist * 2.2, 1.8);
-      mouseX.set(mouseXPos * Math.max(0.2, stickyPull));
-      mouseY.set(mouseYPos * Math.max(0.2, stickyPull));
-    }
+    mouseX.set(mouseXPos);
+    mouseY.set(mouseYPos);
   };
 
   const handleMouseLeave = () => {
-    setIsLocked(false);
     mouseX.set(0);
     mouseY.set(0);
   };
@@ -65,10 +47,9 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss, onOpenCinematic }) =>
         {/* LEFT COLUMN (55% desktop = 7 cols) */}
         <div className="lg:col-span-7 flex flex-col justify-center z-20">
           
-          {/* Sticky Magnetic Mouse-Tracking Headline Container */}
+          {/* Strong Magnetic Mouse-Tracking Headline Container */}
           <motion.div
             ref={containerRef}
-            data-magnetic="true"
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             style={{

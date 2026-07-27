@@ -3,7 +3,6 @@ import { motion, useMotionValue, useSpring } from 'motion/react';
 
 export const CustomCursor: React.FC = () => {
   const [isHovered, setIsHovered] = useState(false);
-  const [isMagnetic, setIsMagnetic] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   // Mouse position values
@@ -26,14 +25,6 @@ export const CustomCursor: React.FC = () => {
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      
-      // Check for magnetic target
-      if (target.closest('[data-magnetic="true"]')) {
-        setIsMagnetic(true);
-      } else {
-        setIsMagnetic(false);
-      }
-
       // Check if hovering over an interactive element
       if (
         target.tagName.toLowerCase() === 'a' ||
@@ -73,7 +64,7 @@ export const CustomCursor: React.FC = () => {
           y: mouseY,
         }}
         animate={{
-          scale: isMagnetic ? 1.5 : 1,
+          scale: 1,
           opacity: 1,
         }}
         transition={{ duration: 0.2 }}
@@ -91,9 +82,9 @@ export const CustomCursor: React.FC = () => {
           height: 32,
         }}
         animate={{
-          scale: isMagnetic ? 2.4 : isHovered ? 1.8 : 1,
-          backgroundColor: isMagnetic ? 'rgba(250, 248, 245, 0.2)' : isHovered ? 'rgba(250, 248, 245, 0.1)' : 'rgba(250, 248, 245, 0)',
-          borderWidth: isMagnetic ? 2.5 : isHovered ? 2 : 1,
+          scale: isHovered ? 1.8 : 1,
+          backgroundColor: isHovered ? 'rgba(250, 248, 245, 0.1)' : 'rgba(250, 248, 245, 0)',
+          borderWidth: isHovered ? 2 : 1,
         }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
       />
