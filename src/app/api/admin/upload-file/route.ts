@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
-import { S3Client } from "@aws-sdk/client-s3";
-import { Readable } from "stream";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import fs from "fs";
+import path from "path";
 
 export const maxDuration = 60;
 
@@ -46,12 +47,7 @@ export async function POST(req: NextRequest) {
     const contentType = req.headers.get("content-type") || "application/octet-stream";
 
     let filename = rawFilename ? decodeURIComponent(rawFilename) : "file.bin";
-    let bodyStream: any = null;
-
-    // Support both raw binary POST body AND FormData POST body for maximum compatibility!
-    if (!req.body) {
-      return NextResponse.json({ error: "No payload stream provided" }, { status: 400 });
-    }
+    let fileBuffer: Buffer;
 
     if (contentType.includes("multipart/form-data")) {
       const formData = await req.formData();
@@ -60,46 +56,67 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "No file in form data" }, { status: 400 });
       }
       filename = file.name;
-      const fileBuffer = Buffer.from(await file.arrayBuffer());
-      bodyStream = Readable.from(fileBuffer);
+      fileBuffer = Buffer.from(await file.arrayBuffer());
     } else {
-      // Direct raw binary stream piping (zero memory limit, zero parsing error)
-      bodyStream = Readable.fromWeb(req.body as any);
+      const arrayBuffer = await req.arrayBuffer();
+      if (!arrayBuffer || arrayBuffer.byteLength === 0) {
+        return NextResponse.json({ error: "Empty payload provided" }, { status: 400 });
+      }
+      fileBuffer = Buffer.from(arrayBuffer);
     }
 
     const timestamp = Date.now();
     const cleanFilename = filename.replace(/[^a-zA-Z0-9.\-_]/g, "_");
     const objectKey = `${prefix}/${timestamp}-${cleanFilename}`;
+    let fileUrl = "";
 
-    // 2. Stream upload to Cloudflare R2 using @aws-sdk/lib-storage Upload manager
+    let r2Success = false;
+
+    // 2. Attempt Cloudflare R2 Upload if configured
     if (s3Client) {
-      const { Upload } = await import("@aws-sdk/lib-storage");
+      try {
+        const { Upload } = await import("@aws-sdk/lib-storage");
+        const parallelUploads3 = new Upload({
+          client: s3Client,
+          params: {
+            Bucket: R2_BUCKET,
+            Key: objectKey,
+            Body: fileBuffer,
+            ContentType: contentType.includes("multipart/form-data") ? "application/octet-stream" : contentType,
+          },
+          queueSize: 4,
+          partSize: 5 * 1024 * 1024,
+          leavePartsOnError: false,
+        });
 
-      const parallelUploads3 = new Upload({
-        client: s3Client,
-        params: {
-          Bucket: R2_BUCKET,
-          Key: objectKey,
-          Body: bodyStream,
-          ContentType: contentType.includes("multipart/form-data") ? "application/octet-stream" : contentType,
-        },
-        queueSize: 4,
-        partSize: 5 * 1024 * 1024, // 5MB chunks
-        leavePartsOnError: false,
-      });
+        await parallelUploads3.done();
+        r2Success = true;
+        fileUrl = `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${R2_BUCKET}/${objectKey}`;
+      } catch (r2Err: any) {
+        console.warn("[/api/admin/upload-file] R2 Upload failed, switching to local disk fallback:", r2Err.message);
+      }
+    }
 
-      await parallelUploads3.done();
-    } else {
-      console.warn("[/api/admin/upload-file] R2 credentials missing, simulating upload.");
+    // 3. Fallback to Local Disk Storage if R2 is absent or fails
+    if (!r2Success) {
+      const targetDir = path.join(process.cwd(), "public", "uploads", prefix);
+      if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+      }
+
+      const localFilePath = path.join(targetDir, `${timestamp}-${cleanFilename}`);
+      await fs.promises.writeFile(localFilePath, fileBuffer);
+
+      fileUrl = `/uploads/${prefix}/${timestamp}-${cleanFilename}`;
     }
 
     return NextResponse.json({
       success: true,
-      key: objectKey,
-      url: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${R2_BUCKET}/${objectKey}`,
+      key: fileUrl,
+      url: fileUrl,
     });
   } catch (err: any) {
-    console.error("[/api/admin/upload-file] Error streaming file to R2:", err);
-    return NextResponse.json({ error: err.message || "Failed to stream upload to R2" }, { status: 500 });
+    console.error("[/api/admin/upload-file] File processing error:", err);
+    return NextResponse.json({ error: err.message || "Failed to upload file" }, { status: 500 });
   }
 }
