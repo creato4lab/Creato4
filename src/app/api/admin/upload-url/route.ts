@@ -60,7 +60,6 @@ export async function POST(req: NextRequest) {
     const command = new PutObjectCommand({
       Bucket: R2_BUCKET,
       Key: objectKey,
-      ContentType: contentType,
     });
 
     const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
