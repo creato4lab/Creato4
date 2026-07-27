@@ -79,7 +79,7 @@ export const StudentProjects: React.FC<StudentProjectsProps> = ({ initialProject
                 <div
                   className="group h-full bg-[#F5F0EA] rounded-2xl overflow-hidden border border-[#E8E2D9] shadow-xs hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
                 >
-                  <Link href={`/shop/${project.id}`} className="block">
+                  <Link href={`/shop/${project.slug}`} className="block">
                     {/* Image & Difficulty Pill */}
                     <div className="relative aspect-[4/3] overflow-hidden bg-[#E8E2D9]">
                       <img
@@ -102,7 +102,7 @@ export const StudentProjects: React.FC<StudentProjectsProps> = ({ initialProject
 
                   {/* Content */}
                   <div className="p-5 flex-1 flex flex-col justify-between bg-[#FAF8F5]">
-                    <Link href={`/shop/${project.id}`} className="block flex-1">
+                    <Link href={`/shop/${project.slug}`} className="block flex-1">
                       <div>
                         <span className="text-[10px] uppercase font-bold tracking-widest text-[#5C6B60] block mb-1">
                           {project.category} BLUEPRINT
@@ -122,7 +122,7 @@ export const StudentProjects: React.FC<StudentProjectsProps> = ({ initialProject
                           {project.price}
                         </span>
                         <Link
-                          href={`/shop/${project.id}`}
+                          href={`/shop/${project.slug}`}
                           className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-[#1A3C2F] hover:text-[#C4A35A] transition-colors"
                         >
                           <span>View Details</span>

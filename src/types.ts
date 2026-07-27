@@ -18,6 +18,7 @@ export interface WorkProject {
 
 export interface StudentProject {
   id: string;
+  slug: string;
   title: string;
   category: 'Hardware' | 'Software';
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';

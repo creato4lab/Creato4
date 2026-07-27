@@ -33,6 +33,7 @@ export default function HomeClient({ initialProducts = [] }: { initialProducts?:
 
     return {
       id: product.id,
+      slug: product.slug,
       title: product.title,
       category,
       difficulty,
