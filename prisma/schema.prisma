@@ -111,6 +111,10 @@ model Product {
   sourceCodePath    String?
   cadFilePath       String?
   pdfDocPath        String?
+  // Firmware delivery (Phase 3) — R2 object key, never exposed as public URL
+  firmwareBinPath       String?   // e.g. "firmware/{productId}/latest.bin" (ESP32/ESP8266)
+  firmwareUf2Path       String?   // e.g. "firmware/{productId}/latest.uf2" (RP2040)
+  firmwareBuildVersion  String?   // e.g. "v1.2.3"
 
   // Media
   images            String[] // array of image URLs
@@ -312,6 +316,10 @@ model DeviceActivation {
   isActive    Boolean   @default(true)
   lastSeenAt  DateTime  @default(now())
   createdAt   DateTime  @default(now())
+
+  // Firmware flash token (Phase 3) — one-time use token to authorize a single flash session
+  firmwareTokenId   String?   // jti claim of last issued firmware token
+  firmwareTokenUsed Boolean   @default(false)  // true after token has been consumed
 
   @@unique([licenseId, chipId])     // One registration per chip per license
   @@index([licenseId])

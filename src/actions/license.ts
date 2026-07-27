@@ -4,7 +4,8 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 
 // ─── Max activations per license type ────────────────────
-export function getMaxActivations(type: string): number {
+/** Returns the maximum allowed device activations for a given license type. */
+export async function getMaxActivations(type: string): Promise<number> {
   if (type === "COMMERCIAL") return 5;
   if (type === "ENTERPRISE") return 999;
   return 2; // STUDENT, SOURCE_CODE_ONLY, REPORT_*, FIRMWARE_FLASH
