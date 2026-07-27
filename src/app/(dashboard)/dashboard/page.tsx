@@ -23,16 +23,7 @@ export default async function DashboardPage(props: {
   const licenses = await prisma.license.findMany({
     where: { userId: session.user.id },
     include: {
-      product: {
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-          firmwareBinPath: true,
-          firmwareUf2Path: true,
-          firmwareBuildVersion: true,
-        },
-      },
+      product: true,
       activations: {
         where: { isActive: true },
         orderBy: { createdAt: "desc" },
