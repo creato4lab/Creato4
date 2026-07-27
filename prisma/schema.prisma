@@ -326,3 +326,24 @@ model DeviceActivation {
   @@index([chipId])
 }
 
+// =========================================
+// DOWNLOAD AUDIT & FORENSIC LOGS (Phase 5)
+// =========================================
+
+model DownloadLog {
+  id          String   @id @default(cuid())
+  licenseId   String
+  userId      String
+  productId   String
+  fileType    String   // "sourceCode" | "cadFile" | "pdfDoc"
+  fingerprint String   // unique per-download ID embedded into source/ZIP
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([licenseId])
+  @@index([userId])
+  @@index([fingerprint])
+}
+
+

@@ -2,29 +2,13 @@
 
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID;
-const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME || 'creato4-digital-assets';
-const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID;
-const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY;
-
-// Initialize S3 Client for Cloudflare R2 only if credentials exist
-const s3Client = (R2_ACCOUNT_ID && R2_ACCESS_KEY_ID && R2_SECRET_ACCESS_KEY) 
-  ? new S3Client({
-      region: "auto",
-      endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-      credentials: {
-        accessKeyId: R2_ACCESS_KEY_ID,
-        secretAccessKey: R2_SECRET_ACCESS_KEY,
-      },
-    })
-  : null;
-
-export async function generateDownloadUrl(productId: string, fileType: 'sourceCode' | 'cadFile' | 'pdfDoc') {
+export async function generateDownloadUrl(
+  productId: string,
+  fileType: "sourceCode" | "cadFile" | "pdfDoc" = "sourceCode"
+) {
   const session = await auth();
-  
+
   // 1. Authenticate user
   if (!session || !session.user || !session.user.id) {
     return { error: "You must be logged in to download files." };
@@ -35,69 +19,39 @@ export async function generateDownloadUrl(productId: string, fileType: 'sourceCo
     where: {
       userId: session.user.id,
       productId: productId,
-      isActive: true
-    }
+      isActive: true,
+    },
   });
 
   if (!license) {
     return { error: "Forbidden: You do not own a valid license for this product." };
   }
 
-  // 3. Get the product to find the file paths
+  // 3. Get the product to verify file path exists
   const product = await prisma.product.findUnique({
     where: { id: productId },
-    select: { sourceCodePath: true, cadFilePath: true, pdfDocPath: true, title: true }
+    select: { sourceCodePath: true, cadFilePath: true, pdfDocPath: true, title: true },
   });
 
   if (!product) {
     return { error: "Product not found." };
   }
 
-  // 4. Determine which file the user requested
-  let objectKey = null;
-  if (fileType === 'sourceCode') objectKey = product.sourceCodePath;
-  if (fileType === 'cadFile') objectKey = product.cadFilePath;
-  if (fileType === 'pdfDoc') objectKey = product.pdfDocPath;
+  let objectKey: string | null = null;
+  if (fileType === "sourceCode") objectKey = product.sourceCodePath;
+  if (fileType === "cadFile") objectKey = product.cadFilePath;
+  if (fileType === "pdfDoc") objectKey = product.pdfDocPath;
 
   if (!objectKey) {
-    return { error: `This product does not have a ${fileType} available.` };
+    return { error: `This product does not have a ${fileType} file uploaded yet.` };
   }
 
-  // 5. Generate the secure URL
-  if (s3Client) {
-    // REAL IMPLEMENTATION (Cloudflare R2)
-    try {
-      const command = new GetObjectCommand({
-        Bucket: R2_BUCKET_NAME,
-        Key: objectKey,
-        ResponseContentDisposition: `attachment; filename="${product.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${fileType}"`
-      });
+  // 4. Return endpoint for watermarked server stream (Phase 5 Protection)
+  const downloadUrl = `/api/download?productId=${encodeURIComponent(productId)}&fileType=${encodeURIComponent(fileType)}`;
 
-      // URL expires in 5 minutes (300 seconds)
-      const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 300 });
-      return { success: true, url: signedUrl };
-      
-    } catch (error) {
-      console.error("Error generating signed URL:", error);
-      return { error: "Failed to generate secure download link. Please contact support." };
-    }
-  } else {
-    if (process.env.NODE_ENV === "production") {
-      console.error("❌ Production Error: Cloudflare R2 credentials (R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY) are missing in environment variables.");
-      return { error: "Secure asset storage is currently undergoing maintenance. Please contact support." };
-    }
-
-    // MOCK IMPLEMENTATION (For local development only)
-    console.warn("⚠️ Cloudflare R2 Credentials not found in .env. Generating a mock download URL in development mode.");
-    
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    const mockSignedUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}?mock_download=${encodeURIComponent(objectKey)}&expires=in_5_minutes&token=mock_signature_12345`;
-    
-    return { 
-      success: true, 
-      url: mockSignedUrl, 
-      isMock: true,
-      message: "This is a simulated download link because Cloudflare R2 is not yet configured."
-    };
-  }
+  return {
+    success: true,
+    url: downloadUrl,
+    isWatermarked: true,
+  };
 }

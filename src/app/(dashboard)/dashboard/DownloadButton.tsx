@@ -20,8 +20,8 @@ export function DownloadButton({ productId, title }: { productId: string, title:
     }
 
     if (result.success && result.url) {
-      if (result.isMock) {
-        alert(result.message + "\n\nMock URL: " + result.url);
+      if ((result as any).isMock) {
+        alert((result as any).message + "\n\nMock URL: " + result.url);
       } else {
         // Trigger download via hidden anchor
         const a = document.createElement('a');
