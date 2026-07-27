@@ -133,6 +133,11 @@ function DownloadBtn({ productId, fileType, label }: { productId: string; fileTy
         <><Check className="w-3 h-3" /> Done!</>
       ) : (
         <><Download className="w-3 h-3" /> {label}</>
+      )}
+    </button>
+  );
+}
+
 function PdfReportButtons({
   licenseId,
   productTitle,
