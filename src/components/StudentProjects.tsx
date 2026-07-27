@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowRight, BookOpen, Layers, CheckCircle2 } from 'lucide-react';
 import { STUDENT_PROJECTS } from '../data';
 import { StudentProject } from '../types';
+import { CheckoutButton } from './CheckoutButton';
 
 export const StudentProjects: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'Hardware' | 'Software'>('Hardware');
@@ -71,54 +72,69 @@ export const StudentProjects: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: idx * 0.1, ease: 'easeOut' }}
               >
-                <Link
-                  href={`/shop/${project.id}`}
+                <div
                   className="group h-full bg-[#F5F0EA] rounded-2xl overflow-hidden border border-[#E8E2D9] shadow-xs hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
                 >
-                {/* Image & Difficulty Pill */}
-                <div className="relative aspect-[4/3] overflow-hidden bg-[#E8E2D9]">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                  <div className="absolute top-3 right-3">
-                    <span
-                      className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border backdrop-blur-xs ${getDifficultyBadge(
-                        project.difficulty
-                      )}`}
-                    >
-                      {project.difficulty}
-                    </span>
-                  </div>
-                </div>
+                  <Link href={`/shop/${project.id}`} className="block">
+                    {/* Image & Difficulty Pill */}
+                    <div className="relative aspect-[4/3] overflow-hidden bg-[#E8E2D9]">
+                      <img
+                        src={project.image}
+                        alt={project.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute top-3 right-3">
+                        <span
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border backdrop-blur-xs ${getDifficultyBadge(
+                            project.difficulty
+                          )}`}
+                        >
+                          {project.difficulty}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
 
-                {/* Content */}
-                <div className="p-5 flex-1 flex flex-col justify-between bg-[#FAF8F5]">
-                  <div>
-                    <span className="text-[10px] uppercase font-bold tracking-widest text-[#5C6B60] block mb-1">
-                      {project.category} BLUEPRINT
-                    </span>
-                    <h3 className="text-base font-bold text-[#1A3C2F] mb-2 group-hover:text-[#234B3C] line-clamp-2">
-                      {project.title}
-                    </h3>
-                    <p className="text-xs text-[#5C6B60] line-clamp-2 leading-relaxed mb-4">
-                      {project.description}
-                    </p>
-                  </div>
+                  {/* Content */}
+                  <div className="p-5 flex-1 flex flex-col justify-between bg-[#FAF8F5]">
+                    <Link href={`/shop/${project.id}`} className="block flex-1">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold tracking-widest text-[#5C6B60] block mb-1">
+                          {project.category} BLUEPRINT
+                        </span>
+                        <h3 className="text-base font-bold text-[#1A3C2F] mb-2 group-hover:text-[#234B3C] line-clamp-2">
+                          {project.title}
+                        </h3>
+                        <p className="text-xs text-[#5C6B60] line-clamp-2 leading-relaxed mb-4">
+                          {project.description}
+                        </p>
+                      </div>
+                    </Link>
 
-                  <div className="pt-3 border-t border-[#E8E2D9] flex items-center justify-between">
-                    <span className="text-base font-extrabold text-[#1A3C2F]">
-                      {project.price}
-                    </span>
-                    <div className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-[#1A3C2F] group-hover:text-[#C4A35A] transition-colors">
-                      <span>View Project</span>
-                      <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                    <div className="pt-4 border-t border-[#E8E2D9] flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-base font-extrabold text-[#1A3C2F]">
+                          {project.price}
+                        </span>
+                        <Link
+                          href={`/shop/${project.id}`}
+                          className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-[#1A3C2F] hover:text-[#C4A35A] transition-colors"
+                        >
+                          <span>View Details</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
+
+                      <CheckoutButton
+                        productId={project.id}
+                        licenseType="STUDENT"
+                        productName={project.title}
+                        variant="compact"
+                      />
                     </div>
                   </div>
                 </div>
-                </Link>
               </motion.div>
             ))}
           </div>

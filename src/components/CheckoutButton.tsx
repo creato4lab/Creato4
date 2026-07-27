@@ -2,16 +2,17 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Download, Loader2 } from 'lucide-react';
+import { Download, Loader2, ShoppingBag } from 'lucide-react';
 import { createRazorpayOrder, verifyPayment } from '@/actions/payment';
 
 interface CheckoutButtonProps {
   productId: string;
   licenseType: "STUDENT" | "COMMERCIAL" | "ENTERPRISE";
   productName: string;
+  variant?: "default" | "compact";
 }
 
-export function CheckoutButton({ productId, licenseType, productName }: CheckoutButtonProps) {
+export function CheckoutButton({ productId, licenseType, productName, variant = "default" }: CheckoutButtonProps) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -96,14 +97,26 @@ export function CheckoutButton({ productId, licenseType, productName }: Checkout
     setLoading(false);
   };
 
+  const isCompact = variant === "compact";
+
   return (
     <button 
       onClick={handleCheckout} 
       disabled={loading}
-      className="w-full flex items-center justify-center gap-2 bg-[#1A3C2F] text-[#FAF8F5] py-4 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity mb-4 disabled:opacity-70"
+      className={
+        isCompact
+          ? "w-full flex items-center justify-center gap-1.5 bg-[#1A3C2F] text-[#FAF8F5] py-2.5 rounded-xl font-bold text-[11px] uppercase tracking-wider hover:bg-[#C4A35A] transition-colors disabled:opacity-70 cursor-pointer shadow-xs"
+          : "w-full flex items-center justify-center gap-2 bg-[#1A3C2F] text-[#FAF8F5] py-4 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity mb-4 disabled:opacity-70 cursor-pointer"
+      }
     >
-      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-      {loading ? "Processing..." : "Proceed to Checkout"}
+      {loading ? (
+        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+      ) : isCompact ? (
+        <ShoppingBag className="w-3.5 h-3.5" />
+      ) : (
+        <Download className="w-3.5 h-3.5" />
+      )}
+      {loading ? "Processing..." : isCompact ? "Buy Now" : "Proceed to Checkout"}
     </button>
   );
 }
