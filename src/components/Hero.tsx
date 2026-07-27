@@ -19,18 +19,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss, onOpenCinematic }) =>
         {/* LEFT COLUMN (55% desktop = 7 cols) */}
         <div className="lg:col-span-7 flex flex-col justify-center z-20">
           
-          {/* Label Tag */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="inline-flex items-center gap-2 mb-6"
-          >
-            <span className="w-2.5 h-2.5 rounded-full bg-[#C4A35A] shrink-0 animate-pulse" />
-            <span className="text-xs sm:text-sm uppercase font-bold tracking-[0.22em] text-[#5C6B60]">
-              MULTIDISCIPLINARY PRODUCT & TECHNOLOGY LAB
-            </span>
-          </motion.div>
+
 
           {/* Headline */}
           <h1 className="text-[#1A3C2F] font-extrabold tracking-tight text-4xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.05] mb-8 flex flex-col gap-3 sm:gap-5">
