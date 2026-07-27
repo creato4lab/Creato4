@@ -277,3 +277,163 @@ export async function toggleLicenseStatus(licenseId: string) {
   }
 }
 
+export async function getAdminSalesAnalytics() {
+  await requireAdmin();
+  const orders = await prisma.order.findMany({
+    where: { status: "COMPLETED" },
+    orderBy: { createdAt: "desc" },
+    include: {
+      user: { select: { name: true, email: true } },
+      items: {
+        include: {
+          product: { select: { title: true, category: true } },
+        },
+      },
+    },
+  });
+
+  const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
+  const totalSales = orders.length;
+
+  return {
+    totalRevenue,
+    totalSales,
+    orders: orders.map((o) => ({
+      ...o,
+      createdAt: o.createdAt.toISOString(),
+      updatedAt: o.updatedAt.toISOString(),
+    })),
+  };
+}
+
+export async function getAdminCustomersList() {
+  await requireAdmin();
+  const users = await prisma.user.findMany({
+    orderBy: { createdAt: "desc" },
+    include: {
+      orders: { where: { status: "COMPLETED" }, select: { total: true } },
+      licenses: { select: { id: true, isActive: true } },
+    },
+  });
+
+  return users.map((u) => ({
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    role: u.role,
+    createdAt: u.createdAt.toISOString(),
+    ordersCount: u.orders.length,
+    totalSpent: u.orders.reduce((sum, o) => sum + o.total, 0),
+    activeLicensesCount: u.licenses.filter((l) => l.isActive).length,
+  }));
+}
+
+export async function getAdminActivationsList() {
+  await requireAdmin();
+  const activations = await prisma.deviceActivation.findMany({
+    orderBy: { createdAt: "desc" },
+    include: {
+      license: {
+        include: {
+          user: { select: { name: true, email: true } },
+          product: { select: { title: true, slug: true } },
+        },
+      },
+    },
+  });
+
+  return activations.map((a) => ({
+    ...a,
+    lastSeenAt: a.lastSeenAt.toISOString(),
+    createdAt: a.createdAt.toISOString(),
+    userEmail: a.license.user.email,
+    userName: a.license.user.name,
+    productTitle: a.license.product.title,
+    licenseKey: a.license.licenseKey,
+  }));
+}
+
+export async function adminUnregisterDevice(activationId: string) {
+  await requireAdmin();
+  try {
+    await prisma.deviceActivation.update({
+      where: { id: activationId },
+      data: { isActive: false },
+    });
+    return { success: true };
+  } catch (err) {
+    console.error("Error unregistering device:", err);
+    return { error: "Failed to unregister device." };
+  }
+}
+
+export async function pushFirmwareUpdateAction(data: {
+  productId: string;
+  version: string;
+  notes: string;
+  firmwareBinPath?: string;
+  firmwareUf2Path?: string;
+}) {
+  await requireAdmin();
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id: data.productId },
+      select: { versionHistory: true },
+    });
+
+    if (!product) return { error: "Product not found" };
+
+    const existingHistory = Array.isArray(product.versionHistory)
+      ? (product.versionHistory as any[])
+      : [];
+
+    const newHistoryEntry = {
+      version: data.version.trim(),
+      date: new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
+      notes: data.notes.trim(),
+    };
+
+    const updatedHistory = [newHistoryEntry, ...existingHistory];
+
+    await prisma.product.update({
+      where: { id: data.productId },
+      data: {
+        version: data.version.trim(),
+        firmwareBuildVersion: data.version.trim(),
+        lastUpdated: new Date(),
+        versionHistory: updatedHistory,
+        ...(data.firmwareBinPath ? { firmwareBinPath: data.firmwareBinPath } : {}),
+        ...(data.firmwareUf2Path ? { firmwareUf2Path: data.firmwareUf2Path } : {}),
+      },
+    });
+
+    return { success: true };
+  } catch (err) {
+    console.error("Error pushing firmware update:", err);
+    return { error: "Failed to push firmware update." };
+  }
+}
+
+export async function toggleUserRoleAction(userId: string) {
+  await requireAdmin();
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+
+    if (!user) return { error: "User not found" };
+
+    const newRole = user.role === "ADMIN" ? "USER" : "ADMIN";
+    await prisma.user.update({
+      where: { id: userId },
+      data: { role: newRole },
+    });
+
+    return { success: true, role: newRole };
+  } catch (err) {
+    console.error("Error toggling user role:", err);
+    return { error: "Failed to update user role." };
+  }
+}
+

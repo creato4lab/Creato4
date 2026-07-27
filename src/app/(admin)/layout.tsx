@@ -3,7 +3,7 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import Link from 'next/link';
-import { LayoutDashboard, Package, LogOut, FileCode2, MessageSquare, Key } from 'lucide-react';
+import { LayoutDashboard, Package, LogOut, FileCode2, MessageSquare, Key, Zap, Cpu, Users } from 'lucide-react';
 import { signOut } from '@/auth';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -34,21 +34,30 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </div>
           </Link>
 
-          <nav className="space-y-2">
-            <Link href="/admin" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition-colors text-sm font-semibold">
-              <LayoutDashboard className="w-5 h-5 text-[#C4A35A]" /> Overview
+          <nav className="space-y-1.5 overflow-y-auto max-h-[calc(100vh-180px)] pr-1">
+            <Link href="/admin" className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-white/10 transition-colors text-xs font-semibold">
+              <LayoutDashboard className="w-4 h-4 text-[#C4A35A]" /> Overview & Sales
             </Link>
-            <Link href="/admin/products" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition-colors text-sm font-semibold">
-              <Package className="w-5 h-5 text-[#C4A35A]" /> Products
+            <Link href="/admin/products" className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-white/10 transition-colors text-xs font-semibold">
+              <Package className="w-4 h-4 text-[#C4A35A]" /> Products & Assets
             </Link>
-            <Link href="/admin/inspector" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition-colors text-sm font-semibold">
-              <FileCode2 className="w-5 h-5 text-[#C4A35A]" /> Forensic Inspector
+            <Link href="/admin/firmware-push" className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-white/10 transition-colors text-xs font-semibold">
+              <Zap className="w-4 h-4 text-amber-400" /> Push Firmware
             </Link>
-            <Link href="/admin/tickets" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition-colors text-sm font-semibold">
-              <MessageSquare className="w-5 h-5 text-[#C4A35A]" /> Inquiries & Tickets
+            <Link href="/admin/licenses" className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-white/10 transition-colors text-xs font-semibold">
+              <Key className="w-4 h-4 text-[#C4A35A]" /> Licenses & Disable
             </Link>
-            <Link href="/admin/licenses" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition-colors text-sm font-semibold">
-              <Key className="w-5 h-5 text-[#C4A35A]" /> Licenses
+            <Link href="/admin/activations" className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-white/10 transition-colors text-xs font-semibold">
+              <Cpu className="w-4 h-4 text-blue-400" /> Device Activations
+            </Link>
+            <Link href="/admin/customers" className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-white/10 transition-colors text-xs font-semibold">
+              <Users className="w-4 h-4 text-[#C4A35A]" /> Customers
+            </Link>
+            <Link href="/admin/inspector" className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-white/10 transition-colors text-xs font-semibold">
+              <FileCode2 className="w-4 h-4 text-[#C4A35A]" /> Forensic Inspector
+            </Link>
+            <Link href="/admin/tickets" className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-white/10 transition-colors text-xs font-semibold">
+              <MessageSquare className="w-4 h-4 text-[#C4A35A]" /> Tickets & Support
             </Link>
           </nav>
         </div>
