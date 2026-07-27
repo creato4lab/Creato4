@@ -19,9 +19,36 @@ import { DiscussionModal } from '@/components/DiscussionModal';
 import { SearchAccountCartModals } from '@/components/SearchAccountCartModals';
 import { CustomCursor } from '@/components/CustomCursor';
 
-import { ServiceItem } from '@/types';
+import { ServiceItem, StudentProject } from '@/types';
 
-export default function HomeClient() {
+export default function HomeClient({ initialProducts = [] }: { initialProducts?: any[] }) {
+  const mappedProjects: StudentProject[] = (initialProducts || []).map((product) => {
+    const hardwareCategories = ['ARDUINO', 'ESP32', 'STM32', 'RASPBERRY_PI', 'CAD_MODEL'];
+    const category = hardwareCategories.includes(product.category) ? 'Hardware' : 'Software';
+
+    let difficulty: 'Beginner' | 'Intermediate' | 'Advanced' = 'Intermediate';
+    if (product.difficulty === 'BEGINNER') difficulty = 'Beginner';
+    else if (product.difficulty === 'INTERMEDIATE') difficulty = 'Intermediate';
+    else if (product.difficulty === 'ADVANCED' || product.difficulty === 'EXPERT') difficulty = 'Advanced';
+
+    return {
+      id: product.id,
+      title: product.title,
+      category,
+      difficulty,
+      price: `₹${product.price.toLocaleString('en-IN')}`,
+      image: product.images?.[0] || '/placeholder.jpg',
+      description: product.description,
+      techStack: [...(product.hardwareUsed || []), ...(product.softwareUsed || [])],
+      includes: product.whatsIncluded || [],
+      specifications: {
+        'Category': product.category,
+        'Hardware Used': (product.hardwareUsed || []).join(', '),
+        'Software Used': (product.softwareUsed || []).join(', '),
+      }
+    };
+  });
+
   const [preloaderDone, setPreloaderDone] = useState(false);
 
   useEffect(() => {
@@ -190,7 +217,7 @@ export default function HomeClient() {
 
           {/* 9. Featured Student Projects */}
           <section id="student-projects" aria-label="Student engineering project blueprints">
-            <StudentProjects />
+            <StudentProjects initialProjects={mappedProjects} />
           </section>
 
           {/* 10. How We Deliver (8-Step Process) */}

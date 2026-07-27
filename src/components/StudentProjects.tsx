@@ -6,7 +6,11 @@ import { STUDENT_PROJECTS } from '../data';
 import { StudentProject } from '../types';
 import { CheckoutButton } from './CheckoutButton';
 
-export const StudentProjects: React.FC = () => {
+interface StudentProjectsProps {
+  initialProjects?: StudentProject[];
+}
+
+export const StudentProjects: React.FC<StudentProjectsProps> = ({ initialProjects = [] }) => {
   const [activeTab, setActiveTab] = useState<'Hardware' | 'Software'>('Hardware');
 
   const tabs: Array<'Hardware' | 'Software'> = [
@@ -14,7 +18,7 @@ export const StudentProjects: React.FC = () => {
     'Software',
   ];
 
-  const filteredProjects = STUDENT_PROJECTS.filter((p) => p.category === activeTab);
+  const filteredProjects = initialProjects.filter((p) => p.category === activeTab);
 
   const getDifficultyBadge = (difficulty: StudentProject['difficulty']) => {
     switch (difficulty) {

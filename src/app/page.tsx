@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { SITE_CONFIG } from '@/lib/constants';
 import { generateLocalBusinessSchema, generateBreadcrumbSchema, generateFAQSchema } from '@/lib/schemas';
+import { getProducts } from '@/actions/product';
 import HomeClient from './HomeClient';
 
 // ─── SEO Metadata (Server-side, visible to crawlers) ──────
@@ -63,7 +64,9 @@ const breadcrumbSchema = generateBreadcrumbSchema([
 const faqSchema = generateFAQSchema(homepageFAQs);
 
 // ─── Server Component (SSR — content visible to crawlers) ──
-export default function HomePage() {
+export default async function HomePage() {
+  const { products } = await getProducts();
+
   return (
     <>
       {/* JSON-LD Structured Data for SEO */}
@@ -87,7 +90,7 @@ export default function HomePage() {
       />
 
       {/* Client-side interactive homepage */}
-      <HomeClient />
+      <HomeClient initialProducts={products || []} />
     </>
   );
 }
