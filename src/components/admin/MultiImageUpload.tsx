@@ -25,97 +25,49 @@ export function MultiImageUpload({ name, label }: MultiImageUploadProps) {
 
   const uploadSingleFile = async (item: ImageFileItem) => {
     try {
-      let keyResult = "";
-
-      // 1. Try same-origin /api/admin/upload-file first (eliminates CORS network errors)
-      try {
-        const formData = new FormData();
-        formData.append("file", item.file);
-        formData.append("prefix", "images");
-
-        keyResult = await new Promise<string>((resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          xhr.open("POST", "/api/admin/upload-file", true);
-
-          xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) {
-              const pct = Math.round((event.loaded / event.total) * 100);
-              setItems((prev) =>
-                prev.map((i) => (i.id === item.id ? { ...i, progress: pct } : i))
-              );
-            }
-          };
-
-          xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              try {
-                const resData = JSON.parse(xhr.responseText);
-                if (resData.key) {
-                  resolve(resData.key);
-                } else {
-                  reject(new Error(resData.error || "Upload failed"));
-                }
-              } catch {
-                reject(new Error("Invalid server response"));
-              }
-            } else {
-              reject(new Error(`Server upload status ${xhr.status}`));
-            }
-          };
-
-          xhr.onerror = () => reject(new Error("Server network error"));
-          xhr.send(formData);
-        });
-      } catch (serverErr) {
-        console.warn("[MultiImageUpload] Server upload fallback, trying presigned URL:", serverErr);
-      }
-
-      // 2. Fallback to presigned URL if server upload route was skipped/failed
-      if (!keyResult) {
-        const urlRes = await fetch("/api/admin/upload-url", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            filename: item.file.name,
-            contentType: item.file.type || "image/jpeg",
-            prefix: "images",
-          }),
-        });
-
-        const urlData = await urlRes.json();
-        if (!urlRes.ok || !urlData.uploadUrl || !urlData.key) {
-          throw new Error(urlData.error || "Failed to get upload URL");
+      const keyResult = await new Promise<string>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/api/admin/upload-file", true);
+        xhr.setRequestHeader("x-filename", encodeURIComponent(item.file.name));
+        xhr.setRequestHeader("x-prefix", "images");
+        if (item.file.type) {
+          xhr.setRequestHeader("Content-Type", item.file.type);
         }
 
-        const { uploadUrl, key } = urlData;
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const pct = Math.round((event.loaded / event.total) * 100);
+            setItems((prev) =>
+              prev.map((i) => (i.id === item.id ? { ...i, progress: pct } : i))
+            );
+          }
+        };
 
-        await new Promise<void>((resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          xhr.open("PUT", uploadUrl, true);
-
-          xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) {
-              const pct = Math.round((event.loaded / event.total) * 100);
-              setItems((prev) =>
-                prev.map((i) => (i.id === item.id ? { ...i, progress: pct } : i))
-              );
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const resData = JSON.parse(xhr.responseText);
+              if (resData.key) {
+                resolve(resData.key);
+              } else {
+                reject(new Error(resData.error || "Upload failed"));
+              }
+            } catch {
+              reject(new Error("Invalid server response"));
             }
-          };
-
-          xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              resolve();
-            } else {
-              reject(new Error(`Upload rejected (Status ${xhr.status})`));
+          } else {
+            try {
+              const errData = JSON.parse(xhr.responseText);
+              reject(new Error(errData.error || `Server upload status ${xhr.status}`));
+            } catch {
+              reject(new Error(`Server upload status ${xhr.status}`));
             }
-          };
+          }
+        };
 
-          xhr.onerror = () => reject(new Error("Network error"));
-          xhr.send(item.file);
-        });
-
-        keyResult = key;
-      }
+        xhr.onerror = () => reject(new Error("Network connection error during upload."));
+        xhr.send(item.file);
+      });
 
       // Mark success
       setItems((prev) =>

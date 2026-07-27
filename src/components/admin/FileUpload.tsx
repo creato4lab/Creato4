@@ -31,102 +31,47 @@ export function FileUpload({ name, label, prefix, accept, required, value = "", 
     setErrorMsg("");
 
     try {
-      let keyResult = "";
-
-      const uploadViaPresigned = async () => {
-        const urlRes = await fetch("/api/admin/upload-url", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            filename: file.name,
-            contentType: file.type || "application/octet-stream",
-            prefix,
-          }),
-        });
-
-        const urlData = await urlRes.json();
-        if (!urlRes.ok || !urlData.uploadUrl || !urlData.key) {
-          throw new Error(urlData.error || "Failed to generate presigned upload URL.");
+      const keyResult = await new Promise<string>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/api/admin/upload-file", true);
+        xhr.setRequestHeader("x-filename", encodeURIComponent(file.name));
+        xhr.setRequestHeader("x-prefix", prefix);
+        if (file.type) {
+          xhr.setRequestHeader("Content-Type", file.type);
         }
 
-        const { uploadUrl, key } = urlData;
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const pct = Math.round((event.loaded / event.total) * 100);
+            setProgress(pct);
+          }
+        };
 
-        await new Promise<void>((resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          xhr.open("PUT", uploadUrl, true);
-
-          xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) {
-              const pct = Math.round((event.loaded / event.total) * 100);
-              setProgress(pct);
-            }
-          };
-
-          xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              resolve();
-            } else {
-              reject(new Error(`Storage provider rejected upload (Status ${xhr.status})`));
-            }
-          };
-
-          xhr.onerror = () => reject(new Error("Network error during direct storage upload."));
-          xhr.send(file);
-        });
-
-        return key;
-      };
-
-      const uploadViaServer = async () => {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("prefix", prefix);
-
-        return await new Promise<string>((resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          xhr.open("POST", "/api/admin/upload-file", true);
-
-          xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) {
-              const pct = Math.round((event.loaded / event.total) * 100);
-              setProgress(pct);
-            }
-          };
-
-          xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              try {
-                const resData = JSON.parse(xhr.responseText);
-                if (resData.key) {
-                  resolve(resData.key);
-                } else {
-                  reject(new Error(resData.error || "Upload failed"));
-                }
-              } catch {
-                reject(new Error("Invalid server response"));
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const resData = JSON.parse(xhr.responseText);
+              if (resData.key) {
+                resolve(resData.key);
+              } else {
+                reject(new Error(resData.error || "Upload failed"));
               }
-            } else {
-              reject(new Error(`SERVER_STATUS_${xhr.status}`));
+            } catch {
+              reject(new Error("Invalid server response"));
             }
-          };
+          } else {
+            try {
+              const errData = JSON.parse(xhr.responseText);
+              reject(new Error(errData.error || `Upload failed with status ${xhr.status}`));
+            } catch {
+              reject(new Error(`Upload failed with status ${xhr.status}`));
+            }
+          }
+        };
 
-          xhr.onerror = () => reject(new Error("Network connection error during upload."));
-          xhr.send(formData);
-        });
-      };
-
-      // > 8MB: Direct presigned storage upload
-      if (file.size > 8 * 1024 * 1024) {
-        keyResult = await uploadViaPresigned();
-      } else {
-        // <= 8MB: Try server route first, fallback to presigned if 413 or error
-        try {
-          keyResult = await uploadViaServer();
-        } catch (serverErr: any) {
-          console.warn("[FileUpload] Server route failed, trying direct presigned upload:", serverErr);
-          keyResult = await uploadViaPresigned();
-        }
-      }
+        xhr.onerror = () => reject(new Error("Network connection error during upload."));
+        xhr.send(file);
+      });
 
       setUploadedKey(keyResult);
       onChange?.(keyResult);
