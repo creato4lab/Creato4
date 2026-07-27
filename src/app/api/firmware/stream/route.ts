@@ -34,7 +34,7 @@ import prisma from "@/lib/prisma";
 const R2_ACCOUNT_ID  = process.env.R2_ACCOUNT_ID  ?? "";
 const R2_ACCESS_KEY  = process.env.R2_ACCESS_KEY_ID ?? "";
 const R2_SECRET_KEY  = process.env.R2_SECRET_ACCESS_KEY ?? "";
-const R2_BUCKET      = process.env.R2_BUCKET_NAME  ?? "creato4-firmware";
+const R2_BUCKET      = process.env.R2_BUCKET_NAME  ?? "creato4-digital-assets";
 const R2_ENDPOINT    = `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`;
 
 /** Minimal AWS Signature V4 request signer for a single GET. */
