@@ -21,6 +21,7 @@ const s3Client =
           accessKeyId: R2_ACCESS_KEY,
           secretAccessKey: R2_SECRET_KEY,
         },
+        maxAttempts: 1,
       })
     : null;
 
@@ -69,31 +70,38 @@ export async function POST(req: NextRequest) {
     const cleanFilename = filename.replace(/[^a-zA-Z0-9.\-_]/g, "_");
     const objectKey = `${prefix}/${timestamp}-${cleanFilename}`;
     let fileUrl = "";
-
     let r2Success = false;
 
-    // 2. Attempt Cloudflare R2 Upload if configured
+    // 2. Attempt Cloudflare R2 Upload if configured (5-second timeout)
     if (s3Client) {
       try {
-        const { Upload } = await import("@aws-sdk/lib-storage");
-        const parallelUploads3 = new Upload({
-          client: s3Client,
-          params: {
-            Bucket: R2_BUCKET,
-            Key: objectKey,
-            Body: fileBuffer,
-            ContentType: contentType.includes("multipart/form-data") ? "application/octet-stream" : contentType,
-          },
-          queueSize: 4,
-          partSize: 5 * 1024 * 1024,
-          leavePartsOnError: false,
-        });
+        const uploadPromise = (async () => {
+          const { Upload } = await import("@aws-sdk/lib-storage");
+          const parallelUploads3 = new Upload({
+            client: s3Client,
+            params: {
+              Bucket: R2_BUCKET,
+              Key: objectKey,
+              Body: fileBuffer,
+              ContentType: contentType.includes("multipart/form-data") ? "application/octet-stream" : contentType,
+            },
+            queueSize: 4,
+            partSize: 5 * 1024 * 1024,
+            leavePartsOnError: false,
+          });
 
-        await parallelUploads3.done();
+          await parallelUploads3.done();
+        })();
+
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("R2 upload connection timeout")), 5000)
+        );
+
+        await Promise.race([uploadPromise, timeoutPromise]);
         r2Success = true;
         fileUrl = `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${R2_BUCKET}/${objectKey}`;
       } catch (r2Err: any) {
-        console.warn("[/api/admin/upload-file] R2 Upload failed, switching to local disk fallback:", r2Err.message);
+        console.warn("[/api/admin/upload-file] R2 Upload skipped/timed out, switching to local disk storage:", r2Err.message);
       }
     }
 
