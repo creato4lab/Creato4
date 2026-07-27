@@ -58,15 +58,46 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss, onOpenCinematic }) =>
             }}
             className="relative cursor-pointer group py-4 my border-0 select-none"
           >
-            {/* Dynamic Spotlight Radial Highlight Following Cursor */}
-            <div
-              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl blur-2xl"
-              style={{
-                background: `radial-gradient(450px circle at ${spotlightPos.x}% ${spotlightPos.y}%, rgba(196, 163, 90, 0.25), transparent 70%)`,
-              }}
-            />
+            {/* Magical Twinkling Stars Floating Particles on Hover */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20">
+              {/* Star 1 - Top Right */}
+              <motion.div
+                animate={{ y: [-5, 5, -5], scale: [0.8, 1.2, 0.8], opacity: [0.6, 1, 0.6] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute top-2 right-12 text-[#1A3C2F]"
+              >
+                <Sparkles className="w-6 h-6 text-[#1A3C2F]" />
+              </motion.div>
 
-            <h1 className="font-extrabold tracking-tight text-4xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.05] mb-8 flex flex-col gap-3 sm:gap-4 relative z-10">
+              {/* Star 2 - Center Floating */}
+              <motion.div
+                animate={{ y: [4, -6, 4], scale: [1, 1.3, 1], opacity: [0.4, 0.9, 0.4] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
+                className="absolute top-1/2 left-1/3 text-[#224B27]"
+              >
+                <Sparkles className="w-5 h-5 text-[#224B27]" />
+              </motion.div>
+
+              {/* Star 3 - Bottom Right */}
+              <motion.div
+                animate={{ y: [-4, 6, -4], scale: [0.9, 1.25, 0.9], opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
+                className="absolute bottom-4 right-1/4 text-[#1A3C2F]"
+              >
+                <Sparkles className="w-5 h-5 text-[#1A3C2F]" />
+              </motion.div>
+
+              {/* Star 4 - Left Sparkle */}
+              <motion.div
+                animate={{ scale: [0.7, 1.1, 0.7], opacity: [0.3, 0.8, 0.3] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.9 }}
+                className="absolute top-1/3 -left-4 text-[#2D5929]"
+              >
+                <Sparkles className="w-4 h-4 text-[#2D5929]" />
+              </motion.div>
+            </div>
+
+            <h1 className="font-extrabold tracking-tight text-4xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.05] mb-8 flex flex-col gap-3 sm:gap-4 relative z-10 text-[#1A3C2F]">
               
               {/* Line 1: We Turn Ideas */}
               <div className="overflow-hidden pb-1 sm:pb-2 flex flex-wrap items-center gap-x-3 sm:gap-x-5">
@@ -83,7 +114,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss, onOpenCinematic }) =>
                   initial={{ y: '100%', opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.52, ease: [0.16, 1, 0.3, 1] }}
-                  className="inline-block bg-gradient-to-r from-[#C4A35A] via-[#E6CA85] to-[#C4A35A] bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300 drop-shadow-sm"
+                  className="inline-block text-[#1A3C2F] group-hover:scale-105 group-hover:text-[#2D5929] transition-all duration-300"
                 >
                   Ideas
                 </motion.span>
@@ -104,7 +135,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss, onOpenCinematic }) =>
                   initial={{ y: '100%', opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.76, ease: [0.16, 1, 0.3, 1] }}
-                  className="inline-block bg-gradient-to-r from-[#1A3C2F] via-[#2D5929] to-[#C4A35A] bg-clip-text text-transparent group-hover:translate-z-8 transition-transform duration-300"
+                  className="inline-block text-[#1A3C2F] group-hover:translate-z-8 transition-transform duration-300"
                 >
                   Reality.
                 </motion.span>
