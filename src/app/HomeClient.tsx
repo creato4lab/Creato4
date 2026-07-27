@@ -5,6 +5,7 @@ import { Preloader } from '@/components/Preloader';
 import { Navbar } from '@/components/Navbar';
 import { Hero } from '@/components/Hero';
 import { WhatWeDo } from '@/components/WhatWeDo';
+import { FromIdeaToReality } from '@/components/cinematic/FromIdeaToReality';
 import { QuickEntry } from '@/components/QuickEntry';
 import { TrustCredibility } from '@/components/TrustCredibility';
 import { SelectedWork } from '@/components/SelectedWork';
@@ -102,14 +103,13 @@ export default function HomeClient({ initialProducts = [] }: { initialProducts?:
   // Modals state
   const [discussOpen, setDiscussOpen] = useState(false);
   const [discussType, setDiscussType] = useState('Physical Product / Hardware');
-
-
+  const [cinematicOpen, setCinematicOpen] = useState(false);
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
 
-  const isAnyModalOpen = Boolean(discussOpen || searchOpen || accountOpen || cartOpen);
+  const isAnyModalOpen = Boolean(discussOpen || searchOpen || accountOpen || cartOpen || cinematicOpen);
 
 
   useEffect(() => {
@@ -180,7 +180,10 @@ export default function HomeClient({ initialProducts = [] }: { initialProducts?:
         {/* Main Content Sections */}
         <main className="relative z-10 bg-[#FAF8F5] shadow-[0_20px_60px_rgba(26,60,47,0.1)]" style={{ marginBottom: footerHeight }}>
           {/* 3. Hero ("FIRST SCREEN") */}
-          <Hero onOpenDiscuss={() => handleOpenDiscuss('Product & Technology Vision')} />
+          <Hero
+            onOpenDiscuss={() => handleOpenDiscuss('Product & Technology Vision')}
+            onOpenCinematic={() => setCinematicOpen(true)}
+          />
 
           {/* 3.5 What We Do (3D UI & Discipline Overview) */}
           <WhatWeDo />
@@ -240,6 +243,12 @@ export default function HomeClient({ initialProducts = [] }: { initialProducts?:
         isOpen={discussOpen}
         onClose={() => setDiscussOpen(false)}
         initialType={discussType}
+      />
+
+      <FromIdeaToReality
+        isOpen={cinematicOpen}
+        onClose={() => setCinematicOpen(false)}
+        onOpenDiscuss={handleOpenDiscuss}
       />
 
 
