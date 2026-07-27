@@ -9,8 +9,7 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss }) => {
   const [explosionFactor, setExplosionFactor] = useState(0.8);
-
-  const headlineLines = ['WE TURN IDEAS', 'INTO WORKING', 'PRODUCTS.'];
+  const headlineLines = ['WE TURN IDEAS', 'INTO', 'REALITY.'];
 
   return (
     <section className="relative min-h-screen pt-24 lg:pt-28 pb-12 w-full flex items-center bg-[#FAF8F5] overflow-hidden border-b border-[#E8E2D9]">
@@ -33,9 +32,9 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss }) => {
           </motion.div>
 
           {/* Headline */}
-          <h1 className="text-[#1A3C2F] font-extrabold uppercase tracking-tight text-4xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.05] mb-8 flex flex-col gap-1 sm:gap-2">
+          <h1 className="text-[#1A3C2F] font-extrabold uppercase text-4xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.15] mb-10 flex flex-col gap-2 sm:gap-4">
             {headlineLines.map((line, idx) => (
-              <div key={idx} className="overflow-hidden pb-1 sm:pb-2">
+              <div key={idx} className="overflow-hidden pb-2 sm:pb-4">
                 <motion.span
                   initial={{ y: '100%', opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
