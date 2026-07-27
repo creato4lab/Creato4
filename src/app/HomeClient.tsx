@@ -133,7 +133,7 @@ export default function HomeClient({ initialProducts = [] }: { initialProducts?:
   }, [isAnyModalOpen]);
 
   // Saved student project blueprints
-  const [cartItems, setCartItems] = useState<string[]>(['iot-weather-station', 'robotic-arm-6dof']);
+  const [cartItems, setCartItems] = useState<string[]>([]);
 
   const handleOpenDiscuss = (type?: string) => {
     if (type) setDiscussType(type);

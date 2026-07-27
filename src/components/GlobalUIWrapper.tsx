@@ -18,7 +18,7 @@ export function GlobalUIWrapper({ children }: { children: React.ReactNode }) {
     handleOpenDiscuss
   } = useGlobalUI();
 
-  const [cartItems, setCartItems] = useState<string[]>(['iot-weather-station', 'robotic-arm-6dof']);
+  const [cartItems, setCartItems] = useState<string[]>([]);
 
   const handleRemoveFromCart = (id: string) => {
     setCartItems((prev) => prev.filter((item) => item !== id));
