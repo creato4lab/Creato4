@@ -60,6 +60,15 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss }) => {
             transition={{ duration: 0.5, delay: 1.2, ease: 'easeOut' }}
             className="flex flex-wrap items-center gap-4 mt-8"
           >
+            {/* What We Do CTA */}
+            <a
+              href="#what-we-do"
+              className="group inline-flex items-center gap-2 px-8 py-4 rounded-full border border-[#C4A35A] bg-[#C4A35A]/10 text-[#1A3C2F] text-sm font-medium tracking-wide hover:bg-[#C4A35A] hover:text-[#1A3C2F] transition-all duration-300 shadow-xs cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4 text-[#C4A35A] group-hover:text-[#1A3C2F] transition-colors" />
+              <span>What We Do</span>
+            </a>
+
             {/* Primary CTA */}
             <button
               onClick={onOpenDiscuss}
