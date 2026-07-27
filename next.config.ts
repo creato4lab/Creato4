@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Allow up to 500MB uploads for videos, CAD STEP/STL models & binaries
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "500mb",
+    },
+  },
+
   // Output standalone bundle for Docker/VPS deployment
   output: "standalone",
 

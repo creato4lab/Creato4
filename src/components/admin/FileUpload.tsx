@@ -43,7 +43,7 @@ export function FileUpload({ name, label, prefix, accept, required, value = "", 
         xhr.upload.onprogress = (event) => {
           if (event.lengthComputable) {
             const pct = Math.round((event.loaded / event.total) * 100);
-            setProgress(pct);
+            setProgress(pct >= 100 ? 99 : pct);
           }
         };
 
@@ -75,6 +75,7 @@ export function FileUpload({ name, label, prefix, accept, required, value = "", 
 
       setUploadedKey(keyResult);
       onChange?.(keyResult);
+      setProgress(100);
       setStatus("success");
     } catch (err: any) {
       console.error("Upload error:", err);
@@ -131,7 +132,9 @@ export function FileUpload({ name, label, prefix, accept, required, value = "", 
             <Loader2 className="w-5 h-5 text-[#C4A35A] animate-spin" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-[#1A3C2F] truncate">{fileName}</p>
-              <p className="text-xs text-[#1A3C2F]/60">Uploading... {progress}%</p>
+              <p className="text-xs text-[#1A3C2F]/60">
+                {progress >= 99 ? "Finalizing server upload..." : `Uploading... ${progress}%`}
+              </p>
             </div>
           </div>
           <div className="w-full bg-[#FAF8F5] rounded-full h-2 overflow-hidden">
