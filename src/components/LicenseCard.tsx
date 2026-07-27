@@ -4,11 +4,12 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Key, Download, Calendar, Package, Cpu,
   Trash2, ChevronDown, ChevronUp, Copy, Check,
-  Usb, Zap, ImageIcon, Clock
+  Usb, Zap, ImageIcon, Clock, FileText, Sparkles, ShieldCheck
 } from "lucide-react";
 import { removeDevice } from "@/actions/license";
 import { BoardConnector } from "./BoardConnector";
 import { generateDownloadUrl } from "@/actions/download";
+import { ProfessionalPdfModal } from "./ProfessionalPdfModal";
 
 // ─── Per-tier available file types ──────────────────────────────────────────
 const TIER_FILES: Record<string, { id: "sourceCode" | "cadFile" | "pdfDoc"; label: string }[]> = {
@@ -132,14 +133,80 @@ function DownloadBtn({ productId, fileType, label }: { productId: string; fileTy
         <><Check className="w-3 h-3" /> Done!</>
       ) : (
         <><Download className="w-3 h-3" /> {label}</>
-      )}
-    </button>
+function PdfReportButtons({
+  licenseId,
+  productTitle,
+  onOpenProfessional,
+}: {
+  licenseId: string;
+  productTitle: string;
+  onOpenProfessional: () => void;
+}) {
+  const [loadingWatermark, setLoadingWatermark] = useState(false);
+
+  const handleWatermarkedDownload = async () => {
+    setLoadingWatermark(true);
+    try {
+      const res = await fetch("/api/pdf/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ licenseId, type: "watermarked" }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        alert(errData.error || "Failed to generate watermarked PDF");
+        setLoadingWatermark(false);
+        return;
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${productTitle.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_watermarked.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      alert("Error generating PDF");
+    } finally {
+      setLoadingWatermark(false);
+    }
+  };
+
+  return (
+    <>
+      <button
+        onClick={handleWatermarkedDownload}
+        disabled={loadingWatermark}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200 hover:bg-amber-100 transition-colors disabled:opacity-60"
+        title="PDF report with customer watermark and license footer"
+      >
+        {loadingWatermark ? (
+          <><Download className="w-3 h-3 animate-bounce" /> Watermarked PDF...</>
+        ) : (
+          <><FileText className="w-3 h-3 text-amber-700" /> Watermarked Report (PDF)</>
+        )}
+      </button>
+
+      <button
+        onClick={onOpenProfessional}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#1A3C2F] text-white hover:bg-[#C4A35A] hover:text-[#1A3C2F] transition-colors"
+        title="Customized PDF report with customer name, team, college & title without watermark"
+      >
+        <Sparkles className="w-3 h-3 text-[#C4A35A]" /> Professional Version (No Watermark)
+      </button>
+    </>
   );
 }
 
 export function LicenseCard({ license }: LicenseCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [showConnector, setShowConnector] = useState(false);
+  const [showProfModal, setShowProfModal] = useState(false);
   const [devices, setDevices] = useState<DeviceActivation[]>(license.activations);
   const [removingId, setRemovingId] = useState<string | null>(null);
 
@@ -247,12 +314,17 @@ export function LicenseCard({ license }: LicenseCardProps) {
                 {availableFiles.length > 0 && (
                   <div>
                     <p className="text-[0.65rem] font-black uppercase tracking-widest text-[#1A3C2F]/40 mb-2.5">
-                      Download Files
+                      Download Files & Documents
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {availableFiles.map(f => (
                         <DownloadBtn key={f.id} productId={license.product.id} fileType={f.id} label={f.label} />
                       ))}
+                      <PdfReportButtons
+                        licenseId={license.id}
+                        productTitle={license.product.title}
+                        onOpenProfessional={() => setShowProfModal(true)}
+                      />
                     </div>
                   </div>
                 )}
@@ -343,6 +415,18 @@ export function LicenseCard({ license }: LicenseCardProps) {
             activeCount={activeDevices.length}
             onActivated={handleActivated}
             onClose={() => setShowConnector(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Professional PDF Customization Modal */}
+      <AnimatePresence>
+        {showProfModal && (
+          <ProfessionalPdfModal
+            licenseId={license.id}
+            defaultTitle={license.product.title}
+            defaultCustomerName={(license as any).user?.name || ""}
+            onClose={() => setShowProfModal(false)}
           />
         )}
       </AnimatePresence>
