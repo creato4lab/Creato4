@@ -43,3 +43,5 @@ coverage/
 
 # Debug & dev artifacts
 *.tsbuildinfo
+/public/uploads/
+
