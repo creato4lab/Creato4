@@ -81,7 +81,7 @@ export const IdeaToPrototype: React.FC<IdeaToPrototypeProps> = ({
         preload="auto"
         muted={isMuted}
         onEnded={() => onEnded?.()}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-contain sm:object-cover bg-black"
         src="/videos/intro-video.mp4"
       />
     </div>
