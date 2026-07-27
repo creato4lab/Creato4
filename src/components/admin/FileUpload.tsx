@@ -154,7 +154,10 @@ export function FileUpload({ name, label, prefix, accept, required, value = "", 
             </div>
             <div className="min-w-0">
               <p className="text-sm font-bold text-green-900 truncate">{fileName}</p>
-              <p className="text-xs text-green-700 font-mono truncate">{uploadedKey}</p>
+              <p className="text-xs text-green-700 font-mono truncate flex items-center gap-1.5 mt-0.5">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500 shrink-0"></span>
+                <span className="truncate">Key: {uploadedKey}</span>
+              </p>
             </div>
           </div>
           <button 

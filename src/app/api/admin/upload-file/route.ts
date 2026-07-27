@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      key: fileUrl,
+      key: objectKey,
       url: fileUrl,
     });
   } catch (err: any) {
