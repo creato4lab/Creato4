@@ -38,15 +38,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Forbidden. Admin access required." }, { status: 403 });
   }
 
+  let file: File | null = null;
+  let prefix = "uploads";
+
   try {
     const formData = await req.formData();
-    const file = formData.get("file") as File | null;
-    const prefix = (formData.get("prefix") as string) || "uploads";
+    file = formData.get("file") as File | null;
+    prefix = (formData.get("prefix") as string) || "uploads";
+  } catch (parseErr) {
+    console.warn("[/api/admin/upload-file] req.formData parse error:", parseErr);
+    return NextResponse.json(
+      { error: "Payload too large for server route. Use direct presigned upload." },
+      { status: 413 }
+    );
+  }
 
-    if (!file) {
-      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
-    }
+  if (!file) {
+    return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+  }
 
+  try {
     const timestamp = Date.now();
     const cleanFilename = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
     const objectKey = `${prefix}/${timestamp}-${cleanFilename}`;
