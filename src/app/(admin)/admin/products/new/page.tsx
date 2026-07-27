@@ -134,6 +134,15 @@ export default function NewProductPage() {
               name="images" 
               label="Product Gallery Images (Unlimited Direct Uploads)" 
             />
+
+            <div>
+              <FileUpload 
+                name="videoUrl" 
+                label="Product Demo Video (.MP4 / .WEBM Video File or YouTube Link)" 
+                prefix="videos" 
+                accept=".mp4,.webm,.mov" 
+              />
+            </div>
           </div>
 
           {/* Secure Digital Asset Delivery */}

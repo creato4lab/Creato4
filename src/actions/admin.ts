@@ -74,6 +74,7 @@ export async function createProduct(data: {
   softwareUsed?: string;
   whatsIncluded?: string;
   images?: string;
+  videoUrl?: string;
   sourceCodePath?: string;
   cadFilePath?: string;
   pdfDocPath?: string;
@@ -109,6 +110,7 @@ export async function createProduct(data: {
         softwareUsed: data.softwareUsed ? data.softwareUsed.split(",").map((s) => s.trim()) : [],
         whatsIncluded: data.whatsIncluded ? data.whatsIncluded.split(",").map((s) => s.trim()) : [],
         images: data.images ? data.images.split(",").map((s) => s.trim()).filter(Boolean) : [],
+        videoUrl: data.videoUrl ? data.videoUrl.trim() : null,
         sourceCodePath: data.sourceCodePath || null,
         cadFilePath: data.cadFilePath || null,
         pdfDocPath: data.pdfDocPath || null,

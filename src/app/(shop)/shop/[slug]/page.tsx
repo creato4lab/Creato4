@@ -250,6 +250,39 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
               </section>
             )}
 
+            {/* Product Demo Video */}
+            {product.videoUrl && (
+              <section>
+                <SectionHeader icon={<Zap className="w-4 h-4 text-[#C4A35A]" />} title="Product Demo Video" />
+                <div className="rounded-2xl overflow-hidden border border-[#1A3C2F]/10 bg-black aspect-video shadow-md">
+                  {product.videoUrl.includes("youtube.com") || product.videoUrl.includes("youtu.be") || product.videoUrl.includes("vimeo.com") ? (
+                    <iframe
+                      src={
+                        product.videoUrl.includes("watch?v=")
+                          ? product.videoUrl.replace("watch?v=", "embed/")
+                          : product.videoUrl
+                      }
+                      title={`${product.title} Demo Video`}
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <video
+                      src={
+                        product.videoUrl.startsWith("http")
+                          ? product.videoUrl
+                          : `/api/download?productId=${product.id}&fileType=video`
+                      }
+                      controls
+                      controlsList="nodownload"
+                      className="w-full h-full object-contain"
+                    />
+                  )}
+                </div>
+              </section>
+            )}
+
             {/* 5. Technical Specifications */}
             <section>
               <SectionHeader icon={<Cpu className="w-4 h-4 text-[#C4A35A]" />} title="Technical Specifications" />
