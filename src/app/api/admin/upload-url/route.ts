@@ -40,39 +40,30 @@ export async function POST(req: NextRequest) {
     const objectPrefix = prefix ? `${prefix}/` : "uploads/";
     const objectKey = `${objectPrefix}${timestamp}-${cleanFilename}`;
 
-    // Generate presigned PUT URL
-    const { SignatureV4 } = await import("@smithy/signature-v4");
-    const { Sha256 } = await import("@aws-crypto/sha256-js");
+    // Generate presigned PUT URL using official AWS SDK S3 request presigner
+    const { S3Client, PutObjectCommand } = await import("@aws-sdk/client-s3");
+    const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
 
     if (!R2_ACCOUNT_ID || !R2_ACCESS_KEY || !R2_SECRET_KEY) {
       return NextResponse.json({ error: "R2 credentials are not configured on the server." }, { status: 501 });
     }
 
-    const signer = new SignatureV4({
-      credentials: { accessKeyId: R2_ACCESS_KEY, secretAccessKey: R2_SECRET_KEY },
+    const s3 = new S3Client({
       region: "auto",
-      service: "s3",
-      sha256: Sha256,
+      endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+      credentials: {
+        accessKeyId: R2_ACCESS_KEY,
+        secretAccessKey: R2_SECRET_KEY,
+      },
     });
 
-    const url = new URL(`${R2_ENDPOINT}/${R2_BUCKET}/${objectKey}`);
-    const signed = await signer.presign(
-      {
-        method: "PUT",
-        hostname: url.hostname,
-        path: url.pathname,
-        protocol: "https:",
-        headers: { 
-          host: url.hostname,
-          "Content-Type": contentType
-        },
-      },
-      { expiresIn: 3600 } // URL valid for 1 hour
-    );
+    const command = new PutObjectCommand({
+      Bucket: R2_BUCKET,
+      Key: objectKey,
+      ContentType: contentType,
+    });
 
-    const uploadUrl = `${signed.protocol}//${signed.hostname}${signed.path}?${new URLSearchParams(
-      signed.query as Record<string, string>
-    ).toString()}`;
+    const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
     return NextResponse.json({ uploadUrl, key: objectKey });
   } catch (err) {

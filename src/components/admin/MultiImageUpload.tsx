@@ -25,94 +25,50 @@ export function MultiImageUpload({ name, label }: MultiImageUploadProps) {
 
   const uploadSingleFile = async (item: ImageFileItem) => {
     try {
-      let key = "";
+      // 1. Get presigned upload URL
+      const urlRes = await fetch("/api/admin/upload-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          filename: item.file.name,
+          contentType: item.file.type || "image/jpeg",
+          prefix: "images",
+        }),
+      });
 
-      // 1. Try presigned direct R2 upload first
-      try {
-        const urlRes = await fetch("/api/admin/upload-url", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            filename: item.file.name,
-            contentType: item.file.type || "image/jpeg",
-            prefix: "images",
-          }),
-        });
-
-        const urlData = await urlRes.json();
-        if (urlRes.ok && urlData.uploadUrl && urlData.key) {
-          await new Promise<void>((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open("PUT", urlData.uploadUrl, true);
-            xhr.setRequestHeader("Content-Type", item.file.type || "image/jpeg");
-
-            xhr.upload.onprogress = (event) => {
-              if (event.lengthComputable) {
-                const pct = Math.round((event.loaded / event.total) * 100);
-                setItems((prev) =>
-                  prev.map((i) => (i.id === item.id ? { ...i, progress: pct } : i))
-                );
-              }
-            };
-
-            xhr.onload = () => {
-              if (xhr.status >= 200 && xhr.status < 300) {
-                resolve();
-              } else {
-                reject(new Error(`Presigned status ${xhr.status}`));
-              }
-            };
-
-            xhr.onerror = () => reject(new Error("Presigned network error"));
-            xhr.send(item.file);
-          });
-
-          key = urlData.key;
-        }
-      } catch (presignedErr) {
-        console.warn("[MultiImageUpload] Presigned upload failed, falling back to server route:", presignedErr);
+      const urlData = await urlRes.json();
+      if (!urlRes.ok || !urlData.uploadUrl || !urlData.key) {
+        throw new Error(urlData.error || "Failed to get upload URL");
       }
 
-      // 2. Fallback to server route if presigned upload didn't succeed
-      if (!key) {
-        const formData = new FormData();
-        formData.append("file", item.file);
-        formData.append("prefix", "images");
+      const { uploadUrl, key } = urlData;
 
-        key = await new Promise<string>((resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          xhr.open("POST", "/api/admin/upload-file", true);
+      // 2. Direct R2 upload via presigned PUT
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", uploadUrl, true);
+        xhr.setRequestHeader("Content-Type", item.file.type || "image/jpeg");
 
-          xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) {
-              const pct = Math.round((event.loaded / event.total) * 100);
-              setItems((prev) =>
-                prev.map((i) => (i.id === item.id ? { ...i, progress: pct } : i))
-              );
-            }
-          };
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const pct = Math.round((event.loaded / event.total) * 100);
+            setItems((prev) =>
+              prev.map((i) => (i.id === item.id ? { ...i, progress: pct } : i))
+            );
+          }
+        };
 
-          xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              try {
-                const resData = JSON.parse(xhr.responseText);
-                if (resData.key) {
-                  resolve(resData.key);
-                } else {
-                  reject(new Error(resData.error || "Upload failed"));
-                }
-              } catch {
-                reject(new Error("Invalid server response"));
-              }
-            } else {
-              reject(new Error(`Upload failed with status ${xhr.status}`));
-            }
-          };
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve();
+          } else {
+            reject(new Error(`Upload rejected (Status ${xhr.status})`));
+          }
+        };
 
-          xhr.onerror = () => reject(new Error("Network error"));
-          xhr.send(formData);
-        });
-      }
+        xhr.onerror = () => reject(new Error("Network error"));
+        xhr.send(item.file);
+      });
 
       // Mark success
       setItems((prev) =>
