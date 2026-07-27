@@ -1,5 +1,6 @@
 import type { NextAuthConfig } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import { NextResponse } from "next/server";
 
 const getAppUrl = () => {
   if (process.env.NETLIFY === "true" || process.env.NODE_ENV === "production") {
@@ -53,7 +54,7 @@ export const authConfig = {
       if (isOnDashboard) {
         if (isLoggedIn) {
           if (isAdminEmail(auth.user?.email)) {
-            return Response.redirect(new URL("/admin", nextUrl));
+            return NextResponse.redirect(new URL("/admin", nextUrl));
           }
           return true;
         }
@@ -62,9 +63,9 @@ export const authConfig = {
         // If user is already logged in and tries to access login/register, redirect appropriately
         if (nextUrl.pathname.startsWith("/login") || nextUrl.pathname.startsWith("/register")) {
           if (isAdminEmail(auth.user?.email)) {
-            return Response.redirect(new URL("/admin", nextUrl));
+            return NextResponse.redirect(new URL("/admin", nextUrl));
           }
-          return Response.redirect(new URL("/dashboard", nextUrl));
+          return NextResponse.redirect(new URL("/dashboard", nextUrl));
         }
       }
       return true;

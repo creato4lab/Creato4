@@ -53,7 +53,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="mt-auto p-6 border-t border-white/10">
           <form action={async () => {
             "use server";
-            await signOut();
+            await signOut({ redirectTo: "/" });
           }}>
             <button className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 w-full transition-colors text-sm font-semibold text-red-400">
               <LogOut className="w-5 h-5" /> Sign Out
