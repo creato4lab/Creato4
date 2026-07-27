@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowRight, X, CheckCircle, Cpu, ShieldCheck, Sparkles, Layers, Award, Wrench } from "lucide-react";
 import { WORK_PROJECTS } from "../data";
@@ -12,6 +12,17 @@ interface SelectedWorkProps {
 
 export const SelectedWork: React.FC<SelectedWorkProps> = ({ onOpenDiscuss }) => {
   const [selectedProject, setSelectedProject] = useState<WorkProject | null>(null);
+
+  useEffect(() => {
+    if (selectedProject) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [selectedProject]);
 
   return (
     <section id="work" className="pt-12 lg:pt-16 pb-16 lg:pb-24 bg-[#1A3C2F] text-[#FAF8F5] px-6 sm:px-10 lg:px-16 xl:px-20 relative">
@@ -92,7 +103,11 @@ export const SelectedWork: React.FC<SelectedWorkProps> = ({ onOpenDiscuss }) => 
       {/* ── PROJECT OVERVIEW MODAL ── */}
       <AnimatePresence>
         {selectedProject && (
-          <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-md">
+          <div
+            className="fixed inset-0 z-[300] flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-md"
+            data-lenis-prevent="true"
+            data-lenis-prevent-wheel="true"
+          >
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
