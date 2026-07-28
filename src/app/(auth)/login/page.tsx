@@ -25,6 +25,47 @@ export default function LoginPage() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
         <div className="bg-white/60 backdrop-blur-xl py-8 px-4 shadow-xl border border-[#E8E2D9]/50 sm:rounded-3xl sm:px-10">
           
+          {/* Direct Email Sign In Form */}
+          <form
+            action={async (formData: FormData) => {
+              "use server";
+              const email = formData.get("email") as string;
+              if (email) {
+                await signIn("credentials", { email, redirectTo: "/dashboard" });
+              }
+            }}
+            className="space-y-4 mb-6"
+          >
+            <div>
+              <label htmlFor="email" className="block text-xs font-bold text-[#1A3C2F] uppercase tracking-wider mb-2">
+                Sign in with Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                placeholder="you@example.com"
+                className="w-full px-4 py-3 rounded-xl border border-[#E8E2D9] focus:outline-none focus:ring-2 focus:ring-[#1A3C2F] bg-white text-sm text-[#1A3C2F]"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full py-3.5 px-4 rounded-xl bg-[#1A3C2F] text-white text-sm font-bold hover:bg-[#234B3C] transition-colors shadow-md cursor-pointer"
+            >
+              Sign In with Email
+            </button>
+          </form>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#E8E2D9]" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-[#FAF8F5] px-2 text-[#5C6B60] font-semibold">Or</span>
+            </div>
+          </div>
+
           {/* Google OAuth Form */}
           <form
             action={async () => {
@@ -34,7 +75,7 @@ export default function LoginPage() {
           >
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-3 py-3.5 px-4 border border-[#E8E2D9] rounded-xl shadow-sm bg-white text-sm font-semibold text-[#1A3C2F] hover:bg-gray-50 focus:outline-none transition-all duration-300"
+              className="w-full flex items-center justify-center gap-3 py-3.5 px-4 border border-[#E8E2D9] rounded-xl shadow-sm bg-white text-sm font-semibold text-[#1A3C2F] hover:bg-gray-50 focus:outline-none transition-all duration-300 cursor-pointer"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -57,7 +98,6 @@ export default function LoginPage() {
               Continue with Google
             </button>
           </form>
-
 
         </div>
       </div>

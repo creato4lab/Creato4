@@ -1,5 +1,6 @@
 import type { NextAuthConfig } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { NextResponse } from "next/server";
 
 const getAppUrl = () => {
@@ -26,6 +27,23 @@ export const authConfig = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
+    CredentialsProvider({
+      name: "Email",
+      credentials: {
+        email: { label: "Email", type: "email" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email) return null;
+        const email = String(credentials.email).trim().toLowerCase();
+        if (!email || !email.includes("@")) return null;
+
+        return {
+          id: email,
+          email: email,
+          name: email.split("@")[0],
+        };
+      },
     }),
   ],
   pages: {
