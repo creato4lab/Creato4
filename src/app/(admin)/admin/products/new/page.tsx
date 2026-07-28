@@ -22,17 +22,22 @@ export default function NewProductPage() {
     setLoading(true);
     setError(null);
 
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries()) as Record<string, string>;
-    
-    const result = await createProduct(data as Parameters<typeof createProduct>[0]);
-    
-    if (result.error) {
-      setError(result.error);
+    try {
+      const formData = new FormData(e.currentTarget);
+      const data = Object.fromEntries(formData.entries()) as Record<string, string>;
+      
+      const result = await createProduct(data as Parameters<typeof createProduct>[0]);
+      
+      if (result.error) {
+        setError(result.error);
+        setLoading(false);
+      } else {
+        window.location.href = '/admin/products';
+      }
+    } catch (err: any) {
+      console.error("Form submission error:", err);
+      setError(err.message || "An unexpected error occurred.");
       setLoading(false);
-    } else {
-      router.push('/admin/products');
-      router.refresh();
     }
   };
 
