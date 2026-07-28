@@ -7,8 +7,9 @@ interface ImageFileItem {
   id: string;
   file: File;
   name: string;
-  previewUrl: string;
-  key: string;
+  previewUrl: string; // blob URL for new uploads, real URL for existing
+  url: string;        // permanent URL — stored in DB and used for display
+  key: string;        // R2 object key (for delete)
   status: "uploading" | "success" | "error";
   progress: number;
   errorMsg?: string;
@@ -30,13 +31,14 @@ export function MultiImageUpload({ name, label, value = "", onChange }: MultiIma
   useEffect(() => {
     if (initializedRef.current || !value) return;
     initializedRef.current = true;
-    const existingKeys = value.split(",").map((s) => s.trim()).filter(Boolean);
-    const prePopulated: ImageFileItem[] = existingKeys.map((key, i) => ({
-      id: `existing_${i}_${key.slice(-8)}`,
-      file: new File([], key.split("/").pop() ?? key),
-      name: key.split("/").pop() ?? key,
-      previewUrl: key.startsWith("http") ? key : `/api/admin/image-proxy?key=${encodeURIComponent(key)}`,
-      key,
+    const existingUrls = value.split(",").map((s) => s.trim()).filter(Boolean);
+    const prePopulated: ImageFileItem[] = existingUrls.map((url, i) => ({
+      id: `existing_${i}_${url.slice(-12).replace(/[^a-z0-9]/gi, "")}`,
+      file: new File([], url.split("/").pop() ?? "image"),
+      name: url.split("/").pop() ?? "image",
+      previewUrl: url,   // URL works directly — no proxy needed
+      url,
+      key: url,          // use url as key for delete fallback
       status: "success" as const,
       progress: 100,
     }));
@@ -45,7 +47,7 @@ export function MultiImageUpload({ name, label, value = "", onChange }: MultiIma
 
   const uploadSingleFile = async (item: ImageFileItem) => {
     try {
-      const keyResult = await new Promise<string>((resolve, reject) => {
+      const keyResult = await new Promise<{ key: string; url: string }>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open("POST", "/api/admin/upload-file", true);
         xhr.setRequestHeader("x-filename", encodeURIComponent(item.file.name));
@@ -67,8 +69,11 @@ export function MultiImageUpload({ name, label, value = "", onChange }: MultiIma
           if (xhr.status >= 200 && xhr.status < 300) {
             try {
               const resData = JSON.parse(xhr.responseText);
-              if (resData.key) {
-                resolve(resData.key);
+              if (resData.key && resData.url) {
+                resolve({ key: resData.key, url: resData.url });
+              } else if (resData.key) {
+                // fallback: derive url from key
+                resolve({ key: resData.key, url: `/uploads/${resData.key}` });
               } else {
                 reject(new Error(resData.error || "Upload failed"));
               }
@@ -89,10 +94,15 @@ export function MultiImageUpload({ name, label, value = "", onChange }: MultiIma
         xhr.send(item.file);
       });
 
-      // Mark success
+      // Revoke the temporary blob URL and replace with permanent URL
+      URL.revokeObjectURL(item.previewUrl);
+
+      // Mark success — use real url for display going forward
       setItems((prev) =>
         prev.map((i) =>
-          i.id === item.id ? { ...i, status: "success", key: keyResult, progress: 100 } : i
+          i.id === item.id
+            ? { ...i, status: "success", key: keyResult.key, url: keyResult.url, previewUrl: keyResult.url, progress: 100 }
+            : i
         )
       );
     } catch (err: any) {
@@ -115,11 +125,13 @@ export function MultiImageUpload({ name, label, value = "", onChange }: MultiIma
     Array.from(files).forEach((file) => {
       if (!file.type.startsWith("image/")) return;
 
+      const blobUrl = URL.createObjectURL(file);
       const item: ImageFileItem = {
         id: `img_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
         file,
         name: file.name,
-        previewUrl: URL.createObjectURL(file),
+        previewUrl: blobUrl,  // temporary blob — replaced with real url after upload
+        url: "",
         key: "",
         status: "uploading",
         progress: 0,
@@ -152,10 +164,10 @@ export function MultiImageUpload({ name, label, value = "", onChange }: MultiIma
     setItems((prev) => prev.filter((i) => i.id !== id));
   };
 
-  // Comma-separated list of successfully uploaded image keys/urls
+  // Comma-separated list of successfully uploaded image URLs (what product.images stores)
   const successfulKeys = items
-    .filter((i) => i.status === "success" && i.key)
-    .map((i) => i.key)
+    .filter((i) => i.status === "success" && i.url)
+    .map((i) => i.url)
     .join(",");
 
   // Notify parent of changes
