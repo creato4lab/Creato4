@@ -7,7 +7,7 @@ import { createRazorpayOrder, verifyPayment, claimFreeLicense } from '@/actions/
 
 interface CheckoutButtonProps {
   productId: string;
-  licenseType: "STUDENT" | "COMMERCIAL" | "ENTERPRISE" | "SOURCE_CODE_ONLY" | "REPORT_SUBMISSION" | "REPORT_EDITABLE" | "FIRMWARE_FLASH" | "PCB_DESIGN_FILES" | "CAD_3D_MODELS";
+  licenseType: "STUDENT" | "COMMERCIAL" | "ENTERPRISE" | "SOURCE_CODE_ONLY" | "REPORT_WATERMARKED" | "REPORT_SUBMISSION" | "REPORT_EDITABLE" | "FIRMWARE_FLASH" | "PCB_DESIGN_FILES" | "CAD_3D_MODELS";
   productName: string;
   price?: number;
   variant?: "default" | "compact";

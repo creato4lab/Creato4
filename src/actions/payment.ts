@@ -18,6 +18,7 @@ const PRICE_MULTIPLIERS: Record<string, number> = {
   COMMERCIAL:        2.5,
   ENTERPRISE:        8.0,
   SOURCE_CODE_ONLY:  0.6,
+  REPORT_WATERMARKED: 0.3,
   REPORT_SUBMISSION: 0.4,
   REPORT_EDITABLE:   0.5,
   FIRMWARE_FLASH:    0.35,
@@ -31,6 +32,7 @@ const MAX_ACTIVATIONS: Record<string, number> = {
   COMMERCIAL:        5,
   ENTERPRISE:        999,
   SOURCE_CODE_ONLY:  1,
+  REPORT_WATERMARKED: 1,
   REPORT_SUBMISSION: 1,
   REPORT_EDITABLE:   1,
   FIRMWARE_FLASH:    1,
@@ -38,7 +40,7 @@ const MAX_ACTIVATIONS: Record<string, number> = {
   CAD_3D_MODELS:     1,
 };
 
-type LicenseTypeAll = "STUDENT" | "COMMERCIAL" | "ENTERPRISE" | "SOURCE_CODE_ONLY" | "REPORT_SUBMISSION" | "REPORT_EDITABLE" | "FIRMWARE_FLASH" | "PCB_DESIGN_FILES" | "CAD_3D_MODELS";
+type LicenseTypeAll = "STUDENT" | "COMMERCIAL" | "ENTERPRISE" | "SOURCE_CODE_ONLY" | "REPORT_WATERMARKED" | "REPORT_SUBMISSION" | "REPORT_EDITABLE" | "FIRMWARE_FLASH" | "PCB_DESIGN_FILES" | "CAD_3D_MODELS";
 
 export async function createRazorpayOrder(productId: string, licenseType: LicenseTypeAll) {
   try {
