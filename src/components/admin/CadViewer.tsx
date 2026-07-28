@@ -169,7 +169,7 @@ export function CadViewer({ file, fileUrl, cadTitle, autoEmbed = true }: CadView
           // Direct STEP / F3D / IGES — info card only
           const ext   = lowerName.match(/\.[^.]+$/)?.[0] ?? "";
           innerFormat = ext;
-          displayName = file.name;
+          displayName = activeFile.name;
 
         } else {
           setError(`Unsupported format. Accepted: .stl, .step, .stp, .zip`);
