@@ -16,6 +16,7 @@ interface CadViewerProps {
   file?: File | null;
   fileUrl?: string | null;
   cadTitle?: string;
+  autoEmbed?: boolean;
 }
 
 // Supported formats that can actually be rendered
@@ -77,7 +78,7 @@ function CadMesh({ geometry }: { geometry: THREE.BufferGeometry }) {
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-export function CadViewer({ file, fileUrl, cadTitle }: CadViewerProps) {
+export function CadViewer({ file, fileUrl, cadTitle, autoEmbed = true }: CadViewerProps) {
   const [geometry,    setGeometry]    = useState<THREE.BufferGeometry | null>(null);
   const [status,      setStatus]      = useState<LoadStatus>("idle");
   const [error,       setError]       = useState("");
@@ -248,11 +249,76 @@ export function CadViewer({ file, fileUrl, cadTitle }: CadViewerProps) {
     };
 
     process();
-  }, [file]);
+  }, [file, fileUrl]);
 
-  if (!file) return null;
+  if (!file && !fileUrl) return null;
 
   const isRenderable = status === "ready" && geometry;
+
+  // Embedded mode for 3D PCB panel in Interactive Hardware Studio
+  if (autoEmbed) {
+    if (status === "loading") {
+      return (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0A1A12] text-white/60 p-8">
+          <Loader2 className="w-8 h-8 animate-spin text-[#C4A35A]" />
+          <p className="text-xs font-bold text-white/70">Loading 3D PCB Model...</p>
+        </div>
+      );
+    }
+
+    if (status === "error" || error) {
+      return (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0A1A12] text-white/60 p-8 text-center">
+          <AlertTriangle className="w-8 h-8 text-amber-400" />
+          <p className="text-sm font-bold text-white/80">3D PCB Load Failed</p>
+          <p className="text-xs text-white/40">{error || "Unable to render 3D model"}</p>
+        </div>
+      );
+    }
+
+    if (isRenderable && geometry) {
+      return (
+        <div className="absolute inset-0 bg-[#0A1A12]">
+          <CanvasErrorBoundary>
+            <Canvas
+              shadows
+              camera={{ position: [2, 1.5, 2], fov: 45, near: 0.01, far: 1000 }}
+              gl={{ antialias: true, alpha: false }}
+            >
+              <color attach="background" args={["#0A1A12"]} />
+              <ambientLight intensity={0.5} />
+              <directionalLight position={[5, 8, 5]} intensity={2} castShadow shadow-mapSize={[2048, 2048]} />
+              <directionalLight position={[-5, -3, -5]} intensity={0.5} color="#6699CC" />
+              <pointLight position={[0, 5, 0]} intensity={0.8} color="#C4A35A" />
+              <hemisphereLight args={["#FFFFFF", "#223322", 0.6]} />
+              <Grid
+                args={[10, 10]}
+                position={[0, -1.1, 0]}
+                cellColor="#C4A35A"
+                sectionColor="#1A3C2F"
+                fadeDistance={8}
+                cellSize={0.5}
+                sectionSize={2}
+                infiniteGrid
+              />
+              <Suspense fallback={null}>
+                <CadMesh geometry={geometry} />
+              </Suspense>
+              <OrbitControls
+                makeDefault
+                autoRotate={autoRotate}
+                autoRotateSpeed={2.5}
+                enableDamping
+                dampingFactor={0.06}
+                minDistance={0.5}
+                maxDistance={20}
+              />
+            </Canvas>
+          </CanvasErrorBoundary>
+        </div>
+      );
+    }
+  }
 
   return (
     <>

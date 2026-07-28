@@ -50,6 +50,7 @@ export function FileUpload({ name, label, prefix, accept, required, value = "", 
 
     try {
       const keyResult = await new Promise<string>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
         const formData = new FormData();
         formData.append("file", file);
 
