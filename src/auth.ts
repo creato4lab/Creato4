@@ -12,8 +12,12 @@ if (process.env.NETLIFY === "true" || process.env.NODE_ENV === "production") {
   }
 }
 
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "")
-  .split(",")
+const ADMIN_EMAILS = [
+  "creato4lab@gmail.com",
+  "creato4@gmail.com",
+  "princetagadiya99@gmail.com",
+  ...(process.env.ADMIN_EMAILS || "").split(","),
+]
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
 

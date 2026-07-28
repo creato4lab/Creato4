@@ -29,9 +29,17 @@ export default function LoginPage() {
           <form
             action={async (formData: FormData) => {
               "use server";
-              const email = formData.get("email") as string;
-              if (email) {
-                await signIn("credentials", { email, redirectTo: "/dashboard" });
+              const rawEmail = (formData.get("email") as string)?.trim().toLowerCase();
+              if (rawEmail) {
+                const adminList = [
+                  "creato4lab@gmail.com",
+                  "creato4@gmail.com",
+                  "princetagadiya99@gmail.com",
+                  ...(process.env.ADMIN_EMAILS || "").split(","),
+                ].map((e) => e.trim().toLowerCase());
+
+                const isAdmin = adminList.includes(rawEmail);
+                await signIn("credentials", { email: rawEmail, redirectTo: isAdmin ? "/admin" : "/dashboard" });
               }
             }}
             className="space-y-4 mb-6"

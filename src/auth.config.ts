@@ -10,9 +10,13 @@ const getAppUrl = () => {
   return process.env.AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 };
 
-// Admin emails from environment variable (comma-separated)
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "")
-  .split(",")
+// Admin emails from environment variable or defaults (comma-separated)
+const ADMIN_EMAILS = [
+  "creato4lab@gmail.com",
+  "creato4@gmail.com",
+  "princetagadiya99@gmail.com",
+  ...(process.env.ADMIN_EMAILS || "").split(","),
+]
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
 
