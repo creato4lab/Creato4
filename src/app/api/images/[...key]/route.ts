@@ -12,19 +12,29 @@ import path from "path";
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { key: string[] } }
+  { params }: { params: Promise<{ key: string[] }> }
 ) {
-  // key segments: e.g. ["images", "1785231324762-photo.jpeg"]
-  const keySegments = params.key;
+  const resolvedParams = await params;
+  const keySegments = resolvedParams.key;
   if (!keySegments || keySegments.length === 0) {
     return NextResponse.json({ error: "Missing key" }, { status: 400 });
   }
 
   // Prevent path traversal
   const safeParts = keySegments.map((s) => s.replace(/\.\./g, ""));
-  const localPath = path.join(process.cwd(), "public", "uploads", ...safeParts);
+  const lastFileName = safeParts[safeParts.length - 1];
 
-  if (!fs.existsSync(localPath)) {
+  // Possible paths to check for the file on disk
+  const candidatePaths = [
+    path.join(process.cwd(), "public", "uploads", ...safeParts),
+    path.join(process.cwd(), "public", ...safeParts),
+    path.join(process.cwd(), "public", "uploads", "images", lastFileName),
+    path.join(process.cwd(), "public", "uploads", "cad-files", lastFileName),
+  ];
+
+  let localPath = candidatePaths.find((p) => fs.existsSync(p));
+
+  if (!localPath) {
     return NextResponse.json({ error: "File not found" }, { status: 404 });
   }
 
