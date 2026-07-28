@@ -12,10 +12,9 @@ import path from "path";
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ key: string[] }> }
+  context: { params: Promise<{ key: string[] }> }
 ) {
-  const resolvedParams = await params;
-  const keySegments = resolvedParams.key;
+  const { key: keySegments } = await context.params;
   if (!keySegments || keySegments.length === 0) {
     return NextResponse.json({ error: "Missing key" }, { status: 400 });
   }

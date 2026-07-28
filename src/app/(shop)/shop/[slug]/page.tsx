@@ -49,14 +49,14 @@ const DIFFICULTY_COLOR: Record<string, string> = {
 };
 
 const CATEGORY_COLOR: Record<string, string> = {
-  ARDUINO:       "bg-teal-100 text-teal-700",
-  ESP32:         "bg-blue-100 text-blue-700",
-  STM32:         "bg-purple-100 text-purple-700",
-  RASPBERRY_PI:  "bg-red-100 text-red-700",
-  PCB_DESIGN:    "bg-yellow-100 text-yellow-700",
-  CAD_MODEL:     "bg-orange-100 text-orange-700",
-  EMBEDDED_CODE: "bg-indigo-100 text-indigo-700",
-  COURSE:        "bg-green-100 text-green-700",
+  ARDUINO:       "bg-teal-100 text-teal-700 border-teal-200",
+  ESP32:         "bg-blue-100 text-blue-700 border-blue-200",
+  STM32:         "bg-purple-100 text-purple-700 border-purple-200",
+  RASPBERRY_PI:  "bg-red-100 text-red-700 border-red-200",
+  PCB_DESIGN:    "bg-yellow-100 text-yellow-700 border-yellow-200",
+  CAD_MODEL:     "bg-orange-100 text-orange-700 border-orange-200",
+  EMBEDDED_CODE: "bg-indigo-100 text-indigo-700 border-indigo-200",
+  COURSE:        "bg-green-100 text-green-700 border-green-200",
 };
 
 // Static placeholder reviews for Phase 1
@@ -103,7 +103,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
         </div>
       </div>
 
-      {/* ── Hero Section ── */}
+      {/* ── Header Title & Meta Section ── */}
       <div className="bg-white border-b border-[#1A3C2F]/8 pb-8">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pt-8">
           <Link
@@ -113,178 +113,110 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
             <ArrowLeft className="w-4 h-4" /> Back to Catalog
           </Link>
 
-          <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
-            {/* Left: title & meta */}
-            <div className="flex-1">
-              {/* Badge row */}
-              <div className="flex flex-wrap items-center gap-2 mb-4">
-                <span className={`text-[0.65rem] font-black uppercase tracking-wider px-3 py-1.5 rounded-full border ${CATEGORY_COLOR[product.category] || "bg-gray-100 text-gray-600"}`}>
-                  {product.category.replace(/_/g, " ")}
+          <div>
+            {/* Badge row */}
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              <span className={`text-[0.65rem] font-black uppercase tracking-wider px-3 py-1 rounded-full border ${CATEGORY_COLOR[product.category] || "bg-gray-100 text-gray-600"}`}>
+                {product.category.replace(/_/g, " ")}
+              </span>
+              <span className={`text-[0.65rem] font-black uppercase tracking-wider px-3 py-1 rounded-full border ${DIFFICULTY_COLOR[product.difficulty] || "bg-gray-100 text-gray-600"}`}>
+                {product.difficulty}
+              </span>
+              {product.version && (
+                <span className="text-[0.65rem] font-mono bg-[#1A3C2F]/5 text-[#1A3C2F]/60 px-3 py-1 rounded-full border border-[#1A3C2F]/10">
+                  {product.version}
                 </span>
-                <span className={`text-[0.65rem] font-black uppercase tracking-wider px-3 py-1.5 rounded-full border ${DIFFICULTY_COLOR[product.difficulty] || "bg-gray-100 text-gray-600"}`}>
-                  {product.difficulty}
-                </span>
-                {product.version && (
-                  <span className="text-[0.65rem] font-mono bg-[#1A3C2F]/5 text-[#1A3C2F]/60 px-3 py-1.5 rounded-full border border-[#1A3C2F]/10">
-                    {product.version}
-                  </span>
-                )}
-                {product.lastUpdated && (
-                  <span className="text-[0.65rem] text-[#1A3C2F]/40 flex items-center gap-1">
-                    <CalendarDays className="w-3 h-3" />
-                    Updated {new Date(product.lastUpdated).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}
-                  </span>
-                )}
-              </div>
-
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#1A3C2F] tracking-tight leading-tight mb-4">
-                {product.title}
-              </h1>
-              <p className="text-[#1A3C2F]/65 text-lg leading-relaxed mb-6 max-w-2xl">
-                {product.shortDescription || product.description}
-              </p>
-
-              {/* Tags */}
-              {product.tags?.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-6">
-                  <Tag className="w-3.5 h-3.5 text-[#1A3C2F]/30 mt-0.5" />
-                  {product.tags.map((tag: string) => (
-                    <Link
-                      key={tag}
-                      href={`/shop?tag=${tag}`}
-                      className="text-xs font-semibold bg-[#1A3C2F]/5 text-[#1A3C2F]/60 hover:bg-[#1A3C2F]/10 px-2.5 py-1 rounded-full transition-colors"
-                    >
-                      {tag}
-                    </Link>
-                  ))}
-                </div>
               )}
-
-              {/* Stats bar */}
-              <div className="flex flex-wrap items-center gap-6">
-                {product.rating > 0 && (
-                  <div>
-                    <RatingStars rating={product.rating} reviewCount={product.reviewCount} size="md" />
-                  </div>
-                )}
-                <div className="flex items-center gap-1.5 text-sm text-[#1A3C2F]/50">
-                  <Download className="w-4 h-4" />
-                  <span className="font-bold text-[#1A3C2F]">{product.downloadCount?.toLocaleString() || 0}</span> downloads
-                </div>
-                {product.hardwareUsed?.length > 0 && (
-                  <div className="flex items-center gap-1.5 text-sm text-[#1A3C2F]/50">
-                    <Cpu className="w-4 h-4" />
-                    {product.hardwareUsed.length} components
-                  </div>
-                )}
-              </div>
+              {product.lastUpdated && (
+                <span className="text-[0.65rem] text-[#1A3C2F]/40 flex items-center gap-1">
+                  <CalendarDays className="w-3 h-3" />
+                  Updated {new Date(product.lastUpdated).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}
+                </span>
+              )}
             </div>
 
-            {/* Right: price preview on hero */}
-            <div className="lg:w-72 shrink-0">
-              <div className="bg-[#1A3C2F]/[0.03] border border-[#1A3C2F]/10 rounded-2xl p-5">
-                <p className="text-xs text-[#1A3C2F]/40 mb-1">Starting from</p>
-                <p className="text-4xl font-black text-[#1A3C2F] mb-1">
-                  ₹{Math.round(product.price * 0.35).toLocaleString("en-IN")}
-                </p>
-                <p className="text-xs text-[#1A3C2F]/40 mb-4">Full package: ₹{product.price.toLocaleString("en-IN")}</p>
-                <Link
-                  href="#purchase"
-                  className="w-full flex items-center justify-center gap-2 bg-[#1A3C2F] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#C4A35A] transition-colors"
-                >
-                  <Package className="w-4 h-4" /> Choose Package
-                </Link>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#1A3C2F] tracking-tight leading-tight mb-4 max-w-4xl">
+              {product.title}
+            </h1>
+            <p className="text-[#1A3C2F]/65 text-base sm:text-lg leading-relaxed mb-6 max-w-3xl">
+              {product.shortDescription || product.description}
+            </p>
+
+            {/* Tags */}
+            {product.tags?.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5 mb-6">
+                <Tag className="w-3.5 h-3.5 text-[#1A3C2F]/30" />
+                {product.tags.map((tag: string) => (
+                  <Link
+                    key={tag}
+                    href={`/shop?tag=${tag}`}
+                    className="text-xs font-semibold bg-[#1A3C2F]/5 text-[#1A3C2F]/60 hover:bg-[#1A3C2F]/10 px-2.5 py-1 rounded-full transition-colors"
+                  >
+                    {tag}
+                  </Link>
+                ))}
               </div>
+            )}
+
+            {/* Stats bar */}
+            <div className="flex flex-wrap items-center gap-6 pt-2">
+              {product.rating > 0 && (
+                <div>
+                  <RatingStars rating={product.rating} reviewCount={product.reviewCount} size="md" />
+                </div>
+              )}
+              <div className="flex items-center gap-1.5 text-sm text-[#1A3C2F]/60 font-semibold">
+                <Download className="w-4 h-4 text-[#C4A35A]" />
+                <span className="font-extrabold text-[#1A3C2F]">{product.downloadCount?.toLocaleString() || 0}</span> downloads
+              </div>
+              {product.hardwareUsed?.length > 0 && (
+                <div className="flex items-center gap-1.5 text-sm text-[#1A3C2F]/60 font-semibold">
+                  <Cpu className="w-4 h-4 text-[#C4A35A]" />
+                  {product.hardwareUsed.length} components
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Main Content ── */}
+      {/* ── Main Two-Column Layout ── */}
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-12">
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
 
-          {/* ── Left Column ── */}
-          <div className="flex-1 min-w-0 space-y-12">
+          {/* ── Left Column (Gallery & Details) ── */}
+          <div className="flex-1 min-w-0 space-y-12 w-full">
 
             {/* 1. Image Gallery */}
-            <section>
+            <section className="bg-white rounded-3xl p-4 border border-[#1A3C2F]/8 shadow-sm">
               <ProductImageGallery images={product.images || []} title={product.title} />
             </section>
 
-            {/* 2. Video Demo */}
-            {product.videoUrl && (
-              <section>
-                <SectionHeader icon={<Zap className="w-4 h-4 text-[#C4A35A]" />} title="Video Demo" />
-                <div className="aspect-video rounded-2xl overflow-hidden border border-[#1A3C2F]/10">
-                  <iframe
-                    src={product.videoUrl}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
-              </section>
-            )}
-
-            {/* 3. Full Description */}
-            <section>
+            {/* 2. Full Description */}
+            <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
               <SectionHeader icon={<Code className="w-4 h-4 text-[#C4A35A]" />} title="About This Project" />
-              <p className="text-[#1A3C2F]/70 leading-relaxed text-base">{product.description}</p>
+              <p className="text-[#1A3C2F]/75 leading-relaxed text-base whitespace-pre-line">{product.description}</p>
             </section>
 
-            {/* 4. Features */}
+            {/* 3. Features */}
             {product.features?.length > 0 && (
-              <section>
+              <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
                 <SectionHeader icon={<Star className="w-4 h-4 text-[#C4A35A]" />} title="Key Features" />
                 <div className="grid sm:grid-cols-2 gap-3">
                   {product.features.map((feat: string, i: number) => (
-                    <div key={i} className="flex items-start gap-3 bg-white rounded-xl p-4 border border-[#1A3C2F]/8">
+                    <div key={i} className="flex items-start gap-3 bg-[#FAF8F5] rounded-2xl p-4 border border-[#1A3C2F]/8">
                       <div className="w-5 h-5 rounded-full bg-[#C4A35A]/15 flex items-center justify-center shrink-0 mt-0.5">
                         <Check className="w-3 h-3 text-[#C4A35A]" />
                       </div>
-                      <span className="text-sm text-[#1A3C2F]/80 leading-relaxed">{feat}</span>
+                      <span className="text-sm text-[#1A3C2F]/80 leading-relaxed font-medium">{feat}</span>
                     </div>
                   ))}
                 </div>
               </section>
             )}
 
-            {/* Product Demo Video */}
-            {product.videoUrl && (
-              <section>
-                <SectionHeader icon={<Zap className="w-4 h-4 text-[#C4A35A]" />} title="Product Demo Video" />
-                <div className="rounded-2xl overflow-hidden border border-[#1A3C2F]/10 bg-black aspect-video shadow-md">
-                  {product.videoUrl.includes("youtube.com") || product.videoUrl.includes("youtu.be") || product.videoUrl.includes("vimeo.com") ? (
-                    <iframe
-                      src={
-                        product.videoUrl.includes("watch?v=")
-                          ? product.videoUrl.replace("watch?v=", "embed/")
-                          : product.videoUrl
-                      }
-                      title={`${product.title} Demo Video`}
-                      className="w-full h-full border-0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  ) : (
-                    <video
-                      src={
-                        product.videoUrl.startsWith("http")
-                          ? product.videoUrl
-                          : `/api/download?productId=${product.id}&fileType=video`
-                      }
-                      controls
-                      controlsList="nodownload"
-                      className="w-full h-full object-contain"
-                    />
-                  )}
-                </div>
-              </section>
-            )}
-
-            {/* 5. Technical Specifications */}
-            <section>
+            {/* 4. Technical Specifications */}
+            <section className="space-y-6">
               <SectionHeader icon={<Cpu className="w-4 h-4 text-[#C4A35A]" />} title="Technical Specifications" />
               <div className="grid sm:grid-cols-2 gap-6">
                 {product.hardwareUsed?.length > 0 && (
@@ -320,13 +252,13 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
               </div>
             </section>
 
-            {/* 6. Compatible Boards */}
+            {/* 5. Compatible Hardware */}
             {product.compatibleBoards?.length > 0 && (
-              <section>
+              <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
                 <SectionHeader icon={<Layers className="w-4 h-4 text-[#C4A35A]" />} title="Compatible Hardware" />
                 <div className="flex flex-wrap gap-3">
                   {product.compatibleBoards.map((board: string, i: number) => (
-                    <div key={i} className="flex items-center gap-2.5 bg-white border border-[#1A3C2F]/10 rounded-xl px-4 py-3 shadow-sm">
+                    <div key={i} className="flex items-center gap-2.5 bg-[#FAF8F5] border border-[#1A3C2F]/10 rounded-xl px-4 py-3 shadow-xs">
                       <Cpu className="w-4 h-4 text-[#C4A35A]" />
                       <span className="text-sm font-semibold text-[#1A3C2F]">{board}</span>
                     </div>
@@ -335,56 +267,67 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
               </section>
             )}
 
-            {/* 7. 3D PCB Gerber Inspection */}
+            {/* 6. 3D Interactive PCB Inspection */}
             {(product.pcbGerberPath || product.pcbPreviewImage || product.category === 'PCB_DESIGN' || product.category === 'ARDUINO' || product.category === 'ESP32') && (
-              <section>
+              <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
                 <SectionHeader icon={<Layers className="w-4 h-4 text-[#C4A35A]" />} title="3D Interactive PCB Inspection" />
                 <PcbViewer3D boardTitle={`${product.title} PCB`} pcbImage={product.pcbPreviewImage} />
               </section>
             )}
 
-            {/* 8. PCB Preview Image */}
-            {product.pcbPreviewImage && (
-              <section>
-                <SectionHeader icon={<Layers className="w-4 h-4 text-[#C4A35A]" />} title="PCB Photo Preview" />
-                <div className="rounded-2xl overflow-hidden border border-[#1A3C2F]/10 bg-white">
-                  <img src={product.pcbPreviewImage} alt="PCB Preview" className="w-full object-contain max-h-96" />
+            {/* 7. Product Demo Video */}
+            {product.videoUrl && (
+              <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
+                <SectionHeader icon={<Zap className="w-4 h-4 text-[#C4A35A]" />} title="Product Demo Video" />
+                <div className="rounded-2xl overflow-hidden border border-[#1A3C2F]/10 bg-black aspect-video shadow-md">
+                  {product.videoUrl.includes("youtube.com") || product.videoUrl.includes("youtu.be") || product.videoUrl.includes("vimeo.com") ? (
+                    <iframe
+                      src={
+                        product.videoUrl.includes("watch?v=")
+                          ? product.videoUrl.replace("watch?v=", "embed/")
+                          : product.videoUrl
+                      }
+                      title={`${product.title} Demo Video`}
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <video
+                      src={
+                        product.videoUrl.startsWith("http")
+                          ? product.videoUrl
+                          : `/api/download?productId=${product.id}&fileType=video`
+                      }
+                      controls
+                      controlsList="nodownload"
+                      className="w-full h-full object-contain"
+                    />
+                  )}
                 </div>
               </section>
             )}
 
-            {/* 8. CAD Preview */}
-            {product.cadPreviewImage && (
-              <section>
-                <SectionHeader icon={<Layers className="w-4 h-4 text-[#C4A35A]" />} title="CAD Model Preview" />
-                <div className="rounded-2xl overflow-hidden border border-[#1A3C2F]/10 bg-white">
-                  <img src={product.cadPreviewImage} alt="CAD Preview" className="w-full object-contain max-h-96" />
-                </div>
-              </section>
-            )}
-
-            {/* 9. What's Included */}
+            {/* 8. What's Included */}
             {product.whatsIncluded?.length > 0 && (
-              <section>
+              <section className="bg-[#1A3C2F] rounded-3xl p-8 shadow-xl text-white">
                 <SectionHeader icon={<Package className="w-4 h-4 text-[#C4A35A]" />} title="What's Included" />
-                <div className="bg-[#1A3C2F] rounded-2xl p-7">
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    {product.whatsIncluded.map((item: string, i: number) => (
-                      <div key={i} className="flex items-start gap-3">
-                        <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center shrink-0 mt-0.5">
-                          <Check className="w-3 h-3 text-green-400" />
-                        </div>
-                        <span className="text-sm text-[#FAF8F5]/90 leading-relaxed">{item}</span>
+                <div className="grid sm:grid-cols-2 gap-4 mt-4">
+                  {product.whatsIncluded.map((item: string, i: number) => (
+                    <div key={i} className="flex items-start gap-3 bg-white/5 rounded-xl p-3 border border-white/10">
+                      <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                        <Check className="w-3 h-3 text-green-400" />
                       </div>
-                    ))}
-                  </div>
+                      <span className="text-sm text-[#FAF8F5]/90 leading-relaxed font-medium">{item}</span>
+                    </div>
+                  ))}
                 </div>
               </section>
             )}
 
-            {/* 10. Safety Warning */}
+            {/* 9. Safety Warning */}
             {product.safetyWarning && (
-              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 flex gap-4">
+              <div className="bg-amber-50 border border-amber-200 rounded-3xl p-6 flex gap-4 shadow-sm">
                 <AlertTriangle className="w-6 h-6 text-amber-600 shrink-0 mt-0.5" />
                 <div>
                   <h4 className="text-sm font-bold text-amber-900 mb-1">⚠ Safety Warning</h4>
@@ -393,16 +336,16 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
               </div>
             )}
 
-            {/* 11. FAQs */}
+            {/* 10. FAQs */}
             {faqs.length > 0 && (
-              <section>
+              <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
                 <SectionHeader icon={<Shield className="w-4 h-4 text-[#C4A35A]" />} title="Frequently Asked Questions" />
                 <ProductFAQ faqs={faqs} />
               </section>
             )}
 
-            {/* 12. Customer Reviews (static placeholder) */}
-            <section>
+            {/* 11. Customer Reviews */}
+            <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
               <div className="flex items-center justify-between mb-6">
                 <SectionHeader icon={<Star className="w-4 h-4 text-[#C4A35A]" />} title="Customer Reviews" noMargin />
                 <div className="flex items-center gap-3">
@@ -411,7 +354,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
               </div>
               <div className="space-y-4">
                 {PLACEHOLDER_REVIEWS.map((review, i) => (
-                  <div key={i} className="bg-white rounded-2xl border border-[#1A3C2F]/8 p-5">
+                  <div key={i} className="bg-[#FAF8F5] rounded-2xl border border-[#1A3C2F]/8 p-5">
                     <div className="flex items-start justify-between mb-2">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
@@ -435,13 +378,13 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
               </div>
             </section>
 
-            {/* 13. Version History */}
+            {/* 12. Version History */}
             {versionHistory.length > 0 && (
-              <section>
+              <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
                 <SectionHeader icon={<GitBranch className="w-4 h-4 text-[#C4A35A]" />} title="Version History" />
                 <div className="space-y-3">
                   {versionHistory.map((v: any, i: number) => (
-                    <div key={i} className="flex gap-4 bg-white rounded-xl border border-[#1A3C2F]/8 p-4">
+                    <div key={i} className="flex gap-4 bg-[#FAF8F5] rounded-xl border border-[#1A3C2F]/8 p-4">
                       <div className="flex flex-col items-center">
                         <div className={`w-2.5 h-2.5 rounded-full ${i === 0 ? "bg-[#C4A35A]" : "bg-[#1A3C2F]/20"} mt-1 shrink-0`} />
                         {i < versionHistory.length - 1 && <div className="w-px flex-1 bg-[#1A3C2F]/10 mt-2" />}
@@ -461,23 +404,24 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
               </section>
             )}
 
-            {/* 14. Related Products */}
+            {/* 13. Related Products */}
             {relatedProducts.length > 0 && (
-              <section>
+              <section className="pt-4">
                 <SectionHeader icon={<Tag className="w-4 h-4 text-[#C4A35A]" />} title="Related Products" />
                 <RelatedProducts products={relatedProducts as any} />
               </section>
             )}
           </div>
 
-          {/* ── Right Column: Purchase Options (Sticky) ── */}
-          <div id="purchase" className="w-full lg:w-[380px] shrink-0">
+          {/* ── Right Column: Purchase Options (Sticky Sidebar) ── */}
+          <div id="purchase" className="w-full lg:w-[380px] shrink-0 lg:sticky lg:top-28">
             <PurchaseOptions
               productId={product.id}
               productName={product.title}
               basePrice={product.price}
             />
           </div>
+
         </div>
       </div>
     </div>

@@ -12,19 +12,26 @@ interface ProductImageGalleryProps {
 export function ProductImageGallery({ images, title }: ProductImageGalleryProps) {
   const [active, setActive] = useState(0);
   const [lightbox, setLightbox] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const validImages = images.filter(Boolean).map(getImageUrl);
-  const hasImages = validImages.length > 0;
+  const hasImages = validImages.length > 0 && !imgError;
 
   const prev = useCallback(() => setActive((a) => (a - 1 + validImages.length) % validImages.length), [validImages.length]);
   const next = useCallback(() => setActive((a) => (a + 1) % validImages.length), [validImages.length]);
 
   if (!hasImages) {
     return (
-      <div className="aspect-[16/9] bg-[#1A3C2F]/5 rounded-3xl border border-[#1A3C2F]/10 flex flex-col items-center justify-center">
-        <ImageIcon className="w-16 h-16 text-[#1A3C2F]/20 mb-3" />
-        <p className="text-[#1A3C2F]/40 font-mono text-xs uppercase tracking-widest">Media Gallery</p>
-        <p className="text-[#1A3C2F]/25 text-xs mt-1">Images coming soon</p>
+      <div className="aspect-[16/9] bg-gradient-to-br from-[#1A3C2F] via-[#2D5929] to-[#102A20] rounded-3xl border border-[#1A3C2F]/20 flex flex-col items-center justify-center p-8 text-center relative overflow-hidden shadow-xl">
+        <div className="absolute inset-0 bg-[radial-gradient(#C4A35A_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none" />
+        <div className="w-16 h-16 rounded-2xl bg-[#FAF8F5]/10 border border-[#C4A35A]/30 flex items-center justify-center mb-4 text-[#C4A35A] shadow-xl relative z-10 backdrop-blur-md">
+          <ImageIcon className="w-8 h-8 text-[#C4A35A]" />
+        </div>
+        <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#C4A35A] bg-[#C4A35A]/10 px-3 py-1 rounded-full border border-[#C4A35A]/20 mb-2 relative z-10">
+          HARDWARE ASSET GALLERY
+        </span>
+        <h3 className="text-[#FAF8F5] text-lg font-bold relative z-10">{title}</h3>
+        <p className="text-[#FAF8F5]/60 text-xs mt-1 relative z-10">Verified Product Blueprint & Schematics</p>
       </div>
     );
   }
@@ -41,7 +48,8 @@ export function ProductImageGallery({ images, title }: ProductImageGalleryProps)
             <motion.img
               key={active}
               src={validImages[active]}
-              alt={`${title} — image ${active + 1}`}
+              alt={title}
+              onError={() => setImgError(true)}
               className="w-full h-full object-cover"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
