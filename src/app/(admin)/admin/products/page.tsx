@@ -80,9 +80,13 @@ export default async function AdminProductsPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors" title="Edit Product">
+                        <Link
+                          href={`/admin/products/${product.id}/edit`}
+                          className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                          title="Edit Product"
+                        >
                           <Edit3 className="w-4 h-4" />
-                        </button>
+                        </Link>
                         <DeleteProductButton id={product.id} />
                       </div>
                     </td>

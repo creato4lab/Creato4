@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { UploadCloud, Image as ImageIcon, X, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 
 interface ImageFileItem {
@@ -17,11 +17,31 @@ interface ImageFileItem {
 interface MultiImageUploadProps {
   name: string; // Form field name (e.g. "images")
   label: string;
+  value?: string; // Comma-separated existing image keys/URLs (for edit mode)
+  onChange?: (value: string) => void;
 }
 
-export function MultiImageUpload({ name, label }: MultiImageUploadProps) {
+export function MultiImageUpload({ name, label, value = "", onChange }: MultiImageUploadProps) {
   const [items, setItems] = useState<ImageFileItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const initializedRef = useRef(false);
+
+  // Pre-populate with existing images when `value` is provided (edit mode)
+  useEffect(() => {
+    if (initializedRef.current || !value) return;
+    initializedRef.current = true;
+    const existingKeys = value.split(",").map((s) => s.trim()).filter(Boolean);
+    const prePopulated: ImageFileItem[] = existingKeys.map((key, i) => ({
+      id: `existing_${i}_${key.slice(-8)}`,
+      file: new File([], key.split("/").pop() ?? key),
+      name: key.split("/").pop() ?? key,
+      previewUrl: key.startsWith("http") ? key : `/api/admin/image-proxy?key=${encodeURIComponent(key)}`,
+      key,
+      status: "success" as const,
+      progress: 100,
+    }));
+    setItems(prePopulated);
+  }, [value]);
 
   const uploadSingleFile = async (item: ImageFileItem) => {
     try {
@@ -137,6 +157,12 @@ export function MultiImageUpload({ name, label }: MultiImageUploadProps) {
     .filter((i) => i.status === "success" && i.key)
     .map((i) => i.key)
     .join(",");
+
+  // Notify parent of changes
+  useEffect(() => {
+    onChange?.(successfulKeys);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [successfulKeys]);
 
   return (
     <div className="space-y-4">

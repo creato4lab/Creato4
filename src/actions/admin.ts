@@ -130,6 +130,73 @@ export async function createProduct(data: {
   }
 }
 
+export async function getProductById(id: string) {
+  await requireAdmin();
+  return prisma.product.findUnique({ where: { id } });
+}
+
+export async function updateProduct(
+  id: string,
+  data: {
+    title: string;
+    description: string;
+    shortDescription: string;
+    price: number | string;
+    category: string;
+    difficulty: string;
+    hardwareUsed?: string;
+    softwareUsed?: string;
+    whatsIncluded?: string;
+    images?: string;
+    videoUrl?: string;
+    sourceCodePath?: string;
+    cadFilePath?: string;
+    pdfDocPath?: string;
+    pcbGerberPath?: string;
+    firmwareBinPath?: string;
+    firmwareUf2Path?: string;
+    firmwareBuildVersion?: string;
+  }
+) {
+  await requireAdmin();
+
+  const slug = data.title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+
+  try {
+    const product = await prisma.product.update({
+      where: { id },
+      data: {
+        title: data.title.trim(),
+        slug,
+        description: data.description.trim(),
+        shortDescription: data.shortDescription.trim(),
+        price: Number(data.price),
+        category: data.category as any,
+        difficulty: data.difficulty as any,
+        hardwareUsed: data.hardwareUsed ? data.hardwareUsed.split(",").map((s) => s.trim()) : [],
+        softwareUsed: data.softwareUsed ? data.softwareUsed.split(",").map((s) => s.trim()) : [],
+        whatsIncluded: data.whatsIncluded ? data.whatsIncluded.split(",").map((s) => s.trim()) : [],
+        images: data.images ? data.images.split(",").map((s) => s.trim()).filter(Boolean) : [],
+        videoUrl: data.videoUrl ? data.videoUrl.trim() : null,
+        sourceCodePath: data.sourceCodePath || null,
+        cadFilePath: data.cadFilePath || null,
+        pdfDocPath: data.pdfDocPath || null,
+        pcbGerberPath: data.pcbGerberPath || null,
+        firmwareBinPath: data.firmwareBinPath || null,
+        firmwareUf2Path: data.firmwareUf2Path || null,
+        firmwareBuildVersion: data.firmwareBuildVersion || null,
+      },
+    });
+    return { success: true, product };
+  } catch (error) {
+    console.error("Error updating product:", error);
+    return { error: "Failed to update product. The title might conflict with another product." };
+  }
+}
+
 export async function deleteProduct(id: string) {
   await requireAdmin();
   try {
