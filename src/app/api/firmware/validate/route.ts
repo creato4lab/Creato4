@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ── 2. Determine default firmware object path if missing ────────────────
+    // ── 2. Determine default firmware object path ────────────────────────────
     const firmwareKey = license.product.firmwareBinPath || license.product.firmwareUf2Path || "firmware/1785231700947-Blink.ino.hex";
 
     // ── 3. Check or Auto-Register Device Activation ─────────────────────────
@@ -59,7 +59,25 @@ export async function POST(req: NextRequest) {
       where: { licenseId_chipId: { licenseId, chipId } },
     });
 
-    if (!activation || !activation.isActive) {
+    if (activation) {
+      if (!activation.isActive) {
+        // Reactivate existing record if slot is available
+        const activeCount = await prisma.deviceActivation.count({
+          where: { licenseId, isActive: true },
+        });
+        if (activeCount >= license.maxActivations) {
+          return NextResponse.json(
+            { error: `Activation limit reached (${license.maxActivations} devices). Remove a device first.` },
+            { status: 422 }
+          );
+        }
+        activation = await prisma.deviceActivation.update({
+          where: { id: activation.id },
+          data: { isActive: true, lastSeenAt: new Date() },
+        });
+      }
+    } else {
+      // Auto-register board on first connect
       const activeCount = await prisma.deviceActivation.count({
         where: { licenseId, isActive: true },
       });
@@ -80,7 +98,6 @@ export async function POST(req: NextRequest) {
         select: { nickname: true },
       });
 
-      // Auto-register board on first connect!
       activation = await prisma.deviceActivation.create({
         data: {
           licenseId,
