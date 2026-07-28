@@ -25,13 +25,13 @@ const PRICE_MULTIPLIERS: Record<string, number> = {
 
 // Max activations per license tier
 const MAX_ACTIVATIONS: Record<string, number> = {
-  STUDENT:           2,
+  STUDENT:           1,
   COMMERCIAL:        5,
   ENTERPRISE:        999,
-  SOURCE_CODE_ONLY:  2,
+  SOURCE_CODE_ONLY:  1,
   REPORT_SUBMISSION: 1,
   REPORT_EDITABLE:   1,
-  FIRMWARE_FLASH:    2,
+  FIRMWARE_FLASH:    1,
 };
 
 type LicenseTypeAll = "STUDENT" | "COMMERCIAL" | "ENTERPRISE" | "SOURCE_CODE_ONLY" | "REPORT_SUBMISSION" | "REPORT_EDITABLE" | "FIRMWARE_FLASH";
