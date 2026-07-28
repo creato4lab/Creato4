@@ -43,27 +43,52 @@ interface Props {
 }
 
 // ─── Known supported board VID:PID for firmware flashing ────────────────────
-const FLASH_SUPPORTED: Record<string, { board: string; type: "esp" | "rp2040" }> = {
-  "10C4:EA60": { board: "ESP32 (CP2102)",    type: "esp" },
-  "1A86:7523": { board: "ESP32 / ESP8266 (CH340)", type: "esp" },
+const FLASH_SUPPORTED: Record<string, { board: string; type: "esp" | "rp2040" | "arduino" }> = {
+  // Arduino Uno / Nano / Mega (USB Serial CH340, FT232R, ATmega16U2)
+  "1A86:7523": { board: "Arduino Uno / Nano (CH340)", type: "arduino" },
+  "0403:6001": { board: "Arduino Nano (FT232R)", type: "arduino" },
+  "2341:0043": { board: "Arduino Uno R3 (ATmega16U2)", type: "arduino" },
+  "2341:0001": { board: "Arduino Uno R3", type: "arduino" },
+  "2341:0042": { board: "Arduino Mega 2560 R3", type: "arduino" },
+  "2341:0010": { board: "Arduino Mega 2560", type: "arduino" },
+  "2341:0036": { board: "Arduino Leonardo", type: "arduino" },
+  "2341:0037": { board: "Arduino Micro", type: "arduino" },
+  // ESP32 / ESP8266
+  "10C4:EA60": { board: "ESP32 / ESP8266 (CP2102)", type: "esp" },
   "1A86:55D4": { board: "ESP32-S3/C3 (CH9102)", type: "esp" },
-  "303A:1001": { board: "ESP32-S2/S3",       type: "esp" },
-  "303A:4001": { board: "ESP32-C3",          type: "esp" },
-  "2E8A:0003": { board: "Raspberry Pi RP2040", type: "rp2040" },
+  "303A:1001": { board: "ESP32-S2/S3", type: "esp" },
+  "303A:4001": { board: "ESP32-C3", type: "esp" },
+  // Raspberry Pi Pico RP2040
+  "2E8A:0003": { board: "Raspberry Pi RP2040 (Pico)", type: "rp2040" },
   "2E8A:000A": { board: "Raspberry Pi Pico 2", type: "rp2040" },
 };
 
 const CHIP_ID_SKETCH = `// Flash this FIRST to get your Chip ID
 #include <Arduino.h>
+
 void setup() {
-  Serial.begin(115200); delay(2000);
+  Serial.begin(115200);
+  delay(2000);
+
+#if defined(ESP32)
   uint64_t mac = ESP.getEfuseMac();
   char id[21];
-  snprintf(id, 21, "CHIPID:%04X%08X",
-    (uint16_t)(mac >> 32), (uint32_t)mac);
+  snprintf(id, 21, "CHIPID:%04X%08X", (uint16_t)(mac >> 32), (uint32_t)mac);
   Serial.println(id);
+#elif defined(ESP8266)
+  uint32_t id_num = ESP.getChipId();
+  char id[21];
+  snprintf(id, 21, "CHIPID:ESP8266_%08X", id_num);
+  Serial.println(id);
+#else
+  // Arduino Uno / Nano / Mega / AVR
+  Serial.println("CHIPID:ARDUINO_AVR_VERIFIED");
+#endif
 }
-void loop() { delay(5000); }`;
+
+void loop() {
+  delay(5000);
+}`;
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -146,7 +171,7 @@ export function FirmwareFlasher({ licenseId, productTitle, isUf2 = false, onClos
           const { value, done } = await reader.read();
           if (done) break;
           buffer += value;
-          const match = buffer.match(/CHIPID:([A-F0-9]{8,24})/i);
+          const match = buffer.match(/CHIPID:([A-F0-9_]{6,32})/i);
           if (match) {
             detectedChipId = match[1].toUpperCase();
             clearTimeout(timeout);
@@ -400,7 +425,7 @@ export function FirmwareFlasher({ licenseId, productTitle, isUf2 = false, onClos
                   <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex gap-3">
                     <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                     <div className="text-xs text-amber-800">
-                      <strong>Supported boards:</strong> ESP32, ESP8266, Raspberry Pi RP2040 (Pico).
+                      <strong>Supported boards:</strong> Arduino Uno R3, Arduino Nano, Arduino Mega 2560, ESP32, ESP8266, Raspberry Pi RP2040 (Pico).
                       Your board must be registered to this license first.
                     </div>
                   </div>
