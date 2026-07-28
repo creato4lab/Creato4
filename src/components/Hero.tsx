@@ -200,7 +200,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDiscuss, onOpenCinematic }) =>
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="lg:col-span-5 relative w-full h-[560px] lg:h-[700px] rounded-3xl bg-[#F5F0EA] border border-[#E8E2D9] p-2 overflow-hidden shadow-sm"
+          className="lg:col-span-5 relative w-full aspect-video rounded-3xl overflow-hidden shadow-lg"
         >
           <Exploded3DProduct
             explosionFactor={explosionFactor}

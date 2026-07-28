@@ -53,9 +53,6 @@ export const Exploded3DProduct: React.FC<Exploded3DProductProps> = ({
   const targetExplosionRef = useRef(0);
   const currentDrawnFrameRef = useRef(0);
 
-  // UI state
-  const [activeLayer, setActiveLayer] = useState<number | null>(null);
-
   // Current frame index from raw explosion factor (just for UI display)
   const uiFrame = Math.max(1, Math.min(TOTAL_FRAMES, Math.round(explosion * (TOTAL_FRAMES - 1)) + 1));
 
@@ -238,19 +235,8 @@ export const Exploded3DProduct: React.FC<Exploded3DProductProps> = ({
     }
   }, [isPlaying]);
 
-  /* ─── LAYER INFO ─── */
-  const layersInfo = [
-    { id: 7, name: '07 / ENCLOSURE', color: '#1A1A1A' },
-    { id: 6, name: '06 / DISPLAY & UI', color: '#E67E22' },
-    { id: 5, name: '05 / PCB & ELECTRONICS', color: '#C4A35A' },
-    { id: 4, name: '04 / BATTERY & POWER', color: '#111111' },
-    { id: 3, name: '03 / FRAME & STRUCTURE', color: '#B8BFC6' },
-    { id: 2, name: '02 / 3D PRINTED PARTS', color: '#6B7280' },
-    { id: 1, name: '01 / FRONT COVER', color: '#FAF8F5' },
-  ];
-
   return (
-    <div className="relative w-full h-full min-h-[520px] lg:min-h-[680px] flex flex-col justify-between items-center group">
+    <div className="relative w-full h-full flex flex-col justify-between items-center group">
 
       {/* Loading Indicator */}
       {!loaded && (
@@ -276,30 +262,8 @@ export const Exploded3DProduct: React.FC<Exploded3DProductProps> = ({
         />
       </div>
 
-      {/* Layer Tag Badges (Horizontal at top) */}
-      <div className="absolute top-4 left-4 right-4 z-20 hidden sm:flex flex-wrap justify-center gap-2">
-        {layersInfo.map((item) => (
-          <div
-            key={item.id}
-            onMouseEnter={() => setActiveLayer(item.id)}
-            onMouseLeave={() => setActiveLayer(null)}
-            className={`px-2.5 py-1 rounded-xl border transition-all duration-300 text-[9px] font-semibold tracking-wider uppercase flex items-center gap-1.5 backdrop-blur-md ${
-              activeLayer === item.id
-                ? 'bg-[#1A3C2F] text-[#FAF8F5] border-[#1A3C2F] scale-105 shadow-md'
-                : 'bg-[#FAF8F5]/80 text-[#5C6B60] border-[#E8E2D9] hover:bg-[#1A3C2F] hover:text-[#FAF8F5]'
-            }`}
-          >
-            <span
-              className="w-1.5 h-1.5 rounded-full border border-[#E8E2D9]"
-              style={{ backgroundColor: item.color }}
-            />
-            <span>{item.name}</span>
-          </div>
-        ))}
-      </div>
-
       {/* Bottom Floating Interactive Controls */}
-      <div className="absolute bottom-4 left-4 right-4 z-20 flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#FAF8F5]/90 backdrop-blur-md border border-[#E8E2D9] shadow-lg">
+      <div className="absolute bottom-4 left-4 right-4 z-20 flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#FAF8F5]/90 backdrop-blur-md border border-[#E8E2D9] shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         {/* Explosion Range Slider */}
         <div className="flex items-center gap-3 w-full sm:flex-1">
           <Layers className="w-4 h-4 text-[#1A3C2F] shrink-0" />
