@@ -67,19 +67,34 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ── 4. The connecting chip must be a registered activation ─────────────────
-    const activation = await prisma.deviceActivation.findUnique({
+    // ── 4. Check or Auto-Register Device Activation ─────────────────────────
+    let activation = await prisma.deviceActivation.findUnique({
       where: { licenseId_chipId: { licenseId, chipId } },
     });
 
     if (!activation || !activation.isActive) {
-      return NextResponse.json(
-        {
-          error:
-            "This board is not registered to your license. Please activate it first via 'Connect Board'.",
+      const activeCount = await prisma.deviceActivation.count({
+        where: { licenseId, isActive: true },
+      });
+
+      if (activeCount >= license.maxActivations) {
+        return NextResponse.json(
+          {
+            error: `Activation limit reached (${license.maxActivations} devices). Please unregister an existing board to connect this one.`,
+          },
+          { status: 422 }
+        );
+      }
+
+      // Auto-register board on first connect!
+      activation = await prisma.deviceActivation.create({
+        data: {
+          licenseId,
+          chipId,
+          boardType: "Arduino / Microcontroller Board",
+          isActive: true,
         },
-        { status: 422 }
-      );
+      });
     }
 
     // ── 5. Issue a signed firmware token ──────────────────────────────────────
