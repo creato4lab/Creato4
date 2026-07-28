@@ -11,7 +11,6 @@ interface ProductVideoPlayerProps {
 
 export function ProductVideoPlayer({ videoUrl, title }: ProductVideoPlayerProps) {
   const [error, setError] = useState(false);
-  const [aspect, setAspect] = useState<"portrait" | "landscape">("landscape");
 
   const isEmbed =
     videoUrl.includes("youtube.com") ||
@@ -28,7 +27,7 @@ export function ProductVideoPlayer({ videoUrl, title }: ProductVideoPlayerProps)
     }
 
     return (
-      <div className="relative w-full aspect-video rounded-3xl overflow-hidden border border-[#1A3C2F]/10 bg-black shadow-lg">
+      <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-[#1A3C2F]/10 bg-black shadow-lg">
         <iframe
           src={embedSrc}
           title={`${title} Demo Video`}
@@ -52,35 +51,17 @@ export function ProductVideoPlayer({ videoUrl, title }: ProductVideoPlayerProps)
     );
   }
 
-  const isPortrait = aspect === "portrait";
-
   return (
-    <div className="w-full flex justify-center py-2">
-      <div
-        className={`relative bg-black rounded-3xl overflow-hidden border border-[#1A3C2F]/15 shadow-2xl transition-all duration-300 ${
-          isPortrait
-            ? "w-full max-w-sm sm:max-w-md aspect-[9/16]"
-            : "w-full aspect-video"
-        }`}
-      >
-        <video
-          src={mediaSrc}
-          controls
-          controlsList="nodownload"
-          playsInline
-          preload="metadata"
-          onLoadedMetadata={(e) => {
-            const { videoWidth, videoHeight } = e.currentTarget;
-            if (videoHeight > videoWidth) {
-              setAspect("portrait");
-            } else {
-              setAspect("landscape");
-            }
-          }}
-          onError={() => setError(true)}
-          className="w-full h-full object-cover"
-        />
-      </div>
+    <div className="w-full rounded-2xl overflow-hidden border border-[#1A3C2F]/15 bg-black shadow-xl flex items-center justify-center min-h-[320px] max-h-[580px] p-2">
+      <video
+        src={mediaSrc}
+        controls
+        controlsList="nodownload"
+        playsInline
+        preload="auto"
+        onError={() => setError(true)}
+        className="w-full max-h-[560px] object-contain rounded-xl"
+      />
     </div>
   );
 }
