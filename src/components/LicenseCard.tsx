@@ -371,14 +371,6 @@ export function LicenseCard({ license }: LicenseCardProps) {
                               <Clock className="w-3 h-3" />
                               {new Date(device.lastSeenAt).toLocaleDateString("en-IN")}
                             </span>
-                            <button
-                              onClick={() => handleRemoveDevice(device.id)}
-                              disabled={removingId === device.id}
-                              className="text-[#1A3C2F]/25 hover:text-red-500 transition-colors p-1 disabled:opacity-40"
-                              title="Remove device"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
                           </div>
                         </div>
                       ))}

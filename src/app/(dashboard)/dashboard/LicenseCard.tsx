@@ -228,18 +228,6 @@ export function LicenseCard({ license }: Props) {
                             </div>
                           </div>
                         </div>
-                        <button
-                          onClick={() => handleRemoveDevice(activation.id)}
-                          disabled={removingId === activation.id}
-                          className="ml-3 p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-40"
-                          title="Remove device"
-                        >
-                          {removingId === activation.id ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <Trash2 className="w-3.5 h-3.5" />
-                          )}
-                        </button>
                       </div>
                     ))}
                   </div>
