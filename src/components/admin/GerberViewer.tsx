@@ -7,7 +7,10 @@ import { PcbViewer3D, type GerberData } from "../PcbViewer3D";
 import { motion, AnimatePresence } from "motion/react";
 
 interface GerberViewerProps {
-  file: File | null;
+  file?: File | null;
+  fileUrl?: string | null;
+  boardTitle?: string;
+  pcbImage?: string | null;
 }
 
 interface GerberLayer {
@@ -207,7 +210,7 @@ function detectLayerType(lowerName: string): string {
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
-export function GerberViewer({ file }: GerberViewerProps) {
+export function GerberViewer({ file, fileUrl, boardTitle, pcbImage }: GerberViewerProps) {
   const [layers,      setLayers]      = useState<GerberLayer[]>([]);
   const [loading,     setLoading]     = useState(false);
   const [error,       setError]       = useState("");
@@ -216,7 +219,7 @@ export function GerberViewer({ file }: GerberViewerProps) {
   const [parseStatus, setParseStatus] = useState<"idle" | "parsing" | "done" | "partial">("idle");
 
   useEffect(() => {
-    if (!file) {
+    if (!file && !fileUrl) {
       setLayers([]);
       setGerberData(null);
       setParseStatus("idle");
@@ -231,8 +234,17 @@ export function GerberViewer({ file }: GerberViewerProps) {
       setParseStatus("parsing");
 
       try {
+        let zipBuffer: ArrayBuffer | File | null = file || null;
+        if (!zipBuffer && fileUrl) {
+          const res = await fetch(fileUrl);
+          if (!res.ok) throw new Error(`Failed to download Gerber zip (${res.status})`);
+          zipBuffer = await res.arrayBuffer();
+        }
+
+        if (!zipBuffer) return;
+
         const zip     = new JSZip();
-        const zipData = await zip.loadAsync(file);
+        const zipData = await zip.loadAsync(zipBuffer);
 
         const gerberExtensions = [
           ".gbr", ".grb", ".drl", ".gbl", ".gtl",
@@ -471,7 +483,8 @@ export function GerberViewer({ file }: GerberViewerProps) {
               {/* Modal Body — PcbViewer3D now receives real Gerber data */}
               <div className="p-6 bg-[#0E241C]">
                 <PcbViewer3D
-                  boardTitle={file?.name.replace(/\.[^/.]+$/, "") ?? "Uploaded PCB"}
+                  boardTitle={boardTitle ?? file?.name.replace(/\.[^/.]+$/, "") ?? "Uploaded PCB"}
+                  pcbImage={pcbImage}
                   gerberData={gerberData}
                 />
               </div>

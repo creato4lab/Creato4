@@ -4,15 +4,15 @@ import { notFound } from "next/navigation";
 import { getProductBySlug, getRelatedProducts } from "@/actions/product";
 import {
   ArrowLeft, Check, AlertTriangle, Cpu, Code, Download,
-  Tag, CalendarDays, History, Layers, Zap, Star, Package,
-  GitBranch, Shield, Box
+  Tag, CalendarDays, History, Zap, Star, Package,
+  GitBranch, Shield
 } from "lucide-react";
 import { ProductImageGallery } from "@/components/ProductImageGallery";
+import { Product3DStudio } from "@/components/Product3DStudio";
 import { ProductFAQ } from "@/components/ProductFAQ";
 import { RelatedProducts } from "@/components/RelatedProducts";
 import { PurchaseOptions } from "@/components/PurchaseOptions";
 import { RatingStars } from "@/components/RatingStars";
-import { PcbViewer3D } from "@/components/PcbViewer3D";
 import { getImageUrl } from "@/lib/imageUrl";
 import { SITE_CONFIG } from "@/lib/constants";
 import { generateProductSchema } from "@/lib/schemas";
@@ -185,7 +185,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-12">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
 
-          {/* ── Left Column (Gallery & Details) ── */}
+          {/* ── Left Column (Gallery, 3D Studio & Details) ── */}
           <div className="flex-1 min-w-0 space-y-12 w-full">
 
             {/* 1. Image Gallery */}
@@ -193,13 +193,50 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
               <ProductImageGallery images={product.images || []} title={product.title} />
             </section>
 
-            {/* 2. Full Description */}
+            {/* 2. Interactive 3D Hardware Studio (Gerber PCB & CAD Model) */}
+            <Product3DStudio
+              title={product.title}
+              gerberPath={product.pcbGerberPath}
+              cadPath={product.cadFilePath}
+              pcbImage={product.pcbPreviewImage || (product.images?.[0] ? getImageUrl(product.images[0]) : undefined)}
+            />
+
+            {/* 3. Product Demo Video */}
+            {product.videoUrl && (
+              <section className="bg-white rounded-3xl p-6 sm:p-8 border border-[#1A3C2F]/8 shadow-sm space-y-4">
+                <SectionHeader icon={<Zap className="w-4 h-4 text-[#C4A35A]" />} title="Product Demo Video" />
+                <div className="rounded-2xl overflow-hidden border border-[#1A3C2F]/10 bg-black aspect-video shadow-md">
+                  {product.videoUrl.includes("youtube.com") || product.videoUrl.includes("youtu.be") || product.videoUrl.includes("vimeo.com") ? (
+                    <iframe
+                      src={
+                        product.videoUrl.includes("watch?v=")
+                          ? product.videoUrl.replace("watch?v=", "embed/")
+                          : product.videoUrl
+                      }
+                      title={`${product.title} Demo Video`}
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <video
+                      src={getImageUrl(product.videoUrl)}
+                      controls
+                      controlsList="nodownload"
+                      className="w-full h-full object-contain"
+                    />
+                  )}
+                </div>
+              </section>
+            )}
+
+            {/* 4. Full Description */}
             <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
               <SectionHeader icon={<Code className="w-4 h-4 text-[#C4A35A]" />} title="About This Project" />
               <p className="text-[#1A3C2F]/75 leading-relaxed text-base whitespace-pre-line">{product.description}</p>
             </section>
 
-            {/* 3. Features */}
+            {/* 5. Key Features */}
             {product.features?.length > 0 && (
               <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
                 <SectionHeader icon={<Star className="w-4 h-4 text-[#C4A35A]" />} title="Key Features" />
@@ -216,7 +253,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
               </section>
             )}
 
-            {/* 4. Technical Specifications */}
+            {/* 6. Technical Specifications */}
             <section className="space-y-6">
               <SectionHeader icon={<Cpu className="w-4 h-4 text-[#C4A35A]" />} title="Technical Specifications" />
               <div className="grid sm:grid-cols-2 gap-6">
@@ -253,87 +290,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
               </div>
             </section>
 
-            {/* 5. Compatible Hardware */}
-            {product.compatibleBoards?.length > 0 && (
-              <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
-                <SectionHeader icon={<Layers className="w-4 h-4 text-[#C4A35A]" />} title="Compatible Hardware" />
-                <div className="flex flex-wrap gap-3">
-                  {product.compatibleBoards.map((board: string, i: number) => (
-                    <div key={i} className="flex items-center gap-2.5 bg-[#FAF8F5] border border-[#1A3C2F]/10 rounded-xl px-4 py-3 shadow-xs">
-                      <Cpu className="w-4 h-4 text-[#C4A35A]" />
-                      <span className="text-sm font-semibold text-[#1A3C2F]">{board}</span>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* 6. 3D Interactive PCB Inspection */}
-            {(product.pcbGerberPath || product.pcbPreviewImage || product.category === 'PCB_DESIGN' || product.category === 'ARDUINO' || product.category === 'ESP32') && (
-              <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
-                <div className="flex items-center justify-between mb-5">
-                  <SectionHeader icon={<Layers className="w-4 h-4 text-[#C4A35A]" />} title="3D Interactive PCB Inspection" noMargin />
-                  {product.pcbGerberPath && (
-                    <a
-                      href={getImageUrl(product.pcbGerberPath)}
-                      download
-                      className="flex items-center gap-1.5 text-xs font-bold text-[#1A3C2F] bg-[#1A3C2F]/5 hover:bg-[#1A3C2F]/10 border border-[#1A3C2F]/10 px-3 py-2 rounded-xl transition-colors"
-                    >
-                      <Download className="w-3.5 h-3.5" /> Download Gerber Files
-                    </a>
-                  )}
-                </div>
-                <PcbViewer3D
-                  boardTitle={`${product.title} PCB`}
-                  pcbImage={product.pcbPreviewImage || (product.images?.[0] ? getImageUrl(product.images[0]) : undefined)}
-                />
-              </section>
-            )}
-
-            {/* 6b. CAD Model Preview */}
-            {product.cadPreviewImage && (
-              <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
-                <SectionHeader icon={<Box className="w-4 h-4 text-[#C4A35A]" />} title="CAD Model Preview" />
-                <div className="rounded-2xl overflow-hidden border border-[#1A3C2F]/10 bg-[#1A3C2F]/3">
-                  <img
-                    src={getImageUrl(product.cadPreviewImage)}
-                    alt={`${product.title} CAD Model`}
-                    className="w-full object-contain max-h-[500px]"
-                  />
-                </div>
-              </section>
-            )}
-
-            {/* 7. Product Demo Video */}
-            {product.videoUrl && (
-              <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
-                <SectionHeader icon={<Zap className="w-4 h-4 text-[#C4A35A]" />} title="Product Demo Video" />
-                <div className="rounded-2xl overflow-hidden border border-[#1A3C2F]/10 bg-black aspect-video shadow-md">
-                  {product.videoUrl.includes("youtube.com") || product.videoUrl.includes("youtu.be") || product.videoUrl.includes("vimeo.com") ? (
-                    <iframe
-                      src={
-                        product.videoUrl.includes("watch?v=")
-                          ? product.videoUrl.replace("watch?v=", "embed/")
-                          : product.videoUrl
-                      }
-                      title={`${product.title} Demo Video`}
-                      className="w-full h-full border-0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  ) : (
-                    <video
-                      src={getImageUrl(product.videoUrl)}
-                      controls
-                      controlsList="nodownload"
-                      className="w-full h-full object-contain"
-                    />
-                  )}
-                </div>
-              </section>
-            )}
-
-            {/* 8. What's Included */}
+            {/* 7. What's Included */}
             {product.whatsIncluded?.length > 0 && (
               <section className="bg-[#1A3C2F] rounded-3xl p-8 shadow-xl text-white">
                 <SectionHeader icon={<Package className="w-4 h-4 text-[#C4A35A]" />} title="What's Included" />
@@ -350,7 +307,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
               </section>
             )}
 
-            {/* 9. Safety Warning */}
+            {/* 8. Safety Warning */}
             {product.safetyWarning && (
               <div className="bg-amber-50 border border-amber-200 rounded-3xl p-6 flex gap-4 shadow-sm">
                 <AlertTriangle className="w-6 h-6 text-amber-600 shrink-0 mt-0.5" />
@@ -361,7 +318,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
               </div>
             )}
 
-            {/* 10. FAQs */}
+            {/* 9. FAQs */}
             {faqs.length > 0 && (
               <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
                 <SectionHeader icon={<Shield className="w-4 h-4 text-[#C4A35A]" />} title="Frequently Asked Questions" />
@@ -369,7 +326,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
               </section>
             )}
 
-            {/* 11. Customer Reviews */}
+            {/* 10. Customer Reviews */}
             <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
               <div className="flex items-center justify-between mb-6">
                 <SectionHeader icon={<Star className="w-4 h-4 text-[#C4A35A]" />} title="Customer Reviews" noMargin />
@@ -403,7 +360,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
               </div>
             </section>
 
-            {/* 12. Version History */}
+            {/* 11. Version History */}
             {versionHistory.length > 0 && (
               <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
                 <SectionHeader icon={<GitBranch className="w-4 h-4 text-[#C4A35A]" />} title="Version History" />
@@ -429,7 +386,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
               </section>
             )}
 
-            {/* 13. Related Products */}
+            {/* 12. Related Products */}
             {relatedProducts.length > 0 && (
               <section className="pt-4">
                 <SectionHeader icon={<Tag className="w-4 h-4 text-[#C4A35A]" />} title="Related Products" />

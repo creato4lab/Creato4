@@ -13,7 +13,9 @@ import * as THREE from "three";
 import { motion, AnimatePresence } from "motion/react";
 
 interface CadViewerProps {
-  file: File | null;
+  file?: File | null;
+  fileUrl?: string | null;
+  cadTitle?: string;
 }
 
 // Supported formats that can actually be rendered
@@ -75,7 +77,7 @@ function CadMesh({ geometry }: { geometry: THREE.BufferGeometry }) {
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-export function CadViewer({ file }: CadViewerProps) {
+export function CadViewer({ file, fileUrl, cadTitle }: CadViewerProps) {
   const [geometry,    setGeometry]    = useState<THREE.BufferGeometry | null>(null);
   const [status,      setStatus]      = useState<LoadStatus>("idle");
   const [error,       setError]       = useState("");
@@ -84,7 +86,7 @@ export function CadViewer({ file }: CadViewerProps) {
   const [autoRotate,  setAutoRotate]  = useState(true);
 
   useEffect(() => {
-    if (!file) {
+    if (!file && !fileUrl) {
       setGeometry(null);
       setStatus("idle");
       setCadInfo(null);
@@ -98,25 +100,38 @@ export function CadViewer({ file }: CadViewerProps) {
       setGeometry(null);
       setCadInfo(null);
 
-      const lowerName = file.name.toLowerCase();
-      const sizeMb    = file.size / (1024 * 1024);
-
       try {
+        let activeFile: File | { name: string; size: number; arrayBuffer(): Promise<ArrayBuffer> } | null = file || null;
+
+        if (!activeFile && fileUrl) {
+          const res = await fetch(fileUrl);
+          if (!res.ok) throw new Error(`Failed to download CAD file (${res.status})`);
+          const blob = await res.blob();
+          const fileName = cadTitle ?? fileUrl.split("/").pop() ?? "model.zip";
+          activeFile = new File([blob], fileName, { type: blob.type });
+        }
+
+        if (!activeFile) return;
+
+        const lowerName = activeFile.name.toLowerCase();
+        const sizeMb    = activeFile.size / (1024 * 1024);
+
         // ── 1. Determine the actual STL source ──────────────────────────────
         let stlBuffer:    ArrayBuffer | null = null;
-        let displayName:  string             = file.name;
-        let displaySize:  number             = file.size / 1024;
+        let displayName:  string             = activeFile.name;
+        let displaySize:  number             = activeFile.size / 1024;
         let innerFormat:  string             = "";
 
         if (lowerName.endsWith(".stl")) {
           // Direct STL file
-          stlBuffer   = await file.arrayBuffer();
+          stlBuffer   = await activeFile.arrayBuffer();
           innerFormat = ".stl";
 
         } else if (lowerName.endsWith(".zip")) {
           // ZIP — look for the best 3D file inside
           const zip     = new JSZip();
-          const zipData = await zip.loadAsync(file);
+          const fileBuf = await activeFile.arrayBuffer();
+          const zipData = await zip.loadAsync(fileBuf);
 
           // Priority: STL first, then check for STEP/others for info card
           let stlEntry:  [string, JSZip.JSZipObject] | null = null;
