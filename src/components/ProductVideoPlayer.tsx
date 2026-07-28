@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { Play, Pause, Volume2, VolumeX, Maximize, AlertCircle } from "lucide-react";
+import React, { useState } from "react";
+import { AlertCircle } from "lucide-react";
 import { getImageUrl } from "@/lib/imageUrl";
 
 interface ProductVideoPlayerProps {
@@ -11,8 +11,7 @@ interface ProductVideoPlayerProps {
 
 export function ProductVideoPlayer({ videoUrl, title }: ProductVideoPlayerProps) {
   const [error, setError] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [aspect, setAspect] = useState<"portrait" | "landscape">("landscape");
 
   const isEmbed =
     videoUrl.includes("youtube.com") ||
@@ -29,7 +28,7 @@ export function ProductVideoPlayer({ videoUrl, title }: ProductVideoPlayerProps)
     }
 
     return (
-      <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-[#1A3C2F]/10 bg-black shadow-md">
+      <div className="relative w-full aspect-video rounded-3xl overflow-hidden border border-[#1A3C2F]/10 bg-black shadow-lg">
         <iframe
           src={embedSrc}
           title={`${title} Demo Video`}
@@ -53,31 +52,35 @@ export function ProductVideoPlayer({ videoUrl, title }: ProductVideoPlayerProps)
     );
   }
 
-  return (
-    <div className="relative w-full rounded-2xl overflow-hidden border border-[#1A3C2F]/10 bg-black/90 shadow-xl flex items-center justify-center min-h-[300px] max-h-[600px] group">
-      {/* Ambient Blurred Backdrop for vertical/portrait videos */}
-      <video
-        src={mediaSrc}
-        className="absolute inset-0 w-full h-full object-cover blur-3xl opacity-35 pointer-events-none scale-110"
-        aria-hidden="true"
-        muted
-        loop
-        playsInline
-      />
+  const isPortrait = aspect === "portrait";
 
-      {/* Main Video Element */}
-      <video
-        ref={videoRef}
-        src={mediaSrc}
-        controls
-        controlsList="nodownload"
-        playsInline
-        preload="metadata"
-        onError={() => setError(true)}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        className="relative z-10 w-full max-h-[580px] object-contain rounded-xl shadow-2xl"
-      />
+  return (
+    <div className="w-full flex justify-center py-2">
+      <div
+        className={`relative bg-black rounded-3xl overflow-hidden border border-[#1A3C2F]/15 shadow-2xl transition-all duration-300 ${
+          isPortrait
+            ? "w-full max-w-sm sm:max-w-md aspect-[9/16]"
+            : "w-full aspect-video"
+        }`}
+      >
+        <video
+          src={mediaSrc}
+          controls
+          controlsList="nodownload"
+          playsInline
+          preload="metadata"
+          onLoadedMetadata={(e) => {
+            const { videoWidth, videoHeight } = e.currentTarget;
+            if (videoHeight > videoWidth) {
+              setAspect("portrait");
+            } else {
+              setAspect("landscape");
+            }
+          }}
+          onError={() => setError(true)}
+          className="w-full h-full object-cover"
+        />
+      </div>
     </div>
   );
 }

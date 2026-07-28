@@ -64,14 +64,46 @@ export async function GET(
   const localPath = candidatePaths.find((p) => fs.existsSync(p));
 
   if (localPath) {
-    const fileBuffer = fs.readFileSync(localPath);
     const ext = path.extname(localPath).toLowerCase();
     const contentType = mimeMap[ext] ?? "application/octet-stream";
+    const stat = fs.statSync(localPath);
+    const fileSize = stat.size;
+    const range = req.headers.get("range");
 
+    if (range && (contentType.startsWith("video/") || contentType.startsWith("audio/"))) {
+      const parts = range.replace(/bytes=/, "").split("-");
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+      const chunksize = end - start + 1;
+
+      const fileStream = fs.createReadStream(localPath, { start, end });
+      const stream = new ReadableStream({
+        start(controller) {
+          fileStream.on("data", (chunk) => controller.enqueue(chunk));
+          fileStream.on("end", () => controller.close());
+          fileStream.on("error", (err) => controller.error(err));
+        },
+      });
+
+      return new NextResponse(stream as any, {
+        status: 206,
+        headers: {
+          "Content-Range": `bytes ${start}-${end}/${fileSize}`,
+          "Accept-Ranges": "bytes",
+          "Content-Length": chunksize.toString(),
+          "Content-Type": contentType,
+          "Cache-Control": "public, max-age=31536000, immutable",
+        },
+      });
+    }
+
+    const fileBuffer = fs.readFileSync(localPath);
     return new NextResponse(fileBuffer, {
       status: 200,
       headers: {
         "Content-Type": contentType,
+        "Accept-Ranges": "bytes",
+        "Content-Length": fileSize.toString(),
         "Cache-Control": "public, max-age=31536000, immutable",
       },
     });
@@ -88,11 +120,14 @@ export async function GET(
       ])
     );
 
+    const rangeHeader = req.headers.get("range") || undefined;
+
     for (const keyToTry of candidateR2Keys) {
       try {
         const command = new GetObjectCommand({
           Bucket: R2_BUCKET_NAME,
           Key: keyToTry,
+          Range: rangeHeader,
         });
 
         const response = await s3Client.send(command);
@@ -101,11 +136,14 @@ export async function GET(
           const stream = response.Body.transformToWebStream();
           const ext = path.extname(lastFileName).toLowerCase();
           const contentType = response.ContentType || mimeMap[ext] || "application/octet-stream";
+          const isPartial = !!response.ContentRange;
 
           return new NextResponse(stream as any, {
-            status: 200,
+            status: isPartial ? 206 : 200,
             headers: {
               "Content-Type": contentType,
+              "Accept-Ranges": "bytes",
+              ...(response.ContentRange ? { "Content-Range": response.ContentRange } : {}),
               ...(response.ContentLength ? { "Content-Length": response.ContentLength.toString() } : {}),
               "Cache-Control": "public, max-age=31536000, immutable",
             },
