@@ -189,7 +189,9 @@ function AssemblyCanvas({
     dir.castShadow = true;
     dir.shadow.mapSize.set(2048, 2048);
     scene.add(dir);
-    scene.add(Object.assign(new THREE.DirectionalLight(0x88ffcc, 0.3), { position: new THREE.Vector3(-10, 5, -10) }));
+    const fillLight = new THREE.DirectionalLight(0x88ffcc, 0.3);
+    fillLight.position.set(-10, 5, -10);
+    scene.add(fillLight);
     const rim = new THREE.PointLight(0xC4A35A, 0.8, 40);
     rim.position.set(5, 10, -5);
     scene.add(rim);
