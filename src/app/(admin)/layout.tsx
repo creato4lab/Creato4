@@ -17,7 +17,16 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     select: { role: true }
   });
 
-  if (user?.role !== "ADMIN") {
+  const adminEmails = [
+    "creato4lab@gmail.com",
+    ...(process.env.ADMIN_EMAILS || "").split(","),
+  ]
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+
+  const isAllowedAdmin = adminEmails.includes(session.user.email.toLowerCase());
+
+  if (user?.role !== "ADMIN" || !isAllowedAdmin) {
     redirect('/dashboard'); // Kick regular users to their dashboard
   }
 
