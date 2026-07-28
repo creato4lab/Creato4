@@ -3,6 +3,7 @@ import { getAdminProducts } from '@/actions/admin';
 import Link from 'next/link';
 import { Plus, Edit3, Trash2, Tag, BookOpen, Package } from 'lucide-react';
 import { DeleteProductButton } from './DeleteProductButton';
+import { getImageUrl } from '@/lib/imageUrl';
 
 export const metadata = { title: "Manage Products - Creato4 Admin" };
 
@@ -54,7 +55,7 @@ export default async function AdminProductsPage() {
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-lg bg-[#FAF8F5] border border-[#1A3C2F]/10 flex items-center justify-center shrink-0 overflow-hidden">
                           {product.images?.[0] ? (
-                            <img src={product.images[0]} alt={product.title} className="w-full h-full object-cover" />
+                            <img src={getImageUrl(product.images[0])} alt={product.title} className="w-full h-full object-cover" />
                           ) : (
                             <Package className="w-5 h-5 text-[#1A3C2F]/20" />
                           )}

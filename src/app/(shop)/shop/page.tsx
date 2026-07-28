@@ -6,6 +6,7 @@ import {
   Search, SlidersHorizontal, Cpu, Code, BookOpen, Layers,
   Download, Tag, Star, ArrowRight, ImageIcon, TrendingUp, Clock, DollarSign
 } from "lucide-react";
+import { getImageUrl } from "@/lib/imageUrl";
 
 export const metadata = {
   title: "Engineering Products Catalog — Creato4 Lab",
@@ -293,7 +294,7 @@ export default async function ShopPage(props: {
                       <div className="aspect-[4/3] bg-gradient-to-br from-[#1A3C2F]/5 to-[#1A3C2F]/10 relative overflow-hidden flex items-center justify-center">
                         {product.images?.[0] ? (
                           <img
-                            src={product.images[0]}
+                            src={getImageUrl(product.images[0])}
                             alt={product.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                           />

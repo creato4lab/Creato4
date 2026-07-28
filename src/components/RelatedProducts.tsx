@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { ArrowRight, ImageIcon } from "lucide-react";
 import { RatingStars } from "./RatingStars";
+import { getImageUrl } from "@/lib/imageUrl";
 
 interface RelatedProduct {
   id: string;
@@ -42,7 +43,7 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
           <div className="aspect-[4/3] bg-[#1A3C2F]/5 relative overflow-hidden flex items-center justify-center">
             {product.images?.[0] ? (
               <img
-                src={product.images[0]}
+                src={getImageUrl(product.images[0])}
                 alt={product.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />

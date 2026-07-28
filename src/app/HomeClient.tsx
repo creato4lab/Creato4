@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Preloader } from '@/components/Preloader';
 import { Navbar } from '@/components/Navbar';
+import { getImageUrl } from '@/lib/imageUrl';
 import { Hero } from '@/components/Hero';
 import { FromIdeaToReality } from '@/components/cinematic/FromIdeaToReality';
 import { QuickEntry } from '@/components/QuickEntry';
@@ -39,7 +40,7 @@ export default function HomeClient({ initialProducts = [] }: { initialProducts?:
       category,
       difficulty,
       price: `₹${product.price.toLocaleString('en-IN')}`,
-      image: product.images?.[0] || '/placeholder.jpg',
+      image: getImageUrl(product.images?.[0]) || '/placeholder.jpg',
       description: product.description,
       techStack: [...(product.hardwareUsed || []), ...(product.softwareUsed || [])],
       includes: product.whatsIncluded || [],

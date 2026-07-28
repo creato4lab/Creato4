@@ -2,6 +2,7 @@
 import React, { useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight, X, ZoomIn, ImageIcon } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { getImageUrl } from "@/lib/imageUrl";
 
 interface ProductImageGalleryProps {
   images: string[];
@@ -12,7 +13,7 @@ export function ProductImageGallery({ images, title }: ProductImageGalleryProps)
   const [active, setActive] = useState(0);
   const [lightbox, setLightbox] = useState(false);
 
-  const validImages = images.filter(Boolean);
+  const validImages = images.filter(Boolean).map(getImageUrl);
   const hasImages = validImages.length > 0;
 
   const prev = useCallback(() => setActive((a) => (a - 1 + validImages.length) % validImages.length), [validImages.length]);

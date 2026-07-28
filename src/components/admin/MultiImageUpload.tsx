@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { UploadCloud, Image as ImageIcon, X, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { getImageUrl } from "@/lib/imageUrl";
 
 interface ImageFileItem {
   id: string;
@@ -36,7 +37,7 @@ export function MultiImageUpload({ name, label, value = "", onChange }: MultiIma
       id: `existing_${i}_${url.slice(-12).replace(/[^a-z0-9]/gi, "")}`,
       file: new File([], url.split("/").pop() ?? "image"),
       name: url.split("/").pop() ?? "image",
-      previewUrl: url,   // URL works directly — no proxy needed
+      previewUrl: getImageUrl(url),  // normalize key → proper URL
       url,
       key: url,          // use url as key for delete fallback
       status: "success" as const,

@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { removeDevice } from "@/actions/license";
 import { BoardConnector } from "./BoardConnector";
+import { getImageUrl } from "@/lib/imageUrl";
 import { generateDownloadUrl } from "@/actions/download";
 import { ProfessionalPdfModal } from "./ProfessionalPdfModal";
 
@@ -246,7 +247,7 @@ export function LicenseCard({ license }: LicenseCardProps) {
           {/* Product image */}
           <div className="w-16 h-16 shrink-0 rounded-xl overflow-hidden bg-[#1A3C2F]/5 flex items-center justify-center">
             {license.product.images?.[0] ? (
-              <img src={license.product.images[0]} alt="" className="w-full h-full object-cover" />
+              <img src={getImageUrl(license.product.images[0])} alt="" className="w-full h-full object-cover" />
             ) : (
               <ImageIcon className="w-7 h-7 text-[#1A3C2F]/20" />
             )}
