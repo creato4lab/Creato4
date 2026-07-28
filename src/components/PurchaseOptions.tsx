@@ -71,7 +71,7 @@ const PURCHASE_TIERS: PurchaseTier[] = [
       "Supports popular dev boards",
       "No source code included",
     ],
-    priceMultiplier: 0.35,
+    priceMultiplier: 0,
   },
 ];
 
@@ -90,7 +90,7 @@ export function PurchaseOptions({ productId, productName, basePrice }: PurchaseO
   const visibleTiers = showAll ? PURCHASE_TIERS : PURCHASE_TIERS.slice(0, 3);
 
   return (
-    <div className="sticky top-28 bg-white border border-[#1A3C2F]/10 rounded-3xl shadow-[0_20px_60px_-15px_rgba(26,60,47,0.12)] p-6 sm:p-7">
+    <div className="sticky top-28 max-h-[calc(100vh-120px)] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#1A3C2F]/20 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent bg-white border border-[#1A3C2F]/10 rounded-3xl shadow-[0_20px_60px_-15px_rgba(26,60,47,0.12)] p-6 sm:p-7">
       <h2 className="text-lg font-black text-[#1A3C2F] mb-1">Purchase Options</h2>
       <p className="text-xs text-[#1A3C2F]/50 mb-5">Choose the package that fits your needs</p>
 
@@ -139,7 +139,7 @@ export function PurchaseOptions({ productId, productName, basePrice }: PurchaseO
 
               {/* Price (fixed right) */}
               <span className="text-sm font-extrabold text-[#1A3C2F] whitespace-nowrap flex-shrink-0 ml-1">
-                ₹{tierPrice.toLocaleString("en-IN")}
+                {tierPrice === 0 ? "Free" : `₹${tierPrice.toLocaleString("en-IN")}`}
               </span>
             </label>
           );
@@ -176,8 +176,10 @@ export function PurchaseOptions({ productId, productName, basePrice }: PurchaseO
 
       {/* Price display */}
       <div className="flex items-baseline gap-2 mb-4">
-        <span className="text-3xl font-black text-[#1A3C2F]">₹{price.toLocaleString("en-IN")}</span>
-        {selectedTier.priceMultiplier < 1 && (
+        <span className="text-3xl font-black text-[#1A3C2F]">
+          {price === 0 ? "Free" : `₹${price.toLocaleString("en-IN")}`}
+        </span>
+        {selectedTier.priceMultiplier > 0 && selectedTier.priceMultiplier < 1 && (
           <span className="text-sm text-[#1A3C2F]/40 line-through">
             ₹{basePrice.toLocaleString("en-IN")}
           </span>
