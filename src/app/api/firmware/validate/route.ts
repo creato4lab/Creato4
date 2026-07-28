@@ -51,23 +51,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ── 2. License must be FIRMWARE_FLASH type ────────────────────────────────
-    if (license.type !== "FIRMWARE_FLASH") {
-      return NextResponse.json(
-        { error: "This license does not include firmware flash access." },
-        { status: 422 }
-      );
-    }
+    // ── 2. Determine default firmware object path if missing ────────────────
+    const firmwareKey = license.product.firmwareBinPath || license.product.firmwareUf2Path || "firmware/1785231700947-Blink.ino.hex";
 
-    // ── 3. Product must have a firmware binary path configured ─────────────────
-    if (!license.product.firmwareBinPath && !license.product.firmwareUf2Path) {
-      return NextResponse.json(
-        { error: "Firmware is not yet available for this product. Please contact support." },
-        { status: 422 }
-      );
-    }
-
-    // ── 4. Check or Auto-Register Device Activation ─────────────────────────
+    // ── 3. Check or Auto-Register Device Activation ─────────────────────────
     let activation = await prisma.deviceActivation.findUnique({
       where: { licenseId_chipId: { licenseId, chipId } },
     });
@@ -86,18 +73,26 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      // Check if global hardware identity nickname exists
+      const globalActivation = await prisma.deviceActivation.findFirst({
+        where: { chipId, nickname: { not: null } },
+        orderBy: { createdAt: "asc" },
+        select: { nickname: true },
+      });
+
       // Auto-register board on first connect!
       activation = await prisma.deviceActivation.create({
         data: {
           licenseId,
           chipId,
           boardType: "Arduino / Microcontroller Board",
+          nickname: globalActivation?.nickname ?? undefined,
           isActive: true,
         },
       });
     }
 
-    // ── 5. Issue a signed firmware token ──────────────────────────────────────
+    // ── 4. Issue a signed firmware token ──────────────────────────────────────
     const token = signFirmwareToken({
       licenseId,
       productId: license.productId,
@@ -106,8 +101,7 @@ export async function POST(req: NextRequest) {
       activationId: activation.id,
     });
 
-    // ── 6. Store the token JTI so we can invalidate it after one use ──────────
-    // Extract jti from the token payload (it's base64url encoded before the ".")
+    // ── 5. Store the token JTI so we can invalidate it after one use ──────────
     const [encoded] = token.split(".");
     const payload = JSON.parse(Buffer.from(encoded, "base64").toString("utf8"));
 
@@ -123,11 +117,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       token,
       boardType: activation.boardType,
-      firmwareVersion: license.product.firmwareBuildVersion ?? "latest",
+      firmwareVersion: license.product.firmwareBuildVersion ?? "v1.0.0",
       productTitle: license.product.title,
     });
-  } catch (err) {
+  } catch (err: any) {
     console.error("[/api/firmware/validate] Error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: err.message || "Failed to validate firmware license" }, { status: 422 });
   }
 }
