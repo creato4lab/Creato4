@@ -23,48 +23,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyFirmwareToken } from "@/lib/firmwareToken";
 import prisma from "@/lib/prisma";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 
 // ─── R2 Config ────────────────────────────────────────────────────────────────
-// We use native fetch against the Cloudflare R2 S3-compatible endpoint.
-// Credentials must be set in Netlify environment variables:
-//   R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME
-//
-// For signed requests to a private bucket we use AWS Signature V4 (pure fetch).
+const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID ?? "";
+const R2_ACCESS_KEY = process.env.R2_ACCESS_KEY_ID ?? "";
+const R2_SECRET_KEY = process.env.R2_SECRET_ACCESS_KEY ?? "";
+const R2_BUCKET     = process.env.R2_BUCKET_NAME ?? "creato4-digital-assets";
+const R2_ENDPOINT   = `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`;
 
-const R2_ACCOUNT_ID  = process.env.R2_ACCOUNT_ID  ?? "";
-const R2_ACCESS_KEY  = process.env.R2_ACCESS_KEY_ID ?? "";
-const R2_SECRET_KEY  = process.env.R2_SECRET_ACCESS_KEY ?? "";
-const R2_BUCKET      = process.env.R2_BUCKET_NAME  ?? "creato4-digital-assets";
-const R2_ENDPOINT    = `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`;
-
-/** Minimal AWS Signature V4 request signer for a single GET. */
-async function signedR2Url(objectKey: string, expiresInSeconds = 60): Promise<string> {
-  const { SignatureV4 } = await import("@smithy/signature-v4");
-  const { Sha256 } = await import("@aws-crypto/sha256-js");
-
-  const signer = new SignatureV4({
-    credentials: { accessKeyId: R2_ACCESS_KEY, secretAccessKey: R2_SECRET_KEY },
-    region: "auto",
-    service: "s3",
-    sha256: Sha256,
-  });
-
-  const url = new URL(`${R2_ENDPOINT}/${R2_BUCKET}/${objectKey}`);
-  const signed = await signer.presign(
-    {
-      method: "GET",
-      hostname: url.hostname,
-      path: url.pathname,
-      protocol: "https:",
-      headers: { host: url.hostname },
-    },
-    { expiresIn: expiresInSeconds }
-  );
-
-  return `${signed.protocol}//${signed.hostname}${signed.path}?${new URLSearchParams(
-    signed.query as Record<string, string>
-  ).toString()}`;
-}
+const s3 = new S3Client({
+  region: "auto",
+  endpoint: R2_ENDPOINT,
+  credentials: {
+    accessKeyId: R2_ACCESS_KEY,
+    secretAccessKey: R2_SECRET_KEY,
+  },
+});
 
 // ─── Route Handler ────────────────────────────────────────────────────────────
 
@@ -119,7 +94,6 @@ export async function POST(req: NextRequest) {
 
     // ── 3. Determine which firmware object to serve ────────────────────────────
     const product = activation.license.product;
-    // Default to .bin (ESP32/ESP8266); UI will request the correct type
     const objectKey = product.firmwareBinPath ?? product.firmwareUf2Path;
     if (!objectKey) {
       return NextResponse.json(
@@ -129,17 +103,13 @@ export async function POST(req: NextRequest) {
     }
 
     // ── 4. Mark token as used BEFORE streaming ─────────────────────────────────
-    // Do this first so that if the stream is interrupted, the token is still
-    // consumed (preventing partial-flash retries without re-validation).
     await prisma.deviceActivation.update({
       where: { id: activation.id },
       data: { firmwareTokenUsed: true, lastSeenAt: new Date() },
     });
 
-    // ── 5. Fetch the binary from private R2 using a short-lived presigned URL ──
-    // If R2 credentials are not configured, fall back to a dev-mode error.
+    // ── 5. Fetch the binary from private R2 using S3Client ─────────────────────
     if (!R2_ACCOUNT_ID || !R2_ACCESS_KEY || !R2_SECRET_KEY) {
-      // ── DEV MODE: serve from /public/firmware-test.bin if it exists ──────────
       console.warn("[firmware/stream] R2 credentials not set — returning 501");
       return NextResponse.json(
         { error: "R2 storage not configured. Add R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME to your environment variables." },
@@ -147,33 +117,43 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const presignedUrl = await signedR2Url(objectKey, 30);
-    const r2Res = await fetch(presignedUrl);
+    try {
+      const r2Res = await s3.send(new GetObjectCommand({
+        Bucket: R2_BUCKET,
+        Key: objectKey,
+      }));
 
-    if (!r2Res.ok) {
-      console.error("[firmware/stream] R2 fetch failed:", r2Res.status, r2Res.statusText);
+      if (!r2Res.Body) {
+        return NextResponse.json(
+          { error: "Failed to retrieve firmware binary stream." },
+          { status: 502 }
+        );
+      }
+
+      const bytes = await r2Res.Body.transformToByteArray();
+      const isUf2 = objectKey.endsWith(".uf2");
+      const isHex = objectKey.endsWith(".hex");
+      const ext = isUf2 ? "uf2" : isHex ? "hex" : "bin";
+
+      return new Response(Buffer.from(bytes), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/octet-stream",
+          "Content-Length": bytes.length.toString(),
+          "Content-Disposition": `attachment; filename="${product.title.replace(/[^a-z0-9]/gi, "_")}_${payload.boardType}.${ext}"`,
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+          "X-Firmware-Version": product.firmwareBuildVersion ?? "latest",
+          "X-Board-Type": payload.boardType,
+        },
+      });
+    } catch (s3Err: any) {
+      console.error("[firmware/stream] R2 S3 error:", s3Err);
       return NextResponse.json(
-        { error: "Failed to retrieve firmware binary. Please contact support." },
+        { error: `Failed to retrieve firmware binary (${s3Err.message || "R2 Error"})` },
         { status: 502 }
       );
     }
-
-    const isUf2 = objectKey.endsWith(".uf2");
-    const contentType = isUf2 ? "application/octet-stream" : "application/octet-stream";
-
-    // Stream the body directly to the client
-    return new Response(r2Res.body, {
-      status: 200,
-      headers: {
-        "Content-Type": contentType,
-        "Content-Disposition": `attachment; filename="${product.title.replace(/[^a-z0-9]/gi, "_")}_${payload.boardType}.${isUf2 ? "uf2" : "bin"}"`,
-        // Prevent any caching of firmware binaries
-        "Cache-Control": "no-store, no-cache, must-revalidate",
-        "X-Firmware-Version": product.firmwareBuildVersion ?? "latest",
-        "X-Board-Type": payload.boardType,
-      },
-    });
-  } catch (err) {
+  } catch (err: any) {
     console.error("[/api/firmware/stream] Error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
