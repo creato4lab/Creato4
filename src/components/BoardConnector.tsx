@@ -93,6 +93,7 @@ export function BoardConnector({ licenseId, productName, maxActivations, activeC
   const [step, setStep] = useState<Step>("idle");
   const [detected, setDetected] = useState<DetectedBoard | null>(null);
   const [nickname, setNickname] = useState("");
+  const [isNameLocked, setIsNameLocked] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [logs, setLogs] = useState<string[]>([]);
   const [showSketch, setShowSketch] = useState<"esp32" | "arduino" | null>(null);
@@ -212,11 +213,14 @@ export function BoardConnector({ licenseId, productName, maxActivations, activeC
 
       setDetected({ chipId, boardType, usbVendorId, usbProductId, portLabel: vendorLabel });
 
-      // Auto-restore previously saved nickname for this Hardware ID across user account
+      // Auto-restore permanent hardware identity for this Chip ID across ALL accounts
       getExistingDeviceNickname(chipId).then((existingNickname) => {
         if (existingNickname) {
           setNickname(existingNickname);
-          log(`✨ Restored saved board name: "${existingNickname}"`);
+          setIsNameLocked(true);
+          log(`🔒 Recognized Permanent Hardware Identity: "${existingNickname}" (Locked)`);
+        } else {
+          setIsNameLocked(false);
         }
       }).catch(() => {});
 
@@ -461,16 +465,34 @@ export function BoardConnector({ licenseId, productName, maxActivations, activeC
                   </div>
 
                   <div>
-                    <label className="text-xs font-bold text-[#1A3C2F]/60 uppercase tracking-wider block mb-1.5">
-                      Device Nickname (optional)
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="text-xs font-bold text-[#1A3C2F]/60 uppercase tracking-wider block">
+                        Device Nickname {isNameLocked ? "(Hardware Locked)" : "(Optional)"}
+                      </label>
+                      {isNameLocked && (
+                        <span className="text-[0.65rem] font-bold text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-md flex items-center gap-1">
+                          🔒 Global Hardware Identity
+                        </span>
+                      )}
+                    </div>
                     <input
                       type="text"
                       value={nickname}
+                      readOnly={isNameLocked}
+                      disabled={isNameLocked}
                       onChange={(e) => setNickname(e.target.value)}
                       placeholder='e.g. "Lab Bench Unit #1"'
-                      className="w-full border border-[#1A3C2F]/15 rounded-xl px-4 py-2.5 text-sm text-[#1A3C2F] focus:outline-none focus:ring-2 focus:ring-[#C4A35A]/40"
+                      className={`w-full border rounded-xl px-4 py-2.5 text-sm transition-colors ${
+                        isNameLocked
+                          ? "bg-amber-50 border-amber-300 font-bold text-amber-900 cursor-not-allowed shadow-xs"
+                          : "border-[#1A3C2F]/15 text-[#1A3C2F] focus:outline-none focus:ring-2 focus:ring-[#C4A35A]/40"
+                      }`}
                     />
+                    {isNameLocked && (
+                      <p className="text-[0.65rem] font-semibold text-amber-800 mt-1.5">
+                        🔒 This physical board is bound to permanent hardware identity <strong>"{nickname}"</strong> across the platform. Name cannot be altered.
+                      </p>
+                    )}
                   </div>
 
                   <div className="flex gap-2.5">

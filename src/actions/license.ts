@@ -77,6 +77,15 @@ export async function activateDevice(
 
     if (!license) return { error: "License not found or inactive" };
 
+    // Check if a permanent global hardware identity exists for this chipId
+    const globalActivation = await prisma.deviceActivation.findFirst({
+      where: { chipId, nickname: { not: null } },
+      orderBy: { createdAt: "asc" },
+      select: { nickname: true },
+    });
+
+    const finalNickname = globalActivation?.nickname?.trim() || nickname?.trim() || undefined;
+
     // 2. Check if this chipId is already registered on this license
     const existing = await prisma.deviceActivation.findUnique({
       where: { licenseId_chipId: { licenseId, chipId } },
@@ -87,7 +96,7 @@ export async function activateDevice(
         // Already registered — just update lastSeenAt
         await prisma.deviceActivation.update({
           where: { id: existing.id },
-          data: { lastSeenAt: new Date(), boardType, nickname: nickname ?? existing.nickname },
+          data: { lastSeenAt: new Date(), boardType, nickname: finalNickname ?? existing.nickname },
         });
         return { success: true, activationId: existing.id, alreadyRegistered: true };
       } else {
@@ -100,7 +109,7 @@ export async function activateDevice(
         }
         await prisma.deviceActivation.update({
           where: { id: existing.id },
-          data: { isActive: true, lastSeenAt: new Date(), boardType, nickname },
+          data: { isActive: true, lastSeenAt: new Date(), boardType, nickname: finalNickname },
         });
         return { success: true, activationId: existing.id };
       }
@@ -113,13 +122,13 @@ export async function activateDevice(
       };
     }
 
-    // 4. Create new activation
+    // 4. Create new activation with preserved hardware identity
     const activation = await prisma.deviceActivation.create({
       data: {
         licenseId,
         chipId,
         boardType,
-        nickname,
+        nickname: finalNickname,
         usbVendorId,
         usbProductId,
         isActive: true,
