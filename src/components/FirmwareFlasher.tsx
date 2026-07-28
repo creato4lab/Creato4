@@ -55,7 +55,7 @@ interface Props {
 const FLASH_SUPPORTED: Record<string, { board: string; type: "esp" | "rp2040" | "arduino" }> = {
   // Arduino Uno / Nano / Mega (USB Serial CH340, FT232R, ATmega16U2)
   "1A86:7523": { board: "Arduino Uno / Nano (CH340)", type: "arduino" },
-  "0403:6001": { board: "Arduino Nano (FT232R)", type: "arduino" },
+  "0403:6001": { board: "Arduino Uno / Nano (FTDI)", type: "arduino" },
   "2341:0043": { board: "Arduino Uno R3 (ATmega16U2)", type: "arduino" },
   "2341:0001": { board: "Arduino Uno R3", type: "arduino" },
   "2341:0042": { board: "Arduino Mega 2560 R3", type: "arduino" },
@@ -172,7 +172,19 @@ export function FirmwareFlasher({ licenseId, productTitle, isUf2 = false, activa
       const vidpid = `${usbVendorId.toString(16).toUpperCase().padStart(4, "0")}:${usbProductId.toString(16).toUpperCase().padStart(4, "0")}`;
 
       const boardInfo = FLASH_SUPPORTED[vidpid];
-      const activeBoardName = boardInfo?.board || selectedBoard;
+
+      // Match active registered device activation if present
+      const registeredActivation = activations?.find((a) => a.isActive);
+
+      let activeBoardName = selectedBoard;
+      if (registeredActivation) {
+        activeBoardName = registeredActivation.nickname
+          ? `${registeredActivation.nickname} (${registeredActivation.boardType})`
+          : registeredActivation.boardType;
+      } else if (boardInfo?.board) {
+        activeBoardName = boardInfo.board;
+      }
+
       log(`✅ Connected hardware: ${activeBoardName} (${vidpid})`);
       setDetectedBoard(activeBoardName);
 
@@ -236,11 +248,16 @@ export function FirmwareFlasher({ licenseId, productTitle, isUf2 = false, activa
         log("ℹ️ Standard serial stream complete.");
       }
 
-      // Fallback: Generate deterministic Hardware Chip ID from USB VID:PID if sketch didn't output one
+      // Match registered device activation hardware ID or generate deterministic fallback
       if (!detectedChipId) {
-        const boardTag = activeBoardName.replace(/[^A-Z0-9]/gi, "_").toUpperCase();
-        detectedChipId = `${boardTag}_${vidpid.replace(":", "")}_88A9F10C`;
-        log(`🔑 Generated Hardware Chip ID: ${detectedChipId}`);
+        if (registeredActivation?.chipId) {
+          detectedChipId = registeredActivation.chipId;
+          log(`🔑 Matched Registered Hardware Chip ID: ${detectedChipId}`);
+        } else {
+          const boardTag = activeBoardName.replace(/[^A-Z0-9]/gi, "_").toUpperCase();
+          detectedChipId = `HW_${boardTag}_${vidpid.replace(":", "")}_88A9F10C`;
+          log(`🔑 Generated Hardware Chip ID: ${detectedChipId}`);
+        }
       } else {
         log(`🎉 Chip ID detected: ${detectedChipId}`);
       }
@@ -257,7 +274,7 @@ export function FirmwareFlasher({ licenseId, productTitle, isUf2 = false, activa
         error(err.message || "Failed to connect to the board.");
       }
     }
-  }, [isSupported, licenseId, selectedBoard, log, error]);
+  }, [isSupported, licenseId, selectedBoard, activations, log, error]);
 
   // ── Step 2: Validate license on the server ────────────────────────────────
   const validateLicense = async (cId: string) => {
