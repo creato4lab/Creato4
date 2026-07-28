@@ -5,6 +5,7 @@ import {
   Usb, Cpu, CheckCircle, AlertTriangle, Loader2,
   X, Terminal, Info, Trash2, Shield
 } from "lucide-react";
+import { getExistingDeviceNickname } from "@/actions/license";
 
 // ─── Known USB VID/PID → Board Type mapping ─────────────────────────────────
 // Supports ESP32 and full Arduino family
@@ -210,6 +211,15 @@ export function BoardConnector({ licenseId, productName, maxActivations, activeC
       await port.close().catch(() => {});
 
       setDetected({ chipId, boardType, usbVendorId, usbProductId, portLabel: vendorLabel });
+
+      // Auto-restore previously saved nickname for this Hardware ID across user account
+      getExistingDeviceNickname(chipId).then((existingNickname) => {
+        if (existingNickname) {
+          setNickname(existingNickname);
+          log(`✨ Restored saved board name: "${existingNickname}"`);
+        }
+      }).catch(() => {});
+
       setStep("confirm");
     } catch (err: any) {
       if (err?.name === "NotFoundError") {

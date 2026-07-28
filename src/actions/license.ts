@@ -196,3 +196,25 @@ export async function getDashboardStats() {
     return null;
   }
 }
+
+// ─── Fetch existing nickname for a chip ID ───────────────────
+export async function getExistingDeviceNickname(chipId: string) {
+  const session = await auth();
+  if (!session?.user?.id) return null;
+
+  try {
+    const existing = await prisma.deviceActivation.findFirst({
+      where: {
+        chipId,
+        nickname: { not: null },
+        license: { userId: session.user.id },
+      },
+      orderBy: { lastSeenAt: "desc" },
+      select: { nickname: true },
+    });
+
+    return existing?.nickname ?? null;
+  } catch (err) {
+    return null;
+  }
+}
