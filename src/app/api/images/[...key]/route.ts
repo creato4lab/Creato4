@@ -79,30 +79,41 @@ export async function GET(
 
   // 2. Fallback to Cloudflare R2 bucket streaming
   if (s3Client) {
-    try {
-      const command = new GetObjectCommand({
-        Bucket: R2_BUCKET_NAME,
-        Key: r2ObjectKey,
-      });
+    const candidateR2Keys = Array.from(
+      new Set([
+        r2ObjectKey,
+        `images/${lastFileName}`,
+        `videos/${lastFileName}`,
+        `cad-files/${lastFileName}`,
+      ])
+    );
 
-      const response = await s3Client.send(command);
-
-      if (response.Body) {
-        const stream = response.Body.transformToWebStream();
-        const ext = path.extname(lastFileName).toLowerCase();
-        const contentType = response.ContentType || mimeMap[ext] || "application/octet-stream";
-
-        return new NextResponse(stream as any, {
-          status: 200,
-          headers: {
-            "Content-Type": contentType,
-            ...(response.ContentLength ? { "Content-Length": response.ContentLength.toString() } : {}),
-            "Cache-Control": "public, max-age=31536000, immutable",
-          },
+    for (const keyToTry of candidateR2Keys) {
+      try {
+        const command = new GetObjectCommand({
+          Bucket: R2_BUCKET_NAME,
+          Key: keyToTry,
         });
+
+        const response = await s3Client.send(command);
+
+        if (response.Body) {
+          const stream = response.Body.transformToWebStream();
+          const ext = path.extname(lastFileName).toLowerCase();
+          const contentType = response.ContentType || mimeMap[ext] || "application/octet-stream";
+
+          return new NextResponse(stream as any, {
+            status: 200,
+            headers: {
+              "Content-Type": contentType,
+              ...(response.ContentLength ? { "Content-Length": response.ContentLength.toString() } : {}),
+              "Cache-Control": "public, max-age=31536000, immutable",
+            },
+          });
+        }
+      } catch (err: any) {
+        // Try next candidate key in R2
       }
-    } catch (err: any) {
-      console.warn(`[api/images] R2 fetch failed for key '${r2ObjectKey}':`, err.message);
     }
   }
 
