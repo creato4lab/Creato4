@@ -90,7 +90,7 @@ export function PurchaseOptions({ productId, productName, basePrice }: PurchaseO
   const visibleTiers = showAll ? PURCHASE_TIERS : PURCHASE_TIERS.slice(0, 3);
 
   return (
-    <div className="sticky top-28 max-h-[calc(100vh-120px)] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#1A3C2F]/20 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent bg-white border border-[#1A3C2F]/10 rounded-3xl shadow-[0_20px_60px_-15px_rgba(26,60,47,0.12)] p-6 sm:p-7">
+    <div className="bg-white border border-[#1A3C2F]/10 rounded-3xl shadow-[0_20px_60px_-15px_rgba(26,60,47,0.12)] p-6 sm:p-7">
       <h2 className="text-lg font-black text-[#1A3C2F] mb-1">Purchase Options</h2>
       <p className="text-xs text-[#1A3C2F]/50 mb-5">Choose the package that fits your needs</p>
 

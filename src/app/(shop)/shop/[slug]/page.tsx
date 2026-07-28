@@ -396,7 +396,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
           </div>
 
           {/* ── Right Column: Purchase Options (Sticky Sidebar) ── */}
-          <div id="purchase" className="w-full lg:w-[380px] shrink-0 lg:sticky lg:top-28">
+          <div id="purchase" className="w-full lg:w-[380px] shrink-0 lg:sticky lg:top-28 self-start">
             <PurchaseOptions
               productId={product.id}
               productName={product.title}
