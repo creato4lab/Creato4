@@ -5,7 +5,7 @@ import { getProductBySlug, getRelatedProducts } from "@/actions/product";
 import {
   ArrowLeft, Check, AlertTriangle, Cpu, Code, Download,
   Tag, CalendarDays, History, Layers, Zap, Star, Package,
-  GitBranch, Shield
+  GitBranch, Shield, Box
 } from "lucide-react";
 import { ProductImageGallery } from "@/components/ProductImageGallery";
 import { ProductFAQ } from "@/components/ProductFAQ";
@@ -271,8 +271,36 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
             {/* 6. 3D Interactive PCB Inspection */}
             {(product.pcbGerberPath || product.pcbPreviewImage || product.category === 'PCB_DESIGN' || product.category === 'ARDUINO' || product.category === 'ESP32') && (
               <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
-                <SectionHeader icon={<Layers className="w-4 h-4 text-[#C4A35A]" />} title="3D Interactive PCB Inspection" />
-                <PcbViewer3D boardTitle={`${product.title} PCB`} pcbImage={product.pcbPreviewImage} />
+                <div className="flex items-center justify-between mb-5">
+                  <SectionHeader icon={<Layers className="w-4 h-4 text-[#C4A35A]" />} title="3D Interactive PCB Inspection" noMargin />
+                  {product.pcbGerberPath && (
+                    <a
+                      href={getImageUrl(product.pcbGerberPath)}
+                      download
+                      className="flex items-center gap-1.5 text-xs font-bold text-[#1A3C2F] bg-[#1A3C2F]/5 hover:bg-[#1A3C2F]/10 border border-[#1A3C2F]/10 px-3 py-2 rounded-xl transition-colors"
+                    >
+                      <Download className="w-3.5 h-3.5" /> Download Gerber Files
+                    </a>
+                  )}
+                </div>
+                <PcbViewer3D
+                  boardTitle={`${product.title} PCB`}
+                  pcbImage={product.pcbPreviewImage || (product.images?.[0] ? getImageUrl(product.images[0]) : undefined)}
+                />
+              </section>
+            )}
+
+            {/* 6b. CAD Model Preview */}
+            {product.cadPreviewImage && (
+              <section className="bg-white rounded-3xl p-8 border border-[#1A3C2F]/8 shadow-sm">
+                <SectionHeader icon={<Box className="w-4 h-4 text-[#C4A35A]" />} title="CAD Model Preview" />
+                <div className="rounded-2xl overflow-hidden border border-[#1A3C2F]/10 bg-[#1A3C2F]/3">
+                  <img
+                    src={getImageUrl(product.cadPreviewImage)}
+                    alt={`${product.title} CAD Model`}
+                    className="w-full object-contain max-h-[500px]"
+                  />
+                </div>
               </section>
             )}
 
