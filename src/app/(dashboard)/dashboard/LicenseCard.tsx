@@ -294,6 +294,7 @@ export function LicenseCard({ license }: Props) {
             licenseId={license.id}
             productTitle={license.product.title}
             isUf2={isUf2}
+            activations={license.activations}
             onClose={() => setShowFlasher(false)}
           />
         )}

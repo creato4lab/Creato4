@@ -34,11 +34,20 @@ type Step =
   | "done"
   | "error";
 
+interface Activation {
+  id: string;
+  chipId: string;
+  boardType: string;
+  nickname?: string | null;
+  isActive?: boolean;
+}
+
 interface Props {
   licenseId: string;
   productTitle: string;
   /** If true the firmware is .uf2 (RP2040), otherwise .bin (ESP32/ESP8266) */
   isUf2?: boolean;
+  activations?: Activation[];
   onClose?: () => void;
 }
 
@@ -92,17 +101,29 @@ void loop() {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export function FirmwareFlasher({ licenseId, productTitle, isUf2 = false, onClose }: Props) {
+export function FirmwareFlasher({ licenseId, productTitle, isUf2 = false, activations = [], onClose }: Props) {
+  const activeDevices = activations.filter((a) => a.isActive !== false);
+
   const [step, setStep] = useState<Step>("idle");
   const [logs, setLogs] = useState<string[]>([]);
   const [errorMsg, setErrorMsg] = useState("");
   const [progress, setProgress] = useState(0);
-  const [selectedBoard, setSelectedBoard] = useState<string>("Arduino Uno R3");
+  const [selectedBoard, setSelectedBoard] = useState<string>(
+    activeDevices.length > 0
+      ? activeDevices[0].nickname || activeDevices[0].boardType
+      : ""
+  );
   const [boardNickname, setBoardNickname] = useState<string>("");
   const [detectedBoard, setDetectedBoard] = useState<string>("");
   const [chipId, setChipId] = useState<string>("");
   const [firmwareVersion, setFirmwareVersion] = useState<string>("");
   const [showSketch, setShowSketch] = useState(false);
+
+  React.useEffect(() => {
+    if (activeDevices.length > 0 && !selectedBoard) {
+      setSelectedBoard(activeDevices[0].nickname || activeDevices[0].boardType);
+    }
+  }, [activations]);
 
   const portRef = useRef<any>(null);
   const logEndRef = useRef<HTMLDivElement>(null);
@@ -457,12 +478,21 @@ export function FirmwareFlasher({ licenseId, productTitle, isUf2 = false, onClos
                       onChange={(e) => setSelectedBoard(e.target.value)}
                       className="w-full bg-white border border-[#1A3C2F]/15 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#1A3C2F] focus:outline-none focus:border-[#1A3C2F] shadow-xs"
                     >
-                      <option value="Arduino Uno R3">Arduino Uno R3 (ATmega328P)</option>
-                      <option value="Arduino Nano">Arduino Nano (ATmega328P)</option>
-                      <option value="Arduino Mega 2560">Arduino Mega 2560</option>
-                      <option value="ESP32 / ESP32-S3">ESP32 / ESP32-S3 / ESP32-C3</option>
-                      <option value="ESP8266 NodeMCU">ESP8266 NodeMCU</option>
-                      <option value="Raspberry Pi RP2040">Raspberry Pi RP2040 (Pico / Pico 2)</option>
+                      {activeDevices.length > 0 ? (
+                        activeDevices.map((dev) => {
+                          const label = dev.nickname
+                            ? `${dev.nickname} (${dev.boardType})`
+                            : `${dev.boardType} (${dev.chipId.slice(0, 10)}...)`;
+                          const value = dev.nickname || dev.boardType;
+                          return (
+                            <option key={dev.id} value={value}>
+                              {label}
+                            </option>
+                          );
+                        })
+                      ) : (
+                        <option value="">No added devices found — Please connect & register a board first</option>
+                      )}
                     </select>
                   </div>
 
