@@ -13,6 +13,7 @@ import { RelatedProducts } from "@/components/RelatedProducts";
 import { PurchaseOptions } from "@/components/PurchaseOptions";
 import { RatingStars } from "@/components/RatingStars";
 import { PcbViewer3D } from "@/components/PcbViewer3D";
+import { getImageUrl } from "@/lib/imageUrl";
 import { SITE_CONFIG } from "@/lib/constants";
 import { generateProductSchema } from "@/lib/schemas";
 
@@ -294,11 +295,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
                     />
                   ) : (
                     <video
-                      src={
-                        product.videoUrl.startsWith("http")
-                          ? product.videoUrl
-                          : `/api/download?productId=${product.id}&fileType=video`
-                      }
+                      src={getImageUrl(product.videoUrl)}
                       controls
                       controlsList="nodownload"
                       className="w-full h-full object-contain"
