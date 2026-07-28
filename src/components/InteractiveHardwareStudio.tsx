@@ -2,7 +2,7 @@
 
 /**
  * InteractiveHardwareStudio.tsx
- * Premium 3-mode hardware viewer — PCB Gerber | 3D PCB | 3D Assembly
+ * Premium 3-mode hardware viewer — PCB Gerber | 3D PCB | 3D Assembly (Step-by-step part inspection)
  */
 
 import React, {
@@ -11,9 +11,8 @@ import React, {
 import { motion, AnimatePresence } from "motion/react";
 import {
   Cpu, Box, Layers, Download, RotateCcw, Maximize2, Eye,
-  EyeOff, Grid3X3, Play, Pause, Search, ChevronRight,
-  SlidersHorizontal, Loader2, AlertTriangle,
-  X, Zap, Monitor, List,
+  EyeOff, Grid3X3, Play, Pause, Search, ChevronLeft, ChevronRight,
+  Loader2, AlertTriangle, X, Zap, Monitor, List, CheckCircle2, Focus
 } from "lucide-react";
 import JSZip from "jszip";
 import * as THREE from "three";
@@ -143,10 +142,10 @@ function EmptyState({ mode }: { mode: StudioMode }) {
 
 // ─── Assembly Three.js Canvas ────────────────────────────────────────────────
 function AssemblyCanvas({
-  parts, wireframe, showGrid, autoRotate, explodeAmount,
+  parts, wireframe, showGrid, autoRotate,
 }: {
   parts: AssemblyPart[]; wireframe: boolean; showGrid: boolean;
-  autoRotate: boolean; explodeAmount: number;
+  autoRotate: boolean;
 }) {
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -156,7 +155,7 @@ function AssemblyCanvas({
   const frameRef = useRef<number>(0);
   const isDraggingRef = useRef(false);
   const prevPointerRef = useRef({ x: 0, y: 0 });
-  const sphericalRef = useRef(new THREE.Spherical(15, Math.PI / 3, Math.PI / 4));
+  const sphericalRef = useRef(new THREE.Spherical(25, Math.PI / 3, Math.PI / 4));
   const targetRef = useRef(new THREE.Vector3(0, 0, 0));
   const gridRef = useRef<THREE.GridHelper | null>(null);
 
@@ -180,30 +179,32 @@ function AssemblyCanvas({
     scene.background = new THREE.Color("#0A1A12");
     sceneRef.current = scene;
 
-    const camera = new THREE.PerspectiveCamera(50, w / h, 0.01, 200);
+    const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 500);
     cameraRef.current = camera;
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
     const dir = new THREE.DirectionalLight(0xffffff, 1.5);
-    dir.position.set(10, 20, 10);
+    dir.position.set(20, 30, 20);
     dir.castShadow = true;
     dir.shadow.mapSize.set(2048, 2048);
     scene.add(dir);
-    const fillLight = new THREE.DirectionalLight(0x88ffcc, 0.3);
-    fillLight.position.set(-10, 5, -10);
+
+    const fillLight = new THREE.DirectionalLight(0x88ffcc, 0.4);
+    fillLight.position.set(-20, 10, -20);
     scene.add(fillLight);
-    const rim = new THREE.PointLight(0xC4A35A, 0.8, 40);
-    rim.position.set(5, 10, -5);
+
+    const rim = new THREE.PointLight(0xC4A35A, 0.8, 50);
+    rim.position.set(10, 15, -10);
     scene.add(rim);
 
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.MeshStandardMaterial({ color: "#0D2018", roughness: 1 }));
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshStandardMaterial({ color: "#0D2018", roughness: 1 }));
     floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -0.05;
+    floor.position.y = -0.1;
     floor.receiveShadow = true;
     scene.add(floor);
 
-    const grid = new THREE.GridHelper(40, 40, "#1A3C2F", "#1A3C2F");
-    (grid.material as THREE.Material).opacity = 0.4;
+    const grid = new THREE.GridHelper(80, 80, "#1A3C2F", "#1A3C2F");
+    (grid.material as THREE.Material).opacity = 0.3;
     (grid.material as THREE.Material).transparent = true;
     scene.add(grid);
     gridRef.current = grid;
@@ -221,7 +222,7 @@ function AssemblyCanvas({
     let rotAngle = sphericalRef.current.theta;
     const animate = () => {
       frameRef.current = requestAnimationFrame(animate);
-      if (!isDraggingRef.current) {
+      if (!isDraggingRef.current && autoRotate) {
         rotAngle += 0.003;
         sphericalRef.current.theta = rotAngle;
       }
@@ -242,8 +243,8 @@ function AssemblyCanvas({
       rotAngle = sphericalRef.current.theta;
     };
     const onUp = () => { isDraggingRef.current = false; };
-    const onWheel = (e: WheelEvent) => { e.preventDefault(); sphericalRef.current.radius = Math.max(2, Math.min(50, sphericalRef.current.radius + e.deltaY * 0.02)); };
-    const onReset = () => { sphericalRef.current.set(15, Math.PI / 3, Math.PI / 4); rotAngle = sphericalRef.current.theta; targetRef.current.set(0, 0, 0); };
+    const onWheel = (e: WheelEvent) => { e.preventDefault(); sphericalRef.current.radius = Math.max(5, Math.min(150, sphericalRef.current.radius + e.deltaY * 0.04)); };
+    const onReset = () => { sphericalRef.current.set(25, Math.PI / 3, Math.PI / 4); rotAngle = sphericalRef.current.theta; targetRef.current.set(0, 0, 0); };
 
     mount.addEventListener("pointerdown", onDown);
     mount.addEventListener("pointermove", onMove);
@@ -266,11 +267,16 @@ function AssemblyCanvas({
 
   useEffect(() => { if (gridRef.current) gridRef.current.visible = showGrid; }, [showGrid]);
 
+  // Sync parts into scene and calculate camera framing
   useEffect(() => {
     const scene = sceneRef.current;
     if (!scene) return;
+
     meshesRef.current.forEach((m) => scene.remove(m));
     meshesRef.current.clear();
+
+    const visibleBox = new THREE.Box3();
+
     parts.forEach((part) => {
       const geo = part.geometry.clone();
       geo.computeVertexNormals();
@@ -283,12 +289,30 @@ function AssemblyCanvas({
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       mesh.visible = part.visible;
-      const dir = part.originalPosition.clone().normalize();
-      mesh.position.copy(part.originalPosition.clone().add(dir.multiplyScalar(explodeAmount * 2)));
+      mesh.position.copy(part.originalPosition);
       scene.add(mesh);
       meshesRef.current.set(part.id, mesh);
+
+      if (part.visible) {
+        const partBox = new THREE.Box3().setFromObject(mesh);
+        visibleBox.union(partBox);
+      }
     });
-  }, [parts, wireframe, explodeAmount]);
+
+    // Auto-fit camera framing to visible parts
+    if (!visibleBox.isEmpty()) {
+      const center = new THREE.Vector3();
+      visibleBox.getCenter(center);
+      const size = new THREE.Vector3();
+      visibleBox.getSize(size);
+      const maxDim = Math.max(size.x, size.y, size.z);
+      if (maxDim > 0) {
+        const fitRadius = Math.max(maxDim * 2.2, 12);
+        sphericalRef.current.radius = fitRadius;
+        targetRef.current.copy(center);
+      }
+    }
+  }, [parts, wireframe]);
 
   return <div ref={mountRef} className="absolute inset-0 cursor-grab active:cursor-grabbing" />;
 }
@@ -300,8 +324,9 @@ function AssemblyViewerPanel({ zipPath, title }: { zipPath?: string | null; titl
   const [err, setErr] = useState("");
   const [wireframe, setWireframe] = useState(false);
   const [showGrid, setShowGrid] = useState(true);
-  const [autoRotate, setAutoRotate] = useState(true);
-  const [explode, setExplode] = useState(0);
+  const [autoRotate, setAutoRotate] = useState(false);
+  const [activePartIndex, setActivePartIndex] = useState(0);
+  const [modeSingle, setModeSingle] = useState(true); // Default to one-by-one inspection!
   const [search, setSearch] = useState("");
   const [panelOpen, setPanelOpen] = useState(true);
 
@@ -314,7 +339,7 @@ function AssemblyViewerPanel({ zipPath, title }: { zipPath?: string | null; titl
     fetch(url).then((r) => r.arrayBuffer()).then(async (buf) => {
       const zip = await JSZip.loadAsync(buf);
       const stlFiles = Object.entries(zip.files).filter(([n]) => n.toLowerCase().endsWith(".stl") && !zip.files[n].dir);
-      if (!stlFiles.length) { setErr("No STL files found"); setStatus("error"); return; }
+      if (!stlFiles.length) { setErr("No STL files found in assembly ZIP"); setStatus("error"); return; }
       const { STLLoader } = await import("three-stdlib");
       const loader = new STLLoader();
       const loaded: AssemblyPart[] = [];
@@ -325,7 +350,7 @@ function AssemblyViewerPanel({ zipPath, title }: { zipPath?: string | null; titl
           const geo = loader.parse(ab);
           geo.computeBoundingBox();
           if (geo.boundingBox) combinedBbox.union(geo.boundingBox);
-          loaded.push({ id: name, name: name.replace(".stl","").replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase()), geometry: geo, visible: true, color: COLORS[loaded.length % COLORS.length], originalPosition: new THREE.Vector3() });
+          loaded.push({ id: name, name: name.replace(".stl","").replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase()), geometry: geo, visible: false, color: COLORS[loaded.length % COLORS.length], originalPosition: new THREE.Vector3() });
         } catch {}
       }
       const center = new THREE.Vector3();
@@ -337,12 +362,43 @@ function AssemblyViewerPanel({ zipPath, title }: { zipPath?: string | null; titl
         p.originalPosition = pc.clone().sub(center);
         p.geometry.translate(-center.x, -center.y, -center.z);
       });
+
+      // Show first part by default for step-by-step JLCPCB style inspection!
+      if (loaded.length > 0) {
+        loaded[0].visible = true;
+      }
       setParts(loaded);
+      setActivePartIndex(0);
       setStatus("ready");
     }).catch((e) => { setErr(e.message); setStatus("error"); });
   }, [zipPath]);
 
-  const togglePart = useCallback((id: string) => setParts((p) => p.map((pt) => pt.id === id ? { ...pt, visible: !pt.visible } : pt)), []);
+  // Select single part mode or toggle part visibility
+  const selectPart = useCallback((index: number) => {
+    setActivePartIndex(index);
+    setParts((prev) => prev.map((pt, idx) => ({
+      ...pt,
+      visible: modeSingle ? idx === index : (idx === index ? !pt.visible : pt.visible),
+    })));
+  }, [modeSingle]);
+
+  const toggleAll = (visible: boolean) => {
+    setModeSingle(false);
+    setParts((p) => p.map((pt) => ({ ...pt, visible })));
+  };
+
+  const nextPart = () => {
+    if (parts.length === 0) return;
+    const nextIdx = (activePartIndex + 1) % parts.length;
+    selectPart(nextIdx);
+  };
+
+  const prevPart = () => {
+    if (parts.length === 0) return;
+    const prevIdx = (activePartIndex - 1 + parts.length) % parts.length;
+    selectPart(prevIdx);
+  };
+
   const filtered = useMemo(() => parts.filter((p) => p.name.toLowerCase().includes(search.toLowerCase())), [parts, search]);
 
   if (!zipPath) return <EmptyState mode="assembly" />;
@@ -354,41 +410,80 @@ function AssemblyViewerPanel({ zipPath, title }: { zipPath?: string | null; titl
         {panelOpen && (
           <motion.div initial={{ x: -280, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -280, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="w-60 flex-shrink-0 bg-black/50 backdrop-blur-md border-r border-white/10 flex flex-col z-10"
+            className="w-64 flex-shrink-0 bg-black/60 backdrop-blur-md border-r border-white/10 flex flex-col z-10"
           >
             <div className="p-4 border-b border-white/10">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <List className="w-3.5 h-3.5 text-[#C4A35A]" />
-                  <span className="text-xs font-black text-white/80 uppercase tracking-wider">Assembly</span>
-                  <span className="text-[0.6rem] bg-[#C4A35A]/20 text-[#C4A35A] px-1.5 py-0.5 rounded-full font-bold">
-                    {parts.filter(p=>p.visible).length}/{parts.length}
+                  <Focus className="w-3.5 h-3.5 text-[#C4A35A]" />
+                  <span className="text-xs font-black text-white/90 uppercase tracking-wider">Part Inspector</span>
+                  <span className="text-[0.6rem] bg-[#C4A35A]/20 text-[#C4A35A] px-2 py-0.5 rounded-full font-bold">
+                    {activePartIndex + 1}/{parts.length}
                   </span>
                 </div>
                 <button onClick={() => setPanelOpen(false)} className="text-white/30 hover:text-white/70 transition-colors"><X className="w-3.5 h-3.5" /></button>
               </div>
+
+              {/* Step Navigation Bar */}
+              <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl p-1.5 mb-3">
+                <button onClick={prevPart} className="p-1 hover:bg-white/10 rounded-lg text-white/70 hover:text-white transition-colors" title="Previous Part">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <div className="flex-1 text-center truncate">
+                  <p className="text-[0.65rem] font-bold text-white/90 truncate">{parts[activePartIndex]?.name || "Select Part"}</p>
+                </div>
+                <button onClick={nextPart} className="p-1 hover:bg-white/10 rounded-lg text-white/70 hover:text-white transition-colors" title="Next Part">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Mode Toggle */}
+              <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10 mb-3">
+                <button
+                  onClick={() => { setModeSingle(true); selectPart(activePartIndex); }}
+                  className={`flex-1 text-[0.6rem] font-bold py-1 rounded-lg transition-colors ${modeSingle ? "bg-[#C4A35A] text-[#1A3C2F]" : "text-white/50 hover:text-white"}`}
+                >
+                  Step Inspection
+                </button>
+                <button
+                  onClick={() => toggleAll(true)}
+                  className={`flex-1 text-[0.6rem] font-bold py-1 rounded-lg transition-colors ${!modeSingle ? "bg-[#C4A35A] text-[#1A3C2F]" : "text-white/50 hover:text-white"}`}
+                >
+                  Full Assembly
+                </button>
+              </div>
+
               <div className="relative">
                 <Search className="w-3 h-3 absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30" />
-                <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search parts..."
+                <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Filter parts..."
                   className="w-full bg-white/5 border border-white/10 rounded-lg pl-7 pr-3 py-1.5 text-xs text-white/80 placeholder-white/30 focus:outline-none focus:border-[#C4A35A]/50" />
               </div>
             </div>
+
+            {/* Parts List */}
             <div className="flex-1 overflow-y-auto p-2 space-y-1">
-              {status === "loading" && <div className="flex items-center gap-2 p-3 text-white/40 text-xs"><Loader2 className="w-4 h-4 animate-spin text-[#C4A35A]" />Loading...</div>}
+              {status === "loading" && <div className="flex items-center gap-2 p-3 text-white/40 text-xs"><Loader2 className="w-4 h-4 animate-spin text-[#C4A35A]" />Parsing STL assembly files...</div>}
               {status === "error" && <div className="p-3 text-xs text-red-400">{err}</div>}
-              {filtered.map((part) => (
-                <motion.button key={part.id} whileHover={{ x: 2 }} onClick={() => togglePart(part.id)}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-all ${part.visible ? "bg-white/5 hover:bg-white/10" : "opacity-40 hover:opacity-60"}`}
-                >
-                  <div className="w-3 h-3 rounded-sm flex-shrink-0" style={{ backgroundColor: part.color }} />
-                  <span className="text-xs font-semibold text-white/80 flex-1 truncate">{part.name}</span>
-                  {part.visible ? <Eye className="w-3 h-3 text-white/30" /> : <EyeOff className="w-3 h-3 text-white/20" />}
-                </motion.button>
-              ))}
+              {filtered.map((part) => {
+                const originalIdx = parts.findIndex(p => p.id === part.id);
+                const isSelected = originalIdx === activePartIndex;
+                return (
+                  <motion.button key={part.id} whileHover={{ x: 2 }} onClick={() => selectPart(originalIdx)}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-all ${
+                      isSelected ? "bg-[#C4A35A]/20 border border-[#C4A35A]/40 text-white font-bold" : part.visible ? "bg-white/5 hover:bg-white/10 text-white/70" : "opacity-40 hover:opacity-70 text-white/50"
+                    }`}
+                  >
+                    <div className="w-3 h-3 rounded-sm flex-shrink-0" style={{ backgroundColor: part.color }} />
+                    <span className="text-xs font-semibold flex-1 truncate">{part.name}</span>
+                    {part.visible ? <Eye className="w-3 h-3 text-green-400 flex-shrink-0" /> : <EyeOff className="w-3 h-3 text-white/20 flex-shrink-0" />}
+                  </motion.button>
+                );
+              })}
             </div>
+
             <div className="p-3 border-t border-white/10 flex gap-2">
-              <button onClick={() => setParts(p => p.map(pt => ({...pt, visible: true})))} className="flex-1 text-[0.65rem] font-bold py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 transition-all">Show All</button>
-              <button onClick={() => setParts(p => p.map(pt => ({...pt, visible: false})))} className="flex-1 text-[0.65rem] font-bold py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 transition-all">Hide All</button>
+              <button onClick={() => toggleAll(true)} className="flex-1 text-[0.65rem] font-bold py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 transition-all">Show All</button>
+              <button onClick={() => toggleAll(false)} className="flex-1 text-[0.65rem] font-bold py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 transition-all">Hide All</button>
             </div>
           </motion.div>
         )}
@@ -404,7 +499,7 @@ function AssemblyViewerPanel({ zipPath, title }: { zipPath?: string | null; titl
             <p className="text-xs text-white/40 text-center">{err}</p>
           </div>
         )}
-        {status === "ready" && <AssemblyCanvas parts={parts} wireframe={wireframe} showGrid={showGrid} autoRotate={autoRotate} explodeAmount={explode} />}
+        {status === "ready" && <AssemblyCanvas parts={parts} wireframe={wireframe} showGrid={showGrid} autoRotate={autoRotate} />}
 
         {!panelOpen && (
           <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -415,6 +510,7 @@ function AssemblyViewerPanel({ zipPath, title }: { zipPath?: string | null; titl
           </motion.button>
         )}
 
+        {/* Top Controls */}
         <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
           <ToolBtn icon={showGrid ? Grid3X3 : Grid3X3} label="Grid" onClick={() => setShowGrid(g => !g)} active={showGrid} />
           <ToolBtn icon={wireframe ? Eye : Eye} label="Wireframe" onClick={() => setWireframe(w => !w)} active={wireframe} />
@@ -422,12 +518,21 @@ function AssemblyViewerPanel({ zipPath, title }: { zipPath?: string | null; titl
           <ToolBtn icon={RotateCcw} label="Reset Camera" onClick={() => window.dispatchEvent(new Event("__studio_reset_camera"))} />
         </div>
 
-        {status === "ready" && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 bg-black/60 backdrop-blur-sm border border-white/10 rounded-2xl px-4 py-2.5 flex items-center gap-3">
-            <SlidersHorizontal className="w-3.5 h-3.5 text-[#C4A35A]" />
-            <span className="text-xs font-bold text-white/60">Explode</span>
-            <input type="range" min={0} max={1} step={0.01} value={explode} onChange={(e) => setExplode(parseFloat(e.target.value))} className="w-28 accent-[#C4A35A]" />
-            <span className="text-xs text-white/40 font-mono w-8">{Math.round(explode*100)}%</span>
+        {/* Bottom Part Step Bar */}
+        {status === "ready" && parts.length > 0 && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 bg-black/60 backdrop-blur-md border border-white/10 rounded-2xl px-4 py-2 flex items-center gap-3">
+            <button onClick={prevPart} className="p-1.5 bg-white/10 hover:bg-white/20 rounded-xl text-white transition-colors">
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            <div className="text-center px-2">
+              <p className="text-[0.65rem] font-black text-[#C4A35A] uppercase tracking-wider">Part {activePartIndex + 1} of {parts.length}</p>
+              <p className="text-xs font-bold text-white max-w-[150px] truncate">{parts[activePartIndex]?.name}</p>
+            </div>
+
+            <button onClick={nextPart} className="p-1.5 bg-white/10 hover:bg-white/20 rounded-xl text-white transition-colors">
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
         )}
       </div>
@@ -489,9 +594,9 @@ export function InteractiveHardwareStudio({ title, gerberPath, cadPath, pcbImage
             <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl px-3 py-1.5">
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
               <span className="text-xs font-bold text-white/70">
-                {activeMode === "gerber" && "PCB Gerber — Layer Viewer"}
+                {activeMode === "gerber" && "PCB Gerber — JLCPCB Style Layer Inspector"}
                 {activeMode === "pcb3d" && "3D PCB — WebGL Renderer"}
-                {activeMode === "assembly" && "3D Assembly — Multi-STL Viewer"}
+                {activeMode === "assembly" && "3D Assembly — Step-by-Step Part Inspector"}
               </span>
             </div>
           </div>
@@ -534,7 +639,7 @@ export function InteractiveHardwareStudio({ title, gerberPath, cadPath, pcbImage
             <span className="text-[#1A3C2F]/30">
               {activeMode === "gerber" && "• RS-274X Gerber Parser Active"}
               {activeMode === "pcb3d" && "• Three.js STL Renderer Active"}
-              {activeMode === "assembly" && "• Multi-STL Assembly Engine"}
+              {activeMode === "assembly" && "• JLCPCB-Style Step Part Inspector"}
             </span>
           </div>
 

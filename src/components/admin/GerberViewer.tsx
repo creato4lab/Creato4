@@ -344,10 +344,9 @@ export function GerberViewer({ file, fileUrl, boardTitle, pcbImage }: GerberView
       }
     };
 
-    inspectZip();
-  }, [file]);
+  }, [file, fileUrl]);
 
-  if (!file) return null;
+  if (!file && !fileUrl) return null;
 
   return (
     <>
