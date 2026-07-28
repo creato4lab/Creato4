@@ -209,3 +209,99 @@ export async function verifyPayment(
     return { error: "An error occurred while confirming your order." };
   }
 }
+
+export async function claimFreeLicense(productId: string, licenseType: LicenseTypeAll) {
+  try {
+    const session = await auth();
+    if (!session || !session.user || !session.user.id) {
+      return { error: "You must be logged in to claim this free license." };
+    }
+
+    const product = await prisma.product.findUnique({
+      where: { id: productId }
+    });
+
+    if (!product) {
+      return { error: "Product not found." };
+    }
+
+    // Check if user already claimed this license
+    const existingLicense = await prisma.license.findFirst({
+      where: {
+        userId: session.user.id,
+        productId: productId,
+        type: licenseType,
+        isActive: true,
+      }
+    });
+
+    if (existingLicense) {
+      return { success: true, redirectUrl: "/dashboard?claimed=already" };
+    }
+
+    // Create ₹0 order in database
+    const freeRazorpayId = `free_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const order = await prisma.order.create({
+      data: {
+        userId: session.user.id,
+        total: 0,
+        currency: "INR",
+        status: "COMPLETED",
+        razorpayId: freeRazorpayId,
+        items: {
+          create: [
+            {
+              productId,
+              price: 0,
+              licenseType,
+            }
+          ]
+        }
+      }
+    });
+
+    // Create Active License
+    const license = await prisma.license.create({
+      data: {
+        type: licenseType,
+        userId: session.user.id,
+        productId,
+        maxActivations: MAX_ACTIVATIONS[licenseType] ?? 2,
+        allowedUses: ["Free verified firmware flash access", "Personal dev board flashing"],
+        restrictions: ["No commercial redistribution"],
+      }
+    });
+
+    // Send confirmation email if email available
+    if (session.user.email) {
+      const name = session.user.name || session.user.email.split("@")[0];
+      const date = new Date().toLocaleDateString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        dateStyle: "long",
+      });
+      try {
+        await sendEmail({
+          to: session.user.email,
+          subject: `🎉 Free License Activated — ${product.title} | Creato4 Lab`,
+          html: getOrderConfirmationEmail({
+            name,
+            email: session.user.email,
+            orderId: order.id,
+            productName: product.title,
+            licenseType,
+            amount: 0,
+            licenseKey: license.licenseKey,
+            date,
+          }),
+        });
+      } catch (err) {
+        console.error("Email send failed for free claim:", err);
+      }
+    }
+
+    return { success: true, redirectUrl: "/dashboard?claimed=success" };
+  } catch (error: any) {
+    console.error("Error claiming free license:", error);
+    return { error: error.message || "Failed to claim free license." };
+  }
+}

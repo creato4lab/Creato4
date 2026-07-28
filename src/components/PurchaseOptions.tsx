@@ -191,6 +191,7 @@ export function PurchaseOptions({ productId, productName, basePrice }: PurchaseO
         productId={productId}
         licenseType={selected}
         productName={`${productName} — ${selectedTier.label}`}
+        price={price}
       />
 
       <div className="text-center mb-5">
@@ -206,11 +207,11 @@ export function PurchaseOptions({ productId, productName, basePrice }: PurchaseO
       <div className="pt-4 border-t border-[#1A3C2F]/8 space-y-2.5">
         <div className="flex items-center gap-2.5 text-xs text-[#1A3C2F]/60">
           <ShieldCheck className="w-4 h-4 text-green-500 shrink-0" />
-          Secure Payment via Razorpay
+          {price === 0 ? "Instant Free Activation on your account" : "Secure Payment via Razorpay"}
         </div>
         <div className="flex items-center gap-2.5 text-xs text-[#1A3C2F]/60">
           <Download className="w-4 h-4 text-[#C4A35A] shrink-0" />
-          Instant Digital Delivery after Payment
+          {price === 0 ? "Instant Flasher & Dashboard Access" : "Instant Digital Delivery after Payment"}
         </div>
       </div>
     </div>
