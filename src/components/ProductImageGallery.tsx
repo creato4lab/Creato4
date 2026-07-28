@@ -12,25 +12,11 @@ interface ProductImageGalleryProps {
 export function ProductImageGallery({ images, title }: ProductImageGalleryProps) {
   const [active, setActive] = useState(0);
   const [lightbox, setLightbox] = useState(false);
-  // Track error per image index so one broken image doesn't hide others
-  const [errorSet, setErrorSet] = useState<Set<number>>(new Set());
-
   const validImages = images.filter(Boolean).map(getImageUrl);
+  const hasImages = validImages.length > 0;
 
-  // Only show images that haven't errored
-  const displayImages = validImages.filter((_, i) => !errorSet.has(i));
-  const hasImages = displayImages.length > 0;
-
-  const markError = (idx: number) => {
-    setErrorSet((prev) => {
-      const next = new Set(prev);
-      next.add(idx);
-      return next;
-    });
-  };
-
-  const prev = useCallback(() => setActive((a) => (a - 1 + displayImages.length) % displayImages.length), [displayImages.length]);
-  const next = useCallback(() => setActive((a) => (a + 1) % displayImages.length), [displayImages.length]);
+  const prev = useCallback(() => setActive((a) => (a - 1 + validImages.length) % validImages.length), [validImages.length]);
+  const next = useCallback(() => setActive((a) => (a + 1) % validImages.length), [validImages.length]);
 
   if (!hasImages) {
     return (
@@ -59,21 +45,8 @@ export function ProductImageGallery({ images, title }: ProductImageGalleryProps)
           <AnimatePresence mode="wait">
             <motion.img
               key={active}
-              src={displayImages[active]}
+              src={validImages[active]}
               alt={title}
-              onError={() => {
-                // Find the original index in validImages that matches the display index
-                let origIdx = 0;
-                let displayCount = 0;
-                for (let i = 0; i < validImages.length; i++) {
-                  if (!errorSet.has(i)) {
-                    if (displayCount === active) { origIdx = i; break; }
-                    displayCount++;
-                  }
-                }
-                markError(origIdx);
-                if (active > 0) setActive(0);
-              }}
               className="w-full h-full object-cover"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -86,7 +59,7 @@ export function ProductImageGallery({ images, title }: ProductImageGalleryProps)
             <ZoomIn className="w-4 h-4 text-white" />
           </div>
           {/* Arrows */}
-          {displayImages.length > 1 && (
+          {validImages.length > 1 && (
             <>
               <button
                 onClick={(e) => { e.stopPropagation(); prev(); }}
@@ -103,17 +76,17 @@ export function ProductImageGallery({ images, title }: ProductImageGalleryProps)
             </>
           )}
           {/* Counter */}
-          {displayImages.length > 1 && (
+          {validImages.length > 1 && (
             <div className="absolute bottom-3 right-4 bg-black/40 backdrop-blur-sm text-white text-xs font-mono rounded-full px-3 py-1">
-              {active + 1} / {displayImages.length}
+              {active + 1} / {validImages.length}
             </div>
           )}
         </div>
 
         {/* Thumbnails */}
-        {displayImages.length > 1 && (
+        {validImages.length > 1 && (
           <div className="flex gap-2 overflow-x-auto pb-1">
-            {displayImages.map((img, i) => (
+            {validImages.map((img, i) => (
               <button
                 key={i}
                 onClick={() => setActive(i)}
@@ -144,7 +117,7 @@ export function ProductImageGallery({ images, title }: ProductImageGalleryProps)
             >
               <X className="w-7 h-7" />
             </button>
-            {displayImages.length > 1 && (
+            {validImages.length > 1 && (
               <>
                 <button
                   onClick={(e) => { e.stopPropagation(); prev(); }}
@@ -162,7 +135,7 @@ export function ProductImageGallery({ images, title }: ProductImageGalleryProps)
             )}
             <motion.img
               key={active}
-              src={displayImages[active]}
+              src={validImages[active]}
               alt={title}
               className="max-w-full max-h-[90vh] object-contain rounded-2xl"
               initial={{ scale: 0.9, opacity: 0 }}
