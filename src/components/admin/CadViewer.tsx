@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import * as THREE from "three";
 import { motion, AnimatePresence } from "motion/react";
-import { GerberViewer } from "./GerberViewer";
 
 interface CadViewerProps {
   file?: File | null;
@@ -80,13 +79,12 @@ function CadMesh({ geometry }: { geometry: THREE.BufferGeometry }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 export function CadViewer({ file, fileUrl, cadTitle, autoEmbed = true }: CadViewerProps) {
-  const [geometry, setGeometry] = useState<THREE.BufferGeometry | null>(null);
-  const [status, setStatus] = useState<LoadStatus>("idle");
-  const [error, setError] = useState("");
-  const [cadInfo, setCadInfo] = useState<CadInfo | null>(null);
+  const [geometry,    setGeometry]    = useState<THREE.BufferGeometry | null>(null);
+  const [status,      setStatus]      = useState<LoadStatus>("idle");
+  const [error,       setError]       = useState("");
+  const [cadInfo,     setCadInfo]     = useState<CadInfo | null>(null);
   const [showPreview, setShowPreview] = useState(false);
-  const [autoRotate, setAutoRotate] = useState(true);
-  const [isGerberZip, setIsGerberZip] = useState(false);
+  const [autoRotate,  setAutoRotate]  = useState(true);
 
   useEffect(() => {
     if (!file && !fileUrl) {
@@ -94,7 +92,6 @@ export function CadViewer({ file, fileUrl, cadTitle, autoEmbed = true }: CadView
       setStatus("idle");
       setCadInfo(null);
       setError("");
-      setIsGerberZip(false);
       return;
     }
 
@@ -103,14 +100,13 @@ export function CadViewer({ file, fileUrl, cadTitle, autoEmbed = true }: CadView
       setError("");
       setGeometry(null);
       setCadInfo(null);
-      setIsGerberZip(false);
 
       try {
         let activeFile: File | { name: string; size: number; arrayBuffer(): Promise<ArrayBuffer> } | null = file || null;
 
         if (!activeFile && fileUrl) {
           const res = await fetch(fileUrl);
-          if (!res.ok) throw new Error(`Failed to download file (${res.status})`);
+          if (!res.ok) throw new Error(`Failed to download CAD file (${res.status})`);
           const blob = await res.blob();
           const fileName = cadTitle ?? fileUrl.split("/").pop() ?? "model.zip";
           activeFile = new File([blob], fileName, { type: blob.type });
@@ -121,35 +117,27 @@ export function CadViewer({ file, fileUrl, cadTitle, autoEmbed = true }: CadView
         const lowerName = activeFile.name.toLowerCase();
         const sizeMb    = activeFile.size / (1024 * 1024);
 
-        // ── 1. Determine the actual STL / Gerber / STEP source ──────────────
+        // ── 1. Determine the actual STL source ──────────────────────────────
         let stlBuffer:    ArrayBuffer | null = null;
         let displayName:  string             = activeFile.name;
         let displaySize:  number             = activeFile.size / 1024;
         let innerFormat:  string             = "";
-
-        const gerberExts = [".gbr", ".grb", ".drl", ".gbl", ".gtl", ".gto", ".gbo", ".gts", ".gbs", ".gko", ".gm1", ".txt"];
 
         if (lowerName.endsWith(".stl")) {
           // Direct STL file
           stlBuffer   = await activeFile.arrayBuffer();
           innerFormat = ".stl";
 
-        } else if (gerberExts.some(ext => lowerName.endsWith(ext))) {
-          // Direct Gerber layer file
-          setIsGerberZip(true);
-          setStatus("ready");
-          return;
-
         } else if (lowerName.endsWith(".zip")) {
-          // ZIP — look for STL first, then STEP, then Gerber files
+          // ZIP — look for the best 3D file inside
           const zip     = new JSZip();
           const fileBuf = await activeFile.arrayBuffer();
           const zipData = await zip.loadAsync(fileBuf);
 
+          // Priority: STL first, then check for STEP/others for info card
           let stlEntry:  [string, JSZip.JSZipObject] | null = null;
           let stepEntry: [string, JSZip.JSZipObject] | null = null;
           let anyEntry:  [string, JSZip.JSZipObject] | null = null;
-          let hasGerber = false;
 
           for (const [fn, obj] of Object.entries(zipData.files)) {
             if (obj.dir) continue;
@@ -157,7 +145,6 @@ export function CadViewer({ file, fileUrl, cadTitle, autoEmbed = true }: CadView
             if (!stlEntry  && fnL.endsWith(".stl"))  stlEntry  = [fn, obj];
             if (!stepEntry && (fnL.endsWith(".step") || fnL.endsWith(".stp"))) stepEntry = [fn, obj];
             if (!anyEntry  && ACKNOWLEDGED.some(e => fnL.endsWith(e))) anyEntry = [fn, obj];
-            if (!hasGerber && gerberExts.some(e => fnL.endsWith(e))) hasGerber = true;
           }
 
           if (stlEntry) {
@@ -165,20 +152,15 @@ export function CadViewer({ file, fileUrl, cadTitle, autoEmbed = true }: CadView
             displayName = stlEntry[0].split("/").pop() ?? stlEntry[0];
             innerFormat = ".stl";
             displaySize = stlBuffer.byteLength / 1024;
-          } else if (hasGerber) {
-            // Gerber ZIP file — fallback to Gerber 3D viewer
-            setIsGerberZip(true);
-            setStatus("ready");
-            return;
           } else if (stepEntry || anyEntry) {
-            // ZIP with STEP/other inside — show info card
+            // ZIP with STEP/other inside — show info card, can't render
             const found = stepEntry ?? anyEntry!;
             displayName = found[0].split("/").pop() ?? found[0];
             const ext   = displayName.toLowerCase().match(/\.[^.]+$/)?.[0] ?? "";
             innerFormat = ext;
-            stlBuffer   = null;
+            stlBuffer   = null; // explicitly not renderable
           } else {
-            setError("No 3D model (.stl, .step) or Gerber files found inside the ZIP.");
+            setError("No recognisable 3D model file (.stl, .step, .stp) found inside the ZIP.");
             setStatus("error");
             return;
           }
@@ -270,10 +252,6 @@ export function CadViewer({ file, fileUrl, cadTitle, autoEmbed = true }: CadView
   }, [file, fileUrl]);
 
   if (!file && !fileUrl) return null;
-
-  if (isGerberZip) {
-    return <GerberViewer file={file} fileUrl={fileUrl} boardTitle={cadTitle ?? "3D PCB"} />;
-  }
 
   const isRenderable = status === "ready" && geometry;
 
