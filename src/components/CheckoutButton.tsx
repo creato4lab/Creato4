@@ -18,7 +18,7 @@ export function CheckoutButton({ productId, licenseType, productName, price = 0,
   const [successMsg, setSuccessMsg] = useState("");
   const router = useRouter();
 
-  const isFree = price === 0 || licenseType === "FIRMWARE_FLASH";
+  const isFree = price === 0;
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {

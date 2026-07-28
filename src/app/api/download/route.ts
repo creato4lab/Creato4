@@ -30,14 +30,15 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url);
   const productId = searchParams.get("productId");
-  const fileType = (searchParams.get("fileType") || "sourceCode") as "sourceCode" | "cadFile" | "pdfDoc";
+  type CustomFileType = "sourceCode" | "cadFile" | "pcbFile" | "pdfDoc" | "reportWatermarked" | "reportSubmission" | "reportEditable" | "docx" | "pptx";
+  const fileType = (searchParams.get("fileType") || "sourceCode") as CustomFileType;
 
   if (!productId) {
     return NextResponse.json({ error: "Missing productId parameter." }, { status: 400 });
   }
 
-  // 1. Check user ownership / valid license
-  const license = await prisma.license.findFirst({
+  // 1. Check user ownership / valid licenses
+  const licenses = await prisma.license.findMany({
     where: {
       userId: session.user.id,
       productId: productId,
@@ -49,18 +50,60 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  if (!license) {
+  if (!licenses || licenses.length === 0) {
     return NextResponse.json(
       { error: "Forbidden: You do not own a valid license for this product." },
       { status: 403 }
     );
   }
 
+  const types = licenses.map((l) => l.type);
+  const license = licenses[0];
+  const product = license.product;
+
+  const hasFullAccess = types.some((t) => ["STUDENT", "COMMERCIAL", "ENTERPRISE"].includes(t));
+  const hasPcbAccess = hasFullAccess || types.includes("PCB_DESIGN_FILES" as any);
+  const hasCadAccess = hasFullAccess || types.includes("CAD_3D_MODELS" as any);
+  const hasSourceAccess = hasFullAccess || types.includes("SOURCE_CODE_ONLY");
+  const hasWatermarkedReportAccess = hasFullAccess || types.some((t) => ["REPORT_WATERMARKED", "REPORT_SUBMISSION", "REPORT_EDITABLE"].includes(t));
+  const hasStudentReportAccess = hasFullAccess || types.some((t) => ["REPORT_SUBMISSION", "REPORT_EDITABLE"].includes(t));
+  const hasEditableReportAccess = hasFullAccess || types.includes("REPORT_EDITABLE");
+
+  // Validate permission for requested fileType
+  let isAuthorized = false;
+  let pdfWatermarkMode: "visible" | "hidden" = "visible";
+
+  if (fileType === "sourceCode") {
+    isAuthorized = hasSourceAccess;
+  } else if (fileType === "cadFile") {
+    isAuthorized = hasCadAccess;
+  } else if (fileType === "pcbFile") {
+    isAuthorized = hasPcbAccess;
+  } else if (fileType === "reportSubmission") {
+    isAuthorized = hasStudentReportAccess;
+    pdfWatermarkMode = "hidden"; // Requirement 3: Hidden forensic watermark
+  } else if (fileType === "reportWatermarked" || fileType === "pdfDoc") {
+    isAuthorized = hasWatermarkedReportAccess;
+    pdfWatermarkMode = "visible"; // Requirement 4: Visible tamper-resistant watermark
+  } else if (fileType === "reportEditable" || fileType === "docx" || fileType === "pptx") {
+    isAuthorized = hasEditableReportAccess;
+  }
+
+  if (!isAuthorized) {
+    return NextResponse.json(
+      { error: `Forbidden: You have not purchased access to the requested asset (${fileType}).` },
+      { status: 403 }
+    );
+  }
+
   // 2. Locate object key
   let objectKey: string | null = null;
-  if (fileType === "sourceCode") objectKey = license.product.sourceCodePath;
-  if (fileType === "cadFile") objectKey = license.product.cadFilePath;
-  if (fileType === "pdfDoc") objectKey = license.product.pdfDocPath;
+  if (fileType === "sourceCode") objectKey = product.sourceCodePath;
+  if (fileType === "cadFile") objectKey = product.cadFilePath;
+  if (fileType === "pcbFile") objectKey = product.pcbGerberPath || product.sourceCodePath;
+  if (["pdfDoc", "reportWatermarked", "reportSubmission", "reportEditable", "docx", "pptx"].includes(fileType)) {
+    objectKey = product.pdfDocPath;
+  }
 
   if (!objectKey) {
     return NextResponse.json(
@@ -94,15 +137,15 @@ export async function GET(req: NextRequest) {
     userId: session.user.id,
     userName: license.user.name,
     userEmail: license.user.email,
-    productId: license.product.id,
-    productTitle: license.product.title,
+    productId: product.id,
+    productTitle: product.title,
     purchasedAt: license.createdAt.toISOString(),
     downloadedAt: nowIso,
     chipId: activeChipId,
   };
 
   let rawBuffer: Buffer;
-  let cleanFilename = `${license.product.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_watermarked`;
+  let cleanFilename = `${product.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_${fileType}`;
 
   // 3. Fetch binary stream from R2 or fallback mock
   if (s3Client) {
@@ -128,11 +171,11 @@ export async function GET(req: NextRequest) {
     }
   } else {
     // Development Mock mode if R2 keys are not present
-    const mockCode = `// Creato4 Sample Project Source Code\nvoid setup() {\n  Serial.begin(115200);\n}\nvoid loop() {\n  Serial.println("Running Creato4 Demo Firmware");\n  delay(1000);\n}\n`;
+    const mockCode = `// Creato4 Sample Project Asset (${fileType})\nvoid setup() {\n  Serial.begin(115200);\n}\nvoid loop() {\n  Serial.println("Running Creato4 Firmware");\n  delay(1000);\n}\n`;
     const JSZip = (await import("jszip")).default;
     const zip = new JSZip();
     zip.file("main.ino", mockCode);
-    zip.file("README.md", `# ${license.product.title}\nSample project documentation.`);
+    zip.file("README.md", `# ${product.title}\nSample project documentation.`);
     const zipUint8 = await zip.generateAsync({ type: "nodebuffer" });
     rawBuffer = Buffer.from(zipUint8);
     objectKey = `${objectKey || "sample"}.zip`;
@@ -142,8 +185,8 @@ export async function GET(req: NextRequest) {
   let watermarkedBuffer: Buffer = rawBuffer;
   const ext = objectKey.split(".").pop() || "txt";
 
-  if (fileType === "cadFile") {
-    // Deliver CAD files/ZIPs raw as-is without alteration
+  if (fileType === "cadFile" || fileType === "pcbFile") {
+    // Deliver CAD / PCB binary files raw as-is
     watermarkedBuffer = rawBuffer;
     cleanFilename += `.${ext}`;
   } else if (fileType === "sourceCode" || ext === "zip" || ext === "rar") {
@@ -156,7 +199,7 @@ export async function GET(req: NextRequest) {
       cleanFilename += `.${ext}`;
     }
   } else {
-    watermarkedBuffer = await watermarkTextBuffer(rawBuffer, ext, metadata);
+    watermarkedBuffer = await watermarkTextBuffer(rawBuffer, ext, metadata, pdfWatermarkMode);
     cleanFilename += `.${ext}`;
   }
 

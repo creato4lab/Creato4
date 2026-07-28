@@ -228,6 +228,32 @@ export async function getExistingDeviceNickname(chipId: string) {
   }
 }
 
+// ─── Auto-unlock Firmware Flash on flash-success event ─────
+export async function autoUnlockFirmwareFlash(userId: string, productId: string) {
+  try {
+    const existing = await prisma.license.findFirst({
+      where: { userId, productId, type: "FIRMWARE_FLASH", isActive: true },
+    });
+
+    if (!existing) {
+      await prisma.license.create({
+        data: {
+          type: "FIRMWARE_FLASH",
+          userId,
+          productId,
+          maxActivations: 2,
+          allowedUses: ["Free verified firmware flash access"],
+          restrictions: ["No commercial redistribution"],
+        },
+      });
+    }
+    return { success: true };
+  } catch (err) {
+    console.error("autoUnlockFirmwareFlash error:", err);
+    return { error: "Failed to unlock firmware flash" };
+  }
+}
+
 // ─── Check active product license access for logged-in user ─────
 export async function checkProductLicenseAccess(productId: string) {
   const session = await auth();
@@ -239,6 +265,9 @@ export async function checkProductLicenseAccess(productId: string) {
       hasSourceAccess: false,
       hasReportAccess: false,
       hasFirmwareAccess: false,
+      hasWatermarkedReportAccess: false,
+      hasStudentReportAccess: false,
+      hasEditableReportAccess: false,
       purchasedTiers: [],
     };
   }
@@ -257,6 +286,9 @@ export async function checkProductLicenseAccess(productId: string) {
         hasSourceAccess: false,
         hasReportAccess: false,
         hasFirmwareAccess: false,
+        hasWatermarkedReportAccess: false,
+        hasStudentReportAccess: false,
+        hasEditableReportAccess: false,
         purchasedTiers: [],
       };
     }
@@ -267,8 +299,11 @@ export async function checkProductLicenseAccess(productId: string) {
     const hasPcbAccess = hasFullAccess || types.includes("PCB_DESIGN_FILES" as any);
     const hasCadAccess = hasFullAccess || types.includes("CAD_3D_MODELS" as any);
     const hasSourceAccess = hasFullAccess || types.includes("SOURCE_CODE_ONLY");
-    const hasReportAccess = hasFullAccess || types.some((t) => ["REPORT_SUBMISSION", "REPORT_EDITABLE"].includes(t));
     const hasFirmwareAccess = hasFullAccess || types.includes("FIRMWARE_FLASH");
+    const hasWatermarkedReportAccess = hasFullAccess || types.some((t) => ["REPORT_WATERMARKED", "REPORT_SUBMISSION", "REPORT_EDITABLE"].includes(t));
+    const hasStudentReportAccess = hasFullAccess || types.some((t) => ["REPORT_SUBMISSION", "REPORT_EDITABLE"].includes(t));
+    const hasEditableReportAccess = hasFullAccess || types.includes("REPORT_EDITABLE");
+    const hasReportAccess = hasWatermarkedReportAccess;
 
     return {
       hasFullAccess,
@@ -277,6 +312,9 @@ export async function checkProductLicenseAccess(productId: string) {
       hasSourceAccess,
       hasReportAccess,
       hasFirmwareAccess,
+      hasWatermarkedReportAccess,
+      hasStudentReportAccess,
+      hasEditableReportAccess,
       purchasedTiers: types,
     };
   } catch (err) {
@@ -288,6 +326,9 @@ export async function checkProductLicenseAccess(productId: string) {
       hasSourceAccess: false,
       hasReportAccess: false,
       hasFirmwareAccess: false,
+      hasWatermarkedReportAccess: false,
+      hasStudentReportAccess: false,
+      hasEditableReportAccess: false,
       purchasedTiers: [],
     };
   }

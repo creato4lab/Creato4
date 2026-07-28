@@ -236,31 +236,97 @@ function getCommentHeader(fileExt: string, meta: WatermarkMetadata): string {
 }
 
 /**
- * Watermarks PDF documents with customer full name & license key in footer using pdf-lib
+ * Watermarks PDF documents with either visible watermark or hidden forensic steganography
  */
 export async function watermarkPdfWithCustomerName(
   pdfBuffer: Buffer,
-  meta: WatermarkMetadata
+  meta: WatermarkMetadata,
+  mode: "visible" | "hidden" = "visible"
 ): Promise<Buffer> {
   try {
-    const { PDFDocument, rgb, StandardFonts } = await import("pdf-lib");
+    const { PDFDocument, rgb, StandardFonts, degrees } = await import("pdf-lib");
     const pdfDoc = await PDFDocument.load(pdfBuffer);
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     const pages = pdfDoc.getPages();
 
-    const customerText = `Licensed to: ${meta.userName || meta.userEmail || meta.userId} | License: ${meta.licenseKey} | Creato4 Lab Digital Asset`;
+    // 1. Embedded PDF Document Metadata Forensic Tags
+    pdfDoc.setKeywords([
+      `C4L_OWNER:${meta.userId}`,
+      `C4L_ORDER:${meta.downloadId}`,
+      `C4L_LICENSE:${meta.licenseKey}`,
+      `C4L_EMAIL:${meta.userEmail || ""}`,
+    ]);
+    if (meta.userName) pdfDoc.setAuthor(meta.userName);
+    pdfDoc.setProducer("Creato4 Lab Forensic Digital Assets Engine v1.0");
 
-    pages.forEach((page) => {
-      const { width } = page.getSize();
-      page.drawText(customerText, {
-        x: 30,
-        y: 15,
-        size: 7.5,
-        font: fontBold,
-        color: rgb(0.1, 0.24, 0.18),
-        opacity: 0.7,
+    if (mode === "hidden") {
+      // REQUIREMENT 3: Personalized Student PDF Report (Hidden forensic watermark)
+      const forensicTag = `[C4L_FORENSIC_TAG: UserID=${meta.userId} | OrderID=${meta.downloadId} | LicenseKey=${meta.licenseKey}]`;
+      const cleanFooterText = `Student: ${meta.userName || meta.userEmail || meta.userId} | Roll No/Reg: Verified | Creato4 Lab Academic Submission`;
+
+      pages.forEach((page) => {
+        const { width, height } = page.getSize();
+        
+        // Low-opacity invisible forensic layer (opacity 0.01 - invisible to reader, embedded in stream)
+        page.drawText(forensicTag, {
+          x: 20,
+          y: height - 12,
+          size: 5,
+          font: fontBold,
+          color: rgb(0, 0, 0),
+          opacity: 0.01,
+        });
+
+        // Clean academic footer
+        page.drawText(cleanFooterText, {
+          x: 30,
+          y: 15,
+          size: 7.5,
+          font: fontBold,
+          color: rgb(0.1, 0.24, 0.18),
+          opacity: 0.6,
+        });
       });
-    });
+    } else {
+      // REQUIREMENT 4: Watermarked Printable PDF Report (Visible tamper-resistant watermark)
+      const watermarkTitle = `CREATO4 LAB — PREVIEW & WATERMARKED REPORT`;
+      const buyerNotice = `LICENSED TO: ${meta.userName || meta.userEmail || meta.userId} | LICENSE: ${meta.licenseKey}`;
+
+      pages.forEach((page) => {
+        const { width, height } = page.getSize();
+
+        // Diagonal prominent visible watermark across center of page
+        page.drawText(watermarkTitle, {
+          x: width / 8,
+          y: height / 2 - 20,
+          size: 18,
+          font: fontBold,
+          color: rgb(0.8, 0.2, 0.2),
+          opacity: 0.35,
+          rotate: degrees(35),
+        });
+
+        page.drawText(buyerNotice, {
+          x: width / 8,
+          y: height / 2 - 45,
+          size: 11,
+          font: fontBold,
+          color: rgb(0.2, 0.2, 0.2),
+          opacity: 0.30,
+          rotate: degrees(35),
+        });
+
+        // Footer banner
+        page.drawText(`WATERMARKED REPORT — DO NOT REDISTRIBUTE | USER ID: ${meta.userId}`, {
+          x: 30,
+          y: 15,
+          size: 8,
+          font: fontBold,
+          color: rgb(0.7, 0.1, 0.1),
+          opacity: 0.8,
+        });
+      });
+    }
 
     const savedBytes = await pdfDoc.save();
     return Buffer.from(savedBytes);
@@ -346,12 +412,13 @@ export async function watermarkZipBuffer(
 export async function watermarkTextBuffer(
   contentBuffer: Buffer,
   fileExt: string,
-  meta: WatermarkMetadata
+  meta: WatermarkMetadata,
+  pdfMode: "visible" | "hidden" = "visible"
 ): Promise<Buffer> {
   const ext = fileExt.toLowerCase();
 
   if (ext === "pdf") {
-    return await watermarkPdfWithCustomerName(contentBuffer, meta);
+    return await watermarkPdfWithCustomerName(contentBuffer, meta, pdfMode);
   }
 
   let text = contentBuffer.toString("utf-8");

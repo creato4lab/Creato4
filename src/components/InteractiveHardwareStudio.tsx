@@ -343,7 +343,7 @@ function AssemblyViewerPanel({ zipPath, title }: { zipPath?: string | null; titl
     fetch(url).then((r) => r.arrayBuffer()).then(async (buf) => {
       const zip = await JSZip.loadAsync(buf);
       const stlFiles = Object.entries(zip.files).filter(([n]) => n.toLowerCase().endsWith(".stl") && !zip.files[n].dir);
-      if (!stlFiles.length) { setErr("No STL files found in assembly ZIP"); setStatus("error"); return; }
+      if (!stlFiles.length) { setErr("Component placement data not provided in upload"); setStatus("error"); return; }
       const { STLLoader } = await import("three-stdlib");
       const loader = new STLLoader();
       const loaded: AssemblyPart[] = [];
@@ -601,25 +601,14 @@ export function InteractiveHardwareStudio({
         </div>
 
         {/* Viewer */}
-        <div className="relative bg-[#0A1A12]" style={{ height: isFullscreen ? "100vh" : "540px" }}>
-          {/* Mode badge */}
-          <div className="absolute top-3 left-3 z-10 pointer-events-none">
-            <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl px-3 py-1.5">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-xs font-bold text-white/70">
-                {activeMode === "gerber" && "PCB Gerber — JLCPCB Style Layer Inspector"}
-                {activeMode === "pcb3d" && "3D PCB — WebGL Renderer"}
-                {activeMode === "assembly" && "3D Assembly — Step-by-Step Part Inspector"}
-              </span>
-            </div>
-          </div>
-
-          {/* Fullscreen */}
-          <div className="absolute top-3 right-3 z-20">
+        <div className="relative bg-[#0A1A12] overflow-hidden" style={{ height: isFullscreen ? "100vh" : "540px" }}>
+          {/* Fullscreen Toggle */}
+          <div className="absolute top-3.5 right-3.5 z-30">
             <button onClick={toggleFullscreen}
-              className="p-2 bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl text-white/50 hover:text-white transition-all hover:bg-black/60"
+              className="p-2 bg-black/60 backdrop-blur-md border border-white/15 rounded-xl text-white/70 hover:text-white transition-all hover:bg-black/80 shadow-lg cursor-pointer"
+              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen View"}
             >
-              <Maximize2 className="w-3.5 h-3.5" />
+              <Maximize2 className="w-4 h-4 text-[#C4A35A]" />
             </button>
           </div>
 
