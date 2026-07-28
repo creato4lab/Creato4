@@ -46,6 +46,7 @@ export default function LoginPage() {
                 type="email"
                 required
                 placeholder="you@example.com"
+                suppressHydrationWarning
                 className="w-full px-4 py-3 rounded-xl border border-[#E8E2D9] focus:outline-none focus:ring-2 focus:ring-[#1A3C2F] bg-white text-sm text-[#1A3C2F]"
               />
             </div>
