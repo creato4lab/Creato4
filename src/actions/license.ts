@@ -227,3 +227,68 @@ export async function getExistingDeviceNickname(chipId: string) {
     return null;
   }
 }
+
+// ─── Check active product license access for logged-in user ─────
+export async function checkProductLicenseAccess(productId: string) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return {
+      hasFullAccess: false,
+      hasPcbAccess: false,
+      hasCadAccess: false,
+      hasSourceAccess: false,
+      hasReportAccess: false,
+      hasFirmwareAccess: false,
+      purchasedTiers: [],
+    };
+  }
+
+  try {
+    const licenses = await prisma.license.findMany({
+      where: { userId: session.user.id, productId, isActive: true },
+      select: { type: true },
+    });
+
+    if (!licenses || licenses.length === 0) {
+      return {
+        hasFullAccess: false,
+        hasPcbAccess: false,
+        hasCadAccess: false,
+        hasSourceAccess: false,
+        hasReportAccess: false,
+        hasFirmwareAccess: false,
+        purchasedTiers: [],
+      };
+    }
+
+    const types = licenses.map((l) => l.type);
+
+    const hasFullAccess = types.some((t) => ["STUDENT", "COMMERCIAL", "ENTERPRISE"].includes(t));
+    const hasPcbAccess = hasFullAccess || types.includes("PCB_DESIGN_FILES" as any);
+    const hasCadAccess = hasFullAccess || types.includes("CAD_3D_MODELS" as any);
+    const hasSourceAccess = hasFullAccess || types.includes("SOURCE_CODE_ONLY");
+    const hasReportAccess = hasFullAccess || types.some((t) => ["REPORT_SUBMISSION", "REPORT_EDITABLE"].includes(t));
+    const hasFirmwareAccess = hasFullAccess || types.includes("FIRMWARE_FLASH");
+
+    return {
+      hasFullAccess,
+      hasPcbAccess,
+      hasCadAccess,
+      hasSourceAccess,
+      hasReportAccess,
+      hasFirmwareAccess,
+      purchasedTiers: types,
+    };
+  } catch (err) {
+    console.error("checkProductLicenseAccess error:", err);
+    return {
+      hasFullAccess: false,
+      hasPcbAccess: false,
+      hasCadAccess: false,
+      hasSourceAccess: false,
+      hasReportAccess: false,
+      hasFirmwareAccess: false,
+      purchasedTiers: [],
+    };
+  }
+}

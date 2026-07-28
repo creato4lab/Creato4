@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProductBySlug, getRelatedProducts } from "@/actions/product";
+import { checkProductLicenseAccess } from "@/actions/license";
 import {
   ArrowLeft, Check, AlertTriangle, Cpu, Code, Download,
   Tag, CalendarDays, History, Zap, Star, Package,
@@ -74,7 +75,12 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
 
   if (error || !product) notFound();
 
-  const { products: relatedProducts } = await getRelatedProducts(product.id, product.category as any, 3);
+  const [relatedRes, userAccess] = await Promise.all([
+    getRelatedProducts(product.id, product.category as any, 3),
+    checkProductLicenseAccess(product.id),
+  ]);
+
+  const relatedProducts = relatedRes.products || [];
 
   const faqs = Array.isArray(product.faqs) ? (product.faqs as any[]) : [];
   const versionHistory = Array.isArray(product.versionHistory) ? (product.versionHistory as any[]) : [];
@@ -200,6 +206,10 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
               gerberPath={product.pcbGerberPath}
               cadPath={product.cadFilePath}
               pcbImage={product.pcbPreviewImage || (product.images?.[0] ? getImageUrl(product.images[0]) : undefined)}
+              hasPcbAccess={userAccess.hasPcbAccess}
+              hasCadAccess={userAccess.hasCadAccess}
+              hasFullAccess={userAccess.hasFullAccess}
+              basePrice={product.price}
             />
 
             {/* 3. Product Demo Video */}
@@ -381,6 +391,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
               productId={product.id}
               productName={product.title}
               basePrice={product.price}
+              purchasedTiers={userAccess.purchasedTiers}
             />
           </div>
 

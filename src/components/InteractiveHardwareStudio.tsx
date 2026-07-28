@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Cpu, Box, Layers, Download, RotateCcw, Maximize2, Eye,
   EyeOff, Grid3X3, Play, Pause, Search, ChevronLeft, ChevronRight,
-  Loader2, AlertTriangle, X, Zap, Monitor, List, CheckCircle2, Focus
+  Loader2, AlertTriangle, X, Zap, Monitor, List, CheckCircle2, Focus, Lock, Check,
 } from "lucide-react";
 import JSZip from "jszip";
 import * as THREE from "three";
@@ -29,6 +29,10 @@ interface StudioProps {
   cadPath?: string | null;
   pcbImage?: string | null;
   assemblyZipPath?: string | null;
+  hasPcbAccess?: boolean;
+  hasCadAccess?: boolean;
+  hasFullAccess?: boolean;
+  basePrice?: number;
 }
 
 interface AssemblyPart {
@@ -541,7 +545,10 @@ function AssemblyViewerPanel({ zipPath, title }: { zipPath?: string | null; titl
 }
 
 // ─── Main Component ─────────────────────────────────────────────────────────────
-export function InteractiveHardwareStudio({ title, gerberPath, cadPath, pcbImage, assemblyZipPath }: StudioProps) {
+export function InteractiveHardwareStudio({
+  title, gerberPath, cadPath, pcbImage, assemblyZipPath,
+  hasPcbAccess = false, hasCadAccess = false, hasFullAccess = false, basePrice = 49,
+}: StudioProps) {
   const hasGerber = !!gerberPath;
   const hasCad = !!cadPath;
   const hasAssembly = !!assemblyZipPath;
@@ -559,6 +566,12 @@ export function InteractiveHardwareStudio({ title, gerberPath, cadPath, pcbImage
   };
 
   const dlUrl = (path?: string | null) => path ? getImageUrl(path) : "";
+
+  const pcbPrice = Math.round(basePrice * 0.35);
+  const cadPrice = Math.round(basePrice * 0.35);
+
+  const canDownloadPcb = hasPcbAccess || hasFullAccess;
+  const canDownloadCad = hasCadAccess || hasFullAccess;
 
   return (
     <section ref={sectionRef} className="space-y-0">
@@ -645,19 +658,39 @@ export function InteractiveHardwareStudio({ title, gerberPath, cadPath, pcbImage
 
           <div className="flex items-center gap-2 flex-wrap">
             {hasGerber && (
-              <a href={dlUrl(gerberPath)} download className="flex items-center gap-1.5 text-xs font-bold text-[#1A3C2F] bg-[#1A3C2F]/5 hover:bg-[#1A3C2F]/10 border border-[#1A3C2F]/10 px-3.5 py-2 rounded-xl transition-all">
-                <Download className="w-3.5 h-3.5 text-[#C4A35A]" /> Gerber ZIP
-              </a>
+              canDownloadPcb ? (
+                <a href={dlUrl(gerberPath)} download className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 px-3.5 py-2 rounded-xl transition-all shadow-sm">
+                  <Check className="w-3.5 h-3.5 text-emerald-600" /> Gerber ZIP (Unlocked)
+                </a>
+              ) : (
+                <a href="#purchase-options" className="flex items-center gap-1.5 text-xs font-bold text-[#1A3C2F] bg-[#C4A35A]/15 hover:bg-[#C4A35A]/30 border border-[#C4A35A]/40 px-3.5 py-2 rounded-xl transition-all shadow-sm">
+                  <Lock className="w-3.5 h-3.5 text-[#C4A35A]" /> Buy Gerber ZIP (₹{pcbPrice})
+                </a>
+              )
             )}
+
             {hasCad && (
-              <a href={dlUrl(cadPath)} download className="flex items-center gap-1.5 text-xs font-bold text-[#1A3C2F] bg-[#1A3C2F]/5 hover:bg-[#1A3C2F]/10 border border-[#1A3C2F]/10 px-3.5 py-2 rounded-xl transition-all">
-                <Download className="w-3.5 h-3.5 text-[#C4A35A]" /> PCB 3D ZIP
-              </a>
+              canDownloadPcb ? (
+                <a href={dlUrl(cadPath)} download className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 px-3.5 py-2 rounded-xl transition-all shadow-sm">
+                  <Check className="w-3.5 h-3.5 text-emerald-600" /> PCB 3D ZIP (Unlocked)
+                </a>
+              ) : (
+                <a href="#purchase-options" className="flex items-center gap-1.5 text-xs font-bold text-[#1A3C2F] bg-[#C4A35A]/15 hover:bg-[#C4A35A]/30 border border-[#C4A35A]/40 px-3.5 py-2 rounded-xl transition-all shadow-sm">
+                  <Lock className="w-3.5 h-3.5 text-[#C4A35A]" /> Buy PCB 3D ZIP (₹{pcbPrice})
+                </a>
+              )
             )}
+
             {hasAssembly && (
-              <a href={dlUrl(assemblyZipPath)} download className="flex items-center gap-1.5 text-xs font-bold text-white bg-[#1A3C2F] hover:bg-[#C4A35A] hover:text-[#1A3C2F] px-3.5 py-2 rounded-xl transition-all shadow-sm">
-                <Download className="w-3.5 h-3.5" /> CAD Assembly ZIP
-              </a>
+              canDownloadCad ? (
+                <a href={dlUrl(assemblyZipPath)} download className="flex items-center gap-1.5 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 border border-emerald-600 px-3.5 py-2 rounded-xl transition-all shadow-sm">
+                  <Check className="w-3.5 h-3.5 text-white" /> CAD Assembly ZIP (Unlocked)
+                </a>
+              ) : (
+                <a href="#purchase-options" className="flex items-center gap-1.5 text-xs font-bold text-white bg-[#1A3C2F] hover:bg-[#C4A35A] hover:text-[#1A3C2F] px-3.5 py-2 rounded-xl transition-all shadow-sm">
+                  <Lock className="w-3.5 h-3.5 text-[#C4A35A]" /> Buy CAD Assembly ZIP (₹{cadPrice})
+                </a>
+              )
             )}
           </div>
         </div>

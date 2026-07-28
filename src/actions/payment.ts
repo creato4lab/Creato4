@@ -21,6 +21,8 @@ const PRICE_MULTIPLIERS: Record<string, number> = {
   REPORT_SUBMISSION: 0.4,
   REPORT_EDITABLE:   0.5,
   FIRMWARE_FLASH:    0.35,
+  PCB_DESIGN_FILES:  0.35,
+  CAD_3D_MODELS:     0.35,
 };
 
 // Max activations per license tier
@@ -32,9 +34,11 @@ const MAX_ACTIVATIONS: Record<string, number> = {
   REPORT_SUBMISSION: 1,
   REPORT_EDITABLE:   1,
   FIRMWARE_FLASH:    1,
+  PCB_DESIGN_FILES:  1,
+  CAD_3D_MODELS:     1,
 };
 
-type LicenseTypeAll = "STUDENT" | "COMMERCIAL" | "ENTERPRISE" | "SOURCE_CODE_ONLY" | "REPORT_SUBMISSION" | "REPORT_EDITABLE" | "FIRMWARE_FLASH";
+type LicenseTypeAll = "STUDENT" | "COMMERCIAL" | "ENTERPRISE" | "SOURCE_CODE_ONLY" | "REPORT_SUBMISSION" | "REPORT_EDITABLE" | "FIRMWARE_FLASH" | "PCB_DESIGN_FILES" | "CAD_3D_MODELS";
 
 export async function createRazorpayOrder(productId: string, licenseType: LicenseTypeAll) {
   try {

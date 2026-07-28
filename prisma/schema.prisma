@@ -235,6 +235,8 @@ enum LicenseType {
   REPORT_SUBMISSION
   REPORT_EDITABLE
   FIRMWARE_FLASH
+  PCB_DESIGN_FILES
+  CAD_3D_MODELS
 }
 
 // =========================================
