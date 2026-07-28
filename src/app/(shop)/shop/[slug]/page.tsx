@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { ProductImageGallery } from "@/components/ProductImageGallery";
 import { Product3DStudio } from "@/components/Product3DStudio";
+import { ProductVideoPlayer } from "@/components/ProductVideoPlayer";
 import { ProductFAQ } from "@/components/ProductFAQ";
 import { RelatedProducts } from "@/components/RelatedProducts";
 import { PurchaseOptions } from "@/components/PurchaseOptions";
@@ -205,28 +206,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ slug:
             {product.videoUrl && (
               <section className="bg-white rounded-3xl p-6 sm:p-8 border border-[#1A3C2F]/8 shadow-sm space-y-4">
                 <SectionHeader icon={<Zap className="w-4 h-4 text-[#C4A35A]" />} title="Product Demo Video" />
-                <div className="rounded-2xl overflow-hidden border border-[#1A3C2F]/10 bg-black aspect-video shadow-md">
-                  {product.videoUrl.includes("youtube.com") || product.videoUrl.includes("youtu.be") || product.videoUrl.includes("vimeo.com") ? (
-                    <iframe
-                      src={
-                        product.videoUrl.includes("watch?v=")
-                          ? product.videoUrl.replace("watch?v=", "embed/")
-                          : product.videoUrl
-                      }
-                      title={`${product.title} Demo Video`}
-                      className="w-full h-full border-0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  ) : (
-                    <video
-                      src={getImageUrl(product.videoUrl)}
-                      controls
-                      controlsList="nodownload"
-                      className="w-full h-full object-contain"
-                    />
-                  )}
-                </div>
+                <ProductVideoPlayer videoUrl={product.videoUrl} title={product.title} />
               </section>
             )}
 
