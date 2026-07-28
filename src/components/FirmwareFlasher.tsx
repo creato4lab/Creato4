@@ -21,6 +21,7 @@ import {
   Cpu, CheckCircle, AlertTriangle, Loader2, X,
   Terminal, Zap, Shield, Info, UploadCloud, RefreshCw,
 } from "lucide-react";
+import { parseIntelHex, ensureHexText, flashArduinoStk500 } from "@/lib/stk500";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -349,6 +350,26 @@ export function FirmwareFlasher({ licenseId, productTitle, isUf2 = false, activa
     }
   };
 
+  // ── Manual .HEX Local File Upload Test ─────────────────────────────────────
+  const handleManualHexUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setStep("flashing");
+    setLogs([]);
+    setErrorMsg("");
+    setProgress(0);
+    log(`📁 Manual Test File: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
+
+    try {
+      const buffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+      await flashToBoard(bytes, selectedBoard || "Arduino Uno R3");
+    } catch (err: any) {
+      error("Manual test flash failed: " + (err?.message || "File read error"));
+    }
+  };
+
   /** Flash microcontroller using active serial port connection. */
   const flashEsp = async (firmware: Uint8Array) => {
     log("🔧 Preparing serial connection for flashing...");
@@ -378,6 +399,27 @@ export function FirmwareFlasher({ licenseId, productTitle, isUf2 = false, activa
         if (!openErr?.message?.includes("already open")) {
           throw openErr;
         }
+      }
+
+      // ── Check if payload is Intel HEX (.hex compiled Arduino binary) ───────
+      const hexText = ensureHexText(firmware);
+      if (hexText) {
+        log("📑 Detected Intel HEX compiled binary. Parsing memory map...");
+        const parsed = parseIntelHex(hexText);
+        log(`📦 Parsed ${parsed.hexBytes.length} bytes of AVR Flash memory payload.`);
+        log("⚡ Synchronizing STK500 Optiboot protocol over WebSerial...");
+
+        await flashArduinoStk500(port, parsed.hexBytes, 115200, (pct, msg) => {
+          setProgress(pct);
+          log(`   ${msg}`);
+        });
+
+        await port.close().catch(() => {});
+        log("✅ Arduino Optiboot flash complete!");
+        setProgress(100);
+        setStep("done");
+        log("🎉 Firmware successfully written to Arduino microcontroller!");
+        return;
       }
 
       log("📡 Port ready. Transmitting firmware binary payload...");
@@ -592,11 +634,22 @@ export function FirmwareFlasher({ licenseId, productTitle, isUf2 = false, activa
 
                   <button
                     onClick={connectAndReadId}
-                    className="w-full flex items-center justify-center gap-2.5 bg-[#1A3C2F] text-white py-3.5 rounded-2xl font-bold text-sm hover:bg-[#C4A35A] hover:text-[#1A3C2F] transition-colors"
+                    className="w-full flex items-center justify-center gap-2.5 bg-[#1A3C2F] text-white py-3.5 rounded-2xl font-bold text-sm hover:bg-[#C4A35A] hover:text-[#1A3C2F] transition-colors shadow-xs"
                   >
                     <Zap className="w-4 h-4" />
                     Connect Board & Flash Firmware
                   </button>
+
+                  <label className="w-full flex items-center justify-center gap-2 py-3 bg-[#FAF8F5] border border-[#1A3C2F]/20 text-[#1A3C2F] rounded-2xl text-xs font-bold hover:bg-[#1A3C2F] hover:text-white transition-colors cursor-pointer shadow-xs">
+                    <UploadCloud className="w-4 h-4 text-[#C4A35A]" />
+                    Upload & Test Local .HEX File (Manual Verification Test)
+                    <input
+                      type="file"
+                      accept=".hex,.bin,.uf2"
+                      onChange={handleManualHexUpload}
+                      className="hidden"
+                    />
+                  </label>
                 </motion.div>
               )}
 
