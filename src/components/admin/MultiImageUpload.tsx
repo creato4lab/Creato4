@@ -49,13 +49,13 @@ export function MultiImageUpload({ name, label, value = "", onChange }: MultiIma
   const uploadSingleFile = async (item: ImageFileItem) => {
     try {
       const keyResult = await new Promise<{ key: string; url: string }>((resolve, reject) => {
+        const formData = new FormData();
+        formData.append("file", item.file);
+
         const xhr = new XMLHttpRequest();
         xhr.open("POST", "/api/admin/upload-file", true);
         xhr.setRequestHeader("x-filename", encodeURIComponent(item.file.name));
         xhr.setRequestHeader("x-prefix", "images");
-        if (item.file.type) {
-          xhr.setRequestHeader("Content-Type", item.file.type);
-        }
 
         xhr.upload.onprogress = (event) => {
           if (event.lengthComputable) {
@@ -92,7 +92,7 @@ export function MultiImageUpload({ name, label, value = "", onChange }: MultiIma
         };
 
         xhr.onerror = () => reject(new Error("Network connection error during upload."));
-        xhr.send(item.file);
+        xhr.send(formData);
       });
 
       // Revoke the temporary blob URL and replace with permanent URL

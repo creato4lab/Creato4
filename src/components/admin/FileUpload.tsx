@@ -50,13 +50,12 @@ export function FileUpload({ name, label, prefix, accept, required, value = "", 
 
     try {
       const keyResult = await new Promise<string>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
+        const formData = new FormData();
+        formData.append("file", file);
+
         xhr.open("POST", "/api/admin/upload-file", true);
         xhr.setRequestHeader("x-filename", encodeURIComponent(file.name));
         xhr.setRequestHeader("x-prefix", prefix);
-        if (file.type) {
-          xhr.setRequestHeader("Content-Type", file.type);
-        }
 
         xhr.upload.onprogress = (event) => {
           if (event.lengthComputable) {
@@ -98,7 +97,7 @@ export function FileUpload({ name, label, prefix, accept, required, value = "", 
         };
 
         xhr.onerror = () => reject(new Error("Network connection error during upload."));
-        xhr.send(file);
+        xhr.send(formData);
       });
 
       setUploadedKey(keyResult);

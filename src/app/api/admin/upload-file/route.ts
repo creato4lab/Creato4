@@ -5,7 +5,7 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import fs from "fs";
 import path from "path";
 
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID ?? "";
 const R2_ACCESS_KEY = process.env.R2_ACCESS_KEY_ID ?? "";
