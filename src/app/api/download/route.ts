@@ -233,13 +233,23 @@ export async function GET(req: NextRequest) {
     console.error("[/api/download] Download audit log failed:", logErr);
   }
 
-  // 6. Return watermarked stream
-  const isZipHeader = ext === "zip" || ext === "rar" || fileType === "sourceCode";
+  // 6. Return watermarked stream with correct Content-Type & Content-Disposition
+  let contentType = "application/octet-stream";
+  if (fileType === "pcbFile" || fileType === "cadFile" || fileType === "sourceCode" || ext === "zip") {
+    contentType = "application/zip";
+    if (!cleanFilename.endsWith(".zip")) cleanFilename += ".zip";
+  } else if (fileType === "reportSubmission" || fileType === "pdfDoc" || fileType === "reportWatermarked") {
+    contentType = "application/pdf";
+    if (!cleanFilename.endsWith(".pdf")) cleanFilename += ".pdf";
+  } else if (fileType === "docx") {
+    contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    if (!cleanFilename.endsWith(".docx")) cleanFilename += ".docx";
+  }
+
   const responseHeaders = new Headers();
-  responseHeaders.set("Content-Type", isZipHeader ? "application/zip" : "application/octet-stream");
+  responseHeaders.set("Content-Type", contentType);
   responseHeaders.set("Content-Disposition", `attachment; filename="${cleanFilename}"`);
   responseHeaders.set("Content-Length", watermarkedBuffer.length.toString());
-  responseHeaders.set("X-Watermark-ID", downloadId);
 
   return new NextResponse(new Uint8Array(watermarkedBuffer), {
     status: 200,
