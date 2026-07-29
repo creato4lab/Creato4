@@ -16,7 +16,7 @@ import React, { useState, useTransition } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import {
   Key, Cpu, Download, Loader2, Zap, Trash2, ChevronDown, ChevronUp,
-  CheckCircle, Clock, Shield, UploadCloud,
+  CheckCircle, Clock, Shield, UploadCloud, Box, FileText, FileSpreadsheet, Sparkles
 } from "lucide-react";
 import { BoardConnector } from "@/components/BoardConnector";
 import { FirmwareFlasher } from "@/components/FirmwareFlasher";
@@ -67,7 +67,7 @@ const LICENSE_TYPE_LABELS: Record<string, string> = {
 };
 
 const LICENSE_TYPE_COLORS: Record<string, string> = {
-  STUDENT:           "bg-blue-100 text-blue-700",
+  STUDENT:           "bg-[#1A3C2F] text-white",
   COMMERCIAL:        "bg-purple-100 text-purple-700",
   ENTERPRISE:        "bg-amber-100 text-amber-700",
   SOURCE_CODE_ONLY:  "bg-teal-100 text-teal-700",
@@ -81,7 +81,7 @@ export function LicenseCard({ license }: Props) {
   const [showConnector, setShowConnector] = useState(false);
   const [showFlasher, setShowFlasher] = useState(false);
   const [activations, setActivations] = useState<Activation[]>(license.activations);
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadingType, setDownloadingType] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -102,31 +102,22 @@ export function LicenseCard({ license }: Props) {
     setRemovingId(null);
   };
 
-  const handleDownload = async () => {
-    setIsDownloading(true);
-    const result = await generateDownloadUrl(license.product.id, "sourceCode");
-    if (result.error) {
-      alert(result.error);
-    } else if (result.success && result.url) {
-      if ((result as any).isMock) {
-        alert((result as any).message + "\n\nURL: " + result.url);
-      } else {
-        const a = document.createElement("a");
-        a.href = result.url;
-        a.download = `${license.product.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.zip`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      }
-    }
-    setIsDownloading(false);
+  const triggerDownload = async (fileType: "pcbFile" | "cadFile" | "sourceCode" | "reportSubmission" | "docx") => {
+    setDownloadingType(fileType);
+    const a = document.createElement("a");
+    a.href = `/api/download?productId=${encodeURIComponent(license.product.id)}&fileType=${encodeURIComponent(fileType)}`;
+    a.download = `${license.product.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_${fileType}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => setDownloadingType(null), 1000);
   };
 
   return (
     <>
-      <div className="border border-[#E8E2D9] rounded-2xl bg-white overflow-hidden">
+      <div className="border border-[#E8E2D9] rounded-2xl bg-white overflow-hidden shadow-sm hover:shadow-md transition-all">
         {/* Card header */}
-        <div className="p-5 flex flex-col sm:flex-row gap-4 justify-between">
+        <div className="p-5 flex flex-col md:flex-row gap-4 justify-between">
           <div className="flex-1 min-w-0">
             <div className="flex items-center flex-wrap gap-2 mb-2">
               <span className={`text-[0.65rem] font-bold uppercase px-2.5 py-1 rounded-full ${LICENSE_TYPE_COLORS[license.type] ?? "bg-gray-100 text-gray-600"}`}>
@@ -136,42 +127,77 @@ export function LicenseCard({ license }: Props) {
                 Purchased {new Date(license.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
               </span>
             </div>
-            <h4 className="text-base font-bold text-[#1A3C2F] mb-2 leading-snug">{license.product.title}</h4>
+            <h4 className="text-base font-black text-[#1A3C2F] mb-1.5 leading-snug">{license.product.title}</h4>
             <div className="flex items-center gap-1.5 text-[0.65rem] text-[#5C6B60]">
-              <Key className="w-3 h-3" />
-              <span className="font-mono truncate max-w-[200px]">{license.licenseKey}</span>
+              <Key className="w-3 h-3 text-[#C4A35A]" />
+              <span className="font-mono truncate max-w-[240px]">{license.licenseKey}</span>
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex flex-col gap-2 shrink-0 justify-center min-w-[140px]">
-            {isFirmware ? (
+          {/* Quick Actions */}
+          <div className="flex items-center gap-2 shrink-0 self-start md:self-center">
+            {isFirmware && (
               <button
                 onClick={() => setShowFlasher(true)}
-                className="flex items-center justify-center gap-2 bg-[#1A3C2F] text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-[#C4A35A] hover:text-[#1A3C2F] transition-colors"
+                className="flex items-center gap-1.5 bg-[#1A3C2F] text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-[#C4A35A] hover:text-[#1A3C2F] transition-all cursor-pointer shadow-sm"
               >
-                <Zap className="w-3.5 h-3.5" />
+                <Zap className="w-3.5 h-3.5 text-amber-400" />
                 Flash Firmware
-              </button>
-            ) : (
-              <button
-                onClick={handleDownload}
-                disabled={isDownloading}
-                className={`flex items-center justify-center gap-2 bg-[#1A3C2F] text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-[#234B3C] transition-colors ${isDownloading ? "opacity-70 cursor-not-allowed" : ""}`}
-              >
-                {isDownloading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
-                {isDownloading ? "Preparing..." : "Download"}
               </button>
             )}
 
             {/* Device activations toggle */}
             <button
               onClick={() => setShowActivations(!showActivations)}
-              className="flex items-center justify-center gap-2 border border-[#E8E2D9] text-[#1A3C2F] px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#F5F0EA] transition-colors"
+              className="flex items-center gap-1.5 border border-[#E8E2D9] text-[#1A3C2F] px-3.5 py-2 rounded-xl text-xs font-bold hover:bg-[#F5F0EA] transition-all cursor-pointer"
             >
-              <Cpu className="w-3.5 h-3.5" />
+              <Cpu className="w-3.5 h-3.5 text-blue-600" />
               <span>{activeCount}/{license.maxActivations} Devices</span>
               {showActivations ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            </button>
+          </div>
+        </div>
+
+        {/* ── Separate Asset Download Buttons Bar ── */}
+        <div className="px-5 pb-5 pt-1 border-t border-[#F0EBE1] bg-[#FAF8F5]">
+          <p className="text-[0.65rem] font-bold text-[#1A3C2F]/50 uppercase tracking-widest mb-2.5">
+            Download Included Assets:
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <button
+              onClick={() => triggerDownload("pcbFile")}
+              disabled={!!downloadingType}
+              className="flex items-center justify-center gap-2 px-3.5 py-2.5 bg-white hover:bg-emerald-50 text-emerald-900 border border-emerald-300 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer hover:border-emerald-400"
+            >
+              {downloadingType === "pcbFile" ? <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600" /> : <Cpu className="w-3.5 h-3.5 text-emerald-600" />}
+              <span>Gerber ZIP</span>
+            </button>
+
+            <button
+              onClick={() => triggerDownload("cadFile")}
+              disabled={!!downloadingType}
+              className="flex items-center justify-center gap-2 px-3.5 py-2.5 bg-white hover:bg-amber-50 text-amber-900 border border-amber-300 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer hover:border-amber-400"
+            >
+              {downloadingType === "cadFile" ? <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-600" /> : <Box className="w-3.5 h-3.5 text-amber-600" />}
+              <span>PCB 3D ZIP</span>
+            </button>
+
+            <button
+              onClick={() => triggerDownload("sourceCode")}
+              disabled={!!downloadingType}
+              className="flex items-center justify-center gap-2 px-3.5 py-2.5 bg-white hover:bg-[#1A3C2F]/5 text-[#1A3C2F] border border-[#1A3C2F]/20 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer hover:border-[#1A3C2F]/40"
+            >
+              {downloadingType === "sourceCode" ? <Loader2 className="w-3.5 h-3.5 animate-spin text-[#1A3C2F]" /> : <Zap className="w-3.5 h-3.5 text-amber-500" />}
+              <span>Source Code</span>
+            </button>
+
+            <button
+              onClick={() => triggerDownload("reportSubmission")}
+              disabled={!!downloadingType}
+              className="flex items-center justify-center gap-2 px-3.5 py-2.5 bg-white hover:bg-blue-50 text-blue-900 border border-blue-300 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer hover:border-blue-400"
+            >
+              {downloadingType === "reportSubmission" ? <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600" /> : <FileText className="w-3.5 h-3.5 text-blue-600" />}
+              <span>Report PDF</span>
             </button>
           </div>
         </div>

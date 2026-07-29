@@ -186,40 +186,9 @@ export function DashboardClient({
           </div>
         </div>
 
-        {/* ── Dashboard Navigation Tabs ── */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar">
-          {navigationTabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as TabType)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
-                  isActive
-                    ? "bg-[#1A3C2F] text-white shadow-md"
-                    : "bg-white border border-[#1A3C2F]/10 text-[#1A3C2F]/70 hover:bg-[#1A3C2F]/5"
-                }`}
-              >
-                {tab.icon}
-                {tab.label}
-                {tab.count !== undefined && (
-                  <span
-                    className={`ml-1 px-2 py-0.5 rounded-full text-[0.6rem] font-mono ${
-                      isActive ? "bg-white/20 text-white" : "bg-[#1A3C2F]/8 text-[#1A3C2F]"
-                    }`}
-                  >
-                    {tab.count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* ── TAB CONTENTS ── */}
-
-        {/* 1. PURCHASED PRODUCTS TAB */}
-        {activeTab === "products" && (
+        {/* ── Dashboard Content ── */}
+        <div className="space-y-12">
+          {/* 1. PURCHASED PRODUCTS & INDIVIDUAL ASSET DOWNLOADS */}
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-black text-[#1A3C2F] uppercase tracking-wide flex items-center gap-2">
@@ -249,206 +218,7 @@ export function DashboardClient({
               </div>
             )}
           </div>
-        )}
-
-        {/* 2. DOWNLOADS TAB */}
-        {activeTab === "downloads" && (
-          <div className="space-y-6">
-            <h2 className="text-lg font-black text-[#1A3C2F] uppercase tracking-wide flex items-center gap-2">
-              <Download className="w-5 h-5 text-[#C4A35A]" /> Download Center
-            </h2>
-            <div className="bg-white rounded-3xl p-6 border border-[#1A3C2F]/10 space-y-4">
-              <p className="text-xs text-[#1A3C2F]/60">
-                Access all your source code ZIPs, KiCad PCB files, CAD 3D models, and PDF documentation manuals.
-              </p>
-
-              {licenses.length === 0 ? (
-                <p className="text-xs text-[#1A3C2F]/40 italic">No assets available for download.</p>
-              ) : (
-                <div className="space-y-4">
-                  {licenses.map((l) => (
-                    <div key={l.id} className="p-4 bg-[#FAF8F5] rounded-2xl border border-[#1A3C2F]/8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[0.6rem] font-bold bg-[#1A3C2F]/10 text-[#1A3C2F] px-2 py-0.5 rounded-full uppercase">
-                            {l.product.category}
-                          </span>
-                          <span className="text-xs text-[#1A3C2F]/50 font-mono">Key: {l.licenseKey}</span>
-                        </div>
-                        <h4 className="font-bold text-[#1A3C2F] text-sm">{l.product.title}</h4>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <Link
-                          href={`/shop/${l.product.slug}`}
-                          className="px-3 py-1.5 bg-[#1A3C2F] text-white text-xs font-bold rounded-lg hover:bg-[#C4A35A] hover:text-[#1A3C2F] transition-colors flex items-center gap-1"
-                        >
-                          View Files <ChevronRight className="w-3.5 h-3.5" />
-                        </Link>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* 3. FLASH FIRMWARE TAB */}
-        {activeTab === "firmware" && (
-          <div className="space-y-6">
-            <h2 className="text-lg font-black text-[#1A3C2F] uppercase tracking-wide flex items-center gap-2">
-              <Zap className="w-5 h-5 text-amber-500" /> WebSerial Firmware Flashing Station
-            </h2>
-            <div className="bg-white rounded-3xl p-6 border border-[#1A3C2F]/10 space-y-4">
-              <p className="text-xs text-[#1A3C2F]/60">
-                Connect your ESP32 or Arduino microcontrollers directly to your computer via USB to register hardware and flash verified firmware directly in Chrome or Edge.
-              </p>
-
-              <div className="space-y-4">
-                {licenses.map((l) => (
-                  <LicenseCard key={l.id} license={l} />
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 4. REPORTS TAB */}
-        {activeTab === "reports" && (
-          <div className="space-y-6">
-            <h2 className="text-lg font-black text-[#1A3C2F] uppercase tracking-wide flex items-center gap-2">
-              <FileText className="w-5 h-5 text-[#C4A35A]" /> Reports & Protection Center
-            </h2>
-            <div className="bg-white rounded-3xl p-6 border border-[#1A3C2F]/10 space-y-4">
-              <p className="text-xs text-[#1A3C2F]/60">
-                Download watermarked protection PDFs or generate a customized, watermark-free Professional PDF with your Author Name, Team Name, and College Title.
-              </p>
-              <div className="space-y-4">
-                {licenses.map((l) => (
-                  <LicenseCard key={l.id} license={l} />
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 5. LICENSE MANAGEMENT TAB */}
-        {activeTab === "licenses" && (
-          <div className="space-y-6">
-            <h2 className="text-lg font-black text-[#1A3C2F] uppercase tracking-wide flex items-center gap-2">
-              <Key className="w-5 h-5 text-[#C4A35A]" /> License Keys & Entitlements
-            </h2>
-            <div className="space-y-4">
-              {licenses.map((l) => (
-                <LicenseCard key={l.id} license={l} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* 6. DEVICE MANAGEMENT TAB */}
-        {activeTab === "devices" && (
-          <div className="space-y-6">
-            <h2 className="text-lg font-black text-[#1A3C2F] uppercase tracking-wide flex items-center gap-2">
-              <Cpu className="w-5 h-5 text-blue-500" /> Registered Hardware Devices ({allDevices.length})
-            </h2>
-
-            {allDevices.length === 0 ? (
-              <div className="bg-white rounded-3xl p-10 text-center border border-[#1A3C2F]/10">
-                <Cpu className="w-10 h-10 text-[#1A3C2F]/20 mx-auto mb-2" />
-                <p className="font-bold text-[#1A3C2F]">No Microcontroller Devices Activated Yet</p>
-                <p className="text-xs text-[#1A3C2F]/50 mt-1">
-                  Connect your ESP32 or Arduino board using the board connector in your purchased licenses list.
-                </p>
-              </div>
-            ) : (
-              <div className="grid sm:grid-cols-2 gap-4">
-                {allDevices.map((dev: any) => (
-                  <div key={dev.id} className="bg-white p-5 rounded-2xl border border-[#1A3C2F]/10 shadow-sm space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[0.65rem] font-bold uppercase bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full">
-                        {dev.boardType}
-                      </span>
-                      <span className="text-xs text-green-600 font-bold flex items-center gap-1">
-                        <CheckCircle className="w-3 h-3" /> Active
-                      </span>
-                    </div>
-                    <h4 className="font-bold text-[#1A3C2F] text-sm">{dev.nickname || dev.boardType}</h4>
-                    <p className="text-xs text-[#1A3C2F]/60">Product: {dev.productTitle}</p>
-                    <div className="pt-2 border-t border-[#1A3C2F]/8 flex items-center justify-between text-[0.65rem] text-[#1A3C2F]/50 font-mono">
-                      <span>Chip ID: {dev.chipId.slice(0, 16)}...</span>
-                      <span>Last seen: {new Date(dev.lastSeenAt).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* 7. SUPPORT TICKETS TAB */}
-        {activeTab === "tickets" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-black text-[#1A3C2F] uppercase tracking-wide flex items-center gap-2">
-                <MessageSquare className="w-5 h-5 text-[#C4A35A]" /> Support & Consultation Tickets ({tickets.length})
-              </h2>
-              <button
-                onClick={() => setShowNewTicketModal(true)}
-                className="px-4 py-2 bg-[#1A3C2F] text-white rounded-full text-xs font-bold hover:bg-[#C4A35A] hover:text-[#1A3C2F] transition-colors flex items-center gap-1.5"
-              >
-                <Plus className="w-3.5 h-3.5" /> Create Ticket
-              </button>
-            </div>
-
-            {tickets.length === 0 ? (
-              <div className="bg-white rounded-3xl p-10 text-center border border-[#1A3C2F]/10">
-                <MessageSquare className="w-10 h-10 text-[#1A3C2F]/20 mx-auto mb-2" />
-                <p className="font-bold text-[#1A3C2F]">No Support Tickets Created</p>
-                <p className="text-xs text-[#1A3C2F]/50 mt-1 mb-4">
-                  Need help with firmware setup or customization? Submit a ticket to our engineering team.
-                </p>
-                <button
-                  onClick={() => setShowNewTicketModal(true)}
-                  className="px-5 py-2.5 bg-[#1A3C2F] text-white rounded-full text-xs font-bold uppercase tracking-wider"
-                >
-                  Create Ticket
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {tickets.map((ticket) => (
-                  <div key={ticket.id} className="bg-white p-5 rounded-2xl border border-[#1A3C2F]/10 shadow-sm space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span
-                        className={`text-[0.6rem] font-bold uppercase px-2.5 py-0.5 rounded-full ${
-                          ticket.status === "RESOLVED"
-                            ? "bg-green-100 text-green-700"
-                            : ticket.status === "IN_PROGRESS"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-amber-100 text-amber-700"
-                        }`}
-                      >
-                        {ticket.status}
-                      </span>
-                      <span className="text-xs text-[#1A3C2F]/40 flex items-center gap-1">
-                        <Clock className="w-3 h-3" /> {new Date(ticket.createdAt).toLocaleDateString("en-IN")}
-                      </span>
-                    </div>
-
-                    <h4 className="font-bold text-[#1A3C2F] text-sm">{ticket.subject || "Support Request"}</h4>
-                    <p className="text-xs text-[#1A3C2F]/70 leading-relaxed bg-[#FAF8F5] p-3 rounded-xl">
-                      {ticket.message}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* 8. ORDER HISTORY & INVOICES TAB */}
-        {activeTab === "orders" && (
+          {/* 2. ORDER HISTORY & INVOICES */}
           <div className="space-y-6">
             <h2 className="text-lg font-black text-[#1A3C2F] uppercase tracking-wide flex items-center gap-2">
               <ShoppingBag className="w-5 h-5 text-[#C4A35A]" /> Order History & Invoices ({orders.length})
@@ -474,7 +244,7 @@ export function DashboardClient({
                         </span>
                         <button
                           onClick={() => setSelectedInvoiceOrder(order as any)}
-                          className="px-3 py-1.5 bg-[#1A3C2F]/8 text-[#1A3C2F] hover:bg-[#1A3C2F] hover:text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5"
+                          className="px-3.5 py-1.5 bg-[#1A3C2F]/8 text-[#1A3C2F] hover:bg-[#1A3C2F] hover:text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
                         >
                           <Printer className="w-3.5 h-3.5" /> Tax Invoice
                         </button>
@@ -494,43 +264,65 @@ export function DashboardClient({
               </div>
             )}
           </div>
-        )}
 
-        {/* 9. UPDATE HISTORY TAB */}
-        {activeTab === "updates" && (
+          {/* 3. SUPPORT & CONSULTATION TICKETS */}
           <div className="space-y-6">
-            <h2 className="text-lg font-black text-[#1A3C2F] uppercase tracking-wide flex items-center gap-2">
-              <History className="w-5 h-5 text-[#C4A35A]" /> Product Updates & Changelogs ({updateLogs.length})
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-black text-[#1A3C2F] uppercase tracking-wide flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-[#C4A35A]" /> Support & Consultation ({tickets.length})
+              </h2>
+              <button
+                onClick={() => setShowNewTicketModal(true)}
+                className="px-4 py-2 bg-[#1A3C2F] text-white rounded-full text-xs font-bold hover:bg-[#C4A35A] hover:text-[#1A3C2F] transition-colors flex items-center gap-1.5 cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" /> Create Ticket
+              </button>
+            </div>
 
-            {updateLogs.length === 0 ? (
+            {tickets.length === 0 ? (
               <div className="bg-white rounded-3xl p-10 text-center border border-[#1A3C2F]/10">
-                <History className="w-10 h-10 text-[#1A3C2F]/20 mx-auto mb-2" />
-                <p className="font-bold text-[#1A3C2F]">No Product Updates Logged</p>
+                <MessageSquare className="w-10 h-10 text-[#1A3C2F]/20 mx-auto mb-2" />
+                <p className="font-bold text-[#1A3C2F]">No Support Tickets Created</p>
+                <p className="text-xs text-[#1A3C2F]/50 mt-1 mb-4">
+                  Need help with firmware setup or customization? Submit a ticket to our engineering team.
+                </p>
+                <button
+                  onClick={() => setShowNewTicketModal(true)}
+                  className="px-5 py-2.5 bg-[#1A3C2F] text-white rounded-full text-xs font-bold uppercase tracking-wider cursor-pointer"
+                >
+                  Create Ticket
+                </button>
               </div>
             ) : (
-              <div className="space-y-3">
-                {updateLogs.map((log: any, idx: number) => (
-                  <div key={idx} className="bg-white p-5 rounded-2xl border border-[#1A3C2F]/10 shadow-sm space-y-2">
+              <div className="space-y-4">
+                {tickets.map((ticket) => (
+                  <div key={ticket.id} className="bg-white p-5 rounded-2xl border border-[#1A3C2F]/10 shadow-sm space-y-3">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-black font-mono bg-[#1A3C2F] text-[#C4A35A] px-2.5 py-0.5 rounded-full">
-                          {log.version}
-                        </span>
-                        <span className="font-bold text-xs text-[#1A3C2F]">{log.productTitle}</span>
-                      </div>
-                      <span className="text-[0.65rem] text-[#1A3C2F]/40">{log.date}</span>
+                      <span
+                        className={`text-[0.6rem] font-bold uppercase px-2.5 py-0.5 rounded-full ${
+                          ticket.status === "RESOLVED"
+                            ? "bg-green-100 text-green-700"
+                            : ticket.status === "IN_PROGRESS"
+                            ? "bg-blue-100 text-blue-700"
+                            : "bg-amber-100 text-amber-700"
+                        }`}
+                      >
+                        {ticket.status}
+                      </span>
+                      <span className="text-xs text-[#1A3C2F]/40 flex items-center gap-1">
+                        <Clock className="w-3 h-3" /> {new Date(ticket.createdAt).toLocaleDateString("en-IN")}
+                      </span>
                     </div>
+
                     <p className="text-xs text-[#1A3C2F]/70 leading-relaxed bg-[#FAF8F5] p-3 rounded-xl">
-                      {log.notes}
+                      {ticket.message}
                     </p>
                   </div>
                 ))}
               </div>
             )}
           </div>
-        )}
-
+        </div>
       </div>
 
       {/* Tax Invoice Modal */}
