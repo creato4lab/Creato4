@@ -616,12 +616,27 @@ export function InteractiveHardwareStudio({
             <motion.div key={activeMode} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="absolute inset-0">
               <ViewerErrorBoundary>
                 {activeMode === "gerber" && (hasGerber
-                  ? <GerberViewer fileUrl={getImageUrl(gerberPath!)} boardTitle={`${title} PCB`} pcbImage={pcbImage} />
+                  ? <GerberViewer fileUrl={getImageUrl(gerberPath!)} boardTitle={`${title} PCB`} pcbImage={pcbImage} defaultViewMode="both" />
                   : <EmptyState mode="gerber" />
                 )}
-                {activeMode === "pcb3d" && (hasCad
-                  ? <CadViewer fileUrl={getImageUrl(cadPath!)} cadTitle={`${title} 3D PCB`} />
-                  : <EmptyState mode="pcb3d" />
+                {activeMode === "pcb3d" && (
+                  hasCad ? (
+                    <CadViewer
+                      fileUrl={getImageUrl(cadPath!)}
+                      cadTitle={`${title} 3D PCB`}
+                      gerberFallbackUrl={hasGerber ? getImageUrl(gerberPath!) : undefined}
+                      pcbImage={pcbImage}
+                    />
+                  ) : hasGerber ? (
+                    <GerberViewer
+                      fileUrl={getImageUrl(gerberPath!)}
+                      boardTitle={`${title} 3D PCB`}
+                      pcbImage={pcbImage}
+                      defaultViewMode="3d"
+                    />
+                  ) : (
+                    <EmptyState mode="pcb3d" />
+                  )
                 )}
                 {activeMode === "assembly" && (
                   <AssemblyViewerPanel zipPath={assemblyZipPath} title={title} />

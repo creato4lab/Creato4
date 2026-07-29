@@ -12,11 +12,15 @@ import {
 import * as THREE from "three";
 import { motion, AnimatePresence } from "motion/react";
 
+import { GerberViewer } from "@/components/admin/GerberViewer";
+
 interface CadViewerProps {
   file?: File | null;
   fileUrl?: string | null;
   cadTitle?: string;
   autoEmbed?: boolean;
+  gerberFallbackUrl?: string | null;
+  pcbImage?: string | null;
 }
 
 // Supported formats that can actually be rendered
@@ -78,7 +82,7 @@ function CadMesh({ geometry }: { geometry: THREE.BufferGeometry }) {
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-export function CadViewer({ file, fileUrl, cadTitle, autoEmbed = true }: CadViewerProps) {
+export function CadViewer({ file, fileUrl, cadTitle, autoEmbed = true, gerberFallbackUrl, pcbImage }: CadViewerProps) {
   const [geometry,    setGeometry]    = useState<THREE.BufferGeometry | null>(null);
   const [status,      setStatus]      = useState<LoadStatus>("idle");
   const [error,       setError]       = useState("");
@@ -160,6 +164,11 @@ export function CadViewer({ file, fileUrl, cadTitle, autoEmbed = true }: CadView
             innerFormat = ext;
             stlBuffer   = null; // explicitly not renderable
           } else {
+            // No 3D model inside ZIP — fallback to Gerber rendering if fallback is present
+            if (gerberFallbackUrl || fileUrl) {
+              setStatus("unsupported");
+              return;
+            }
             setError("No recognisable 3D model file (.stl, .step, .stp) found inside the ZIP.");
             setStatus("error");
             return;
@@ -172,6 +181,10 @@ export function CadViewer({ file, fileUrl, cadTitle, autoEmbed = true }: CadView
           displayName = activeFile.name;
 
         } else {
+          if (gerberFallbackUrl || fileUrl) {
+            setStatus("unsupported");
+            return;
+          }
           setError(`Unsupported format. Accepted: .stl, .step, .stp, .zip`);
           setStatus("error");
           return;
@@ -243,15 +256,19 @@ export function CadViewer({ file, fileUrl, cadTitle, autoEmbed = true }: CadView
 
       } catch (err: any) {
         console.error("CadViewer error:", err);
+        if (gerberFallbackUrl || fileUrl) {
+          setStatus("unsupported");
+          return;
+        }
         setError(err.message ?? "Failed to process the CAD file.");
         setStatus("error");
       }
     };
 
     process();
-  }, [file, fileUrl]);
+  }, [file, fileUrl, gerberFallbackUrl]);
 
-  if (!file && !fileUrl) return null;
+  if (!file && !fileUrl && !gerberFallbackUrl) return null;
 
   const isRenderable = status === "ready" && geometry;
 
@@ -266,7 +283,13 @@ export function CadViewer({ file, fileUrl, cadTitle, autoEmbed = true }: CadView
       );
     }
 
-    if (status === "error" || error) {
+    if (status === "error" || status === "unsupported" || !isRenderable) {
+      const fallbackUrl = gerberFallbackUrl || fileUrl;
+      if (fallbackUrl) {
+        return (
+          <GerberViewer fileUrl={fallbackUrl} boardTitle={cadTitle ?? "3D PCB"} pcbImage={pcbImage} />
+        );
+      }
       return (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0A1A12] text-white/60 p-8 text-center">
           <AlertTriangle className="w-8 h-8 text-amber-400" />

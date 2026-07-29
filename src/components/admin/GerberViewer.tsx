@@ -11,6 +11,7 @@ interface GerberViewerProps {
   fileUrl?: string | null;
   boardTitle?: string;
   pcbImage?: string | null;
+  defaultViewMode?: "both" | "top" | "bottom" | "3d";
 }
 
 interface GerberLayer {
@@ -21,6 +22,7 @@ interface GerberLayer {
 
 interface DrillHole { x: number; y: number; diameter: number }
 
+// ── Enhanced RS-274X Gerber Parser ──────────────────────────────────────────
 // ── Enhanced RS-274X Gerber Parser ──────────────────────────────────────────
 function parseGerberContent(content: string): { traces: GerberTrace[]; pads: GerberPad[] } {
   const traces: GerberTrace[] = [];
@@ -46,13 +48,14 @@ function parseGerberContent(content: string): { traces: GerberTrace[]; pads: Ger
     const shapeRaw = addM[2] as "C" | "R" | "O" | "P";
     const shape = ["C", "R", "O", "P"].includes(shapeRaw) ? shapeRaw : "C";
     const params = addM[3].split("X").map(Number).filter(isFinite);
-    const w = (params[0] ?? 0.2) * unitScale;
-    const h = (params[1] ?? params[0] ?? 0.2) * unitScale;
+    const w = (params[0] ?? 0.8) * unitScale;
+    const h = (params[1] ?? params[0] ?? 0.8) * unitScale;
     apertures.set(code, { shape, w, h });
   }
 
-  const cmdRe = /^(?:G0*[123]\*?)?(?:X(-?\d+))?(?:Y(-?\d+))?(?:I-?\d+)?(?:J-?\d+)?D(0[123])\*$/;
-  const selRe = /^D(\d{2,})\*$/;
+  // Command regex supporting D01/D1, D02/D2, D03/D3
+  const cmdRe = /(?:G0*[123]\*?)?(?:X(-?\d+))?(?:Y(-?\d+))?(?:I-?\d+)?(?:J-?\d+)?D(0?[123])\*/;
+  const selRe = /(?:G54)?D(\d{2,})\*/;
 
   let curX = 0, curY = 0;
   let curApt = "";
@@ -64,7 +67,6 @@ function parseGerberContent(content: string): { traces: GerberTrace[]; pads: Ger
     const selM = line.match(selRe);
     if (selM && parseInt(selM[1], 10) >= 10) {
       curApt = selM[1];
-      continue;
     }
 
     const cmdM = line.match(cmdRe);
@@ -74,15 +76,15 @@ function parseGerberContent(content: string): { traces: GerberTrace[]; pads: Ger
     const newY = cmdM[2] !== undefined ? coord(cmdM[2]) : curY;
     const dCode = cmdM[3];
 
-    if (dCode === "01") {
+    if (dCode === "01" || dCode === "1") {
       const apt = apertures.get(curApt);
-      const w = apt ? apt.w : 0.15;
+      const w = apt ? apt.w : 0.2;
       traces.push({ x1: curX, y1: curY, x2: newX, y2: newY, width: w });
       curX = newX; curY = newY;
-    } else if (dCode === "02") {
+    } else if (dCode === "02" || dCode === "2") {
       curX = newX; curY = newY;
-    } else if (dCode === "03") {
-      const apt = apertures.get(curApt) ?? { shape: "C", w: 0.5, h: 0.5 };
+    } else if (dCode === "03" || dCode === "3") {
+      const apt = apertures.get(curApt) ?? { shape: "C", w: 0.8, h: 0.8 };
       pads.push({ x: newX, y: newY, shape: apt.shape, w: apt.w, h: apt.h });
       curX = newX; curY = newY;
     }
@@ -91,13 +93,13 @@ function parseGerberContent(content: string): { traces: GerberTrace[]; pads: Ger
   return { traces, pads };
 }
 
-// ── Excellon Drill File Parser ──────────────────────────────────────────────
+// ── Excellon Drill File Parser with Robust Scale Auto-Alignment ────────────
 function parseExcellonDrill(content: string): DrillHole[] {
   const holes: DrillHole[] = [];
   const tools  = new Map<string, number>();
   let curTool  = "";
 
-  const isMetric = /METRIC|,LZ|,TZ/i.test(content);
+  const isMetric  = /METRIC|MM/i.test(content);
   const unitScale = isMetric ? 1.0 : 25.4;
   const divisor   = isMetric ? 1_000 : 10_000;
 
@@ -105,24 +107,29 @@ function parseExcellonDrill(content: string): DrillHole[] {
     const line = rawLine.trim();
     if (!line || line.startsWith(";") || line === "M48" || line === "M30" || line === "%") continue;
 
-    const toolDef = line.match(/^T(\d+)C([\d.]+)/);
+    const toolDef = line.match(/T(\d+)\s*C([\d.]+)/i);
     if (toolDef) {
-      tools.set(toolDef[1], parseFloat(toolDef[2]) * unitScale);
+      const dia = parseFloat(toolDef[2]) * unitScale;
+      tools.set(parseInt(toolDef[1], 10).toString(), dia);
+      tools.set(toolDef[1], dia);
       continue;
     }
 
-    const toolSel = line.match(/^T(\d+)$/);
-    if (toolSel) { curTool = toolSel[1]; continue; }
+    const toolSel = line.match(/^T(\d+)/i);
+    if (toolSel && !line.includes("X") && !line.includes("Y")) {
+      curTool = parseInt(toolSel[1], 10).toString();
+      continue;
+    }
 
-    const holeM = line.match(/^X(-?[\d.]+)Y(-?[\d.]+)/);
+    const holeM = line.match(/X(-?[\d.]+)\s*Y(-?[\d.]+)/i);
     if (holeM) {
       let x: number, y: number;
       if (holeM[1].includes(".") || holeM[2].includes(".")) {
         x = parseFloat(holeM[1]) * unitScale;
         y = parseFloat(holeM[2]) * unitScale;
       } else {
-        x = parseInt(holeM[1], 10) / divisor * unitScale;
-        y = parseInt(holeM[2], 10) / divisor * unitScale;
+        x = (parseInt(holeM[1], 10) / divisor) * unitScale;
+        y = (parseInt(holeM[2], 10) / divisor) * unitScale;
       }
       holes.push({ x, y, diameter: tools.get(curTool) ?? 0.8 });
     }
@@ -147,7 +154,7 @@ function detectLayerType(lowerName: string): string {
 // ─────────────────────────────────────────────────────────────────────────────
 // GerberViewer Component
 // ─────────────────────────────────────────────────────────────────────────────
-export function GerberViewer({ file, fileUrl, boardTitle = "Uploaded Gerber PCB", pcbImage }: GerberViewerProps) {
+export function GerberViewer({ file, fileUrl, boardTitle = "Uploaded Gerber PCB", pcbImage, defaultViewMode }: GerberViewerProps) {
   const [layers, setLayers] = useState<GerberLayer[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -287,28 +294,62 @@ export function GerberViewer({ file, fileUrl, boardTitle = "Uploaded Gerber PCB"
         const botSilkParsed = botSilkContent ? parseGerberContent(botSilkContent) : { traces: [], pads: [] };
         const drillHoles = drillContent ? parseExcellonDrill(drillContent) : [];
 
-        // Collect all coordinates to compute board bounds
-        const allX: number[] = [];
-        const allY: number[] = [];
-        const addPt = (x: number, y: number) => { allX.push(x); allY.push(y); };
-
-        outlineParsed.traces.forEach(s => { addPt(s.x1, s.y1); addPt(s.x2, s.y2); });
-        topCopperParsed.traces.forEach(s => { addPt(s.x1, s.y1); addPt(s.x2, s.y2); });
-        topCopperParsed.pads.forEach(p => addPt(p.x, p.y));
-        topSilkParsed.traces.forEach(s => { addPt(s.x1, s.y1); addPt(s.x2, s.y2); });
-        drillHoles.forEach(h => addPt(h.x, h.y));
-
+        // Collect coordinates for board bounds calculation
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
         let outlineTraces = outlineParsed.traces;
 
-        if (allX.length > 0) {
-          const minX = allX.reduce((a, b) => Math.min(a, b), Infinity);
-          const maxX = allX.reduce((a, b) => Math.max(a, b), -Infinity);
-          const minY = allY.reduce((a, b) => Math.min(a, b), Infinity);
-          const maxY = allY.reduce((a, b) => Math.max(a, b), -Infinity);
+        if (outlineTraces.length > 0) {
+          // Compute bounds strictly from Board Outline / Edge Cuts layer
+          outlineTraces.forEach(s => {
+            minX = Math.min(minX, s.x1, s.x2);
+            maxX = Math.max(maxX, s.x1, s.x2);
+            minY = Math.min(minY, s.y1, s.y2);
+            maxY = Math.max(maxY, s.y1, s.y2);
+          });
+        } else {
+          // Fallback to top copper, silk, and drill points
+          const allPts: Array<{ x: number; y: number }> = [];
+          topCopperParsed.traces.forEach(s => { allPts.push({ x: s.x1, y: s.y1 }, { x: s.x2, y: s.y2 }); });
+          topCopperParsed.pads.forEach(p => allPts.push({ x: p.x, y: p.y }));
+          topSilkParsed.traces.forEach(s => { allPts.push({ x: s.x1, y: s.y1 }, { x: s.x2, y: s.y2 }); });
+
+          if (allPts.length > 0) {
+            allPts.forEach(p => {
+              minX = Math.min(minX, p.x);
+              maxX = Math.max(maxX, p.x);
+              minY = Math.min(minY, p.y);
+              maxY = Math.max(maxY, p.y);
+            });
+          }
+        }
+
+        if (isFinite(minX) && isFinite(maxX) && isFinite(minY) && isFinite(maxY)) {
           const width = Math.max(0.1, maxX - minX);
           const height = Math.max(0.1, maxY - minY);
 
-          // Synthesize outline if missing in edge cuts layer
+          // Auto-align drill holes to board bounds if scale/divisor differed in drill file
+          let finalDrills = drillHoles;
+          if (drillHoles.length > 0 && (topCopperParsed.pads.length > 0 || topCopperParsed.traces.length > 0)) {
+            const dMinX = drillHoles.reduce((a, b) => Math.min(a, b.x), Infinity);
+            const dMaxX = drillHoles.reduce((a, b) => Math.max(a, b.x), -Infinity);
+            const dMinY = drillHoles.reduce((a, b) => Math.min(a, b.y), Infinity);
+            const dMaxY = drillHoles.reduce((a, b) => Math.max(a, b.y), -Infinity);
+            const dW = Math.max(0.01, dMaxX - dMinX);
+            const dH = Math.max(0.01, dMaxY - dMinY);
+
+            // If drill bounds are outside copper bounds, align them to copper layer space
+            if (Math.abs(dMinX - minX) > width * 0.2 || Math.abs(dW - width) > width * 0.2) {
+              const scaleX = width / dW;
+              const scaleY = height / dH;
+              finalDrills = drillHoles.map(h => ({
+                x: minX + (h.x - dMinX) * scaleX,
+                y: minY + (h.y - dMinY) * scaleY,
+                diameter: h.diameter,
+              }));
+            }
+          }
+
+          // Synthesize outline if missing
           if (outlineTraces.length === 0) {
             outlineTraces = [
               { x1: minX, y1: minY, x2: maxX, y2: minY, width: 0.2 },
@@ -329,7 +370,7 @@ export function GerberViewer({ file, fileUrl, boardTitle = "Uploaded Gerber PCB"
             bottomPads: botCopperParsed.pads.slice(0, 1000),
             topSilkscreen: topSilkParsed.traces.slice(0, 5000),
             bottomSilkscreen: botSilkParsed.traces.slice(0, 3000),
-            drillHoles: drillHoles.slice(0, 800),
+            drillHoles: finalDrills.slice(0, 800),
             boardBounds: { minX, maxX, minY, maxY, width, height },
             parsedLayerNames,
             hasRealData: true,
@@ -352,7 +393,7 @@ export function GerberViewer({ file, fileUrl, boardTitle = "Uploaded Gerber PCB"
       {loading && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0A1A12]/90 backdrop-blur-sm z-30">
           <Loader2 className="w-10 h-10 animate-spin text-[#C4A35A] mb-3" />
-          <p className="text-sm font-bold text-white/90">Parsing Gerber Stackup (PCBWay Style)...</p>
+          <p className="text-sm font-bold text-white/90">Parsing Gerber Stackup (JLCPCB Style)...</p>
           <p className="text-xs text-[#C4A35A] mt-1 font-mono">Extracting Top/Bottom Copper, Silkscreen Labels & Drill Files</p>
         </div>
       )}
@@ -373,6 +414,7 @@ export function GerberViewer({ file, fileUrl, boardTitle = "Uploaded Gerber PCB"
           pcbImage={pcbImage}
           gerberData={gerberData}
           layers={layers}
+          defaultViewMode={defaultViewMode}
         />
       </div>
     </div>
